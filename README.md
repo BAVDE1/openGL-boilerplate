@@ -1,1 +1,0 @@
-# java-lwjgl-boilerplate
