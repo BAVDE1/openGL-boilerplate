@@ -17,6 +17,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Main {
     private long window;  // handle
     boolean vSync = false;
+    int fps = 0;
 
     public void run() {
         System.out.println("HARHARHAR");
@@ -40,11 +41,9 @@ public class Main {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_POSITION_X, 500);
-        glfwWindowHint(GLFW_POSITION_Y, 500);
 
         // Create the window
-        window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(300, 300, "ARGG IT HURTS", NULL, NULL);
         if (window == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
         // events
@@ -58,26 +57,25 @@ public class Main {
         });
 
         // Get the thread stack and push a new frame
-//        try (MemoryStack stack = stackPush()) {
-//            IntBuffer pWidth = stack.mallocInt(1);
-//            IntBuffer pHeight = stack.mallocInt(1);
-//
-//            glfwGetWindowSize(window, pWidth, pHeight);
-//            GLFWVidMode screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
-//            assert screen != null;
-//
-//            System.out.println(GLFW_PLATFORM_WAYLAND == glfwGetPlatform());
-//
-////            glfwSetWindowPos(
-////                    window,
-////                    (screen.width() - pWidth.get(0)) / 2,
-////                    (screen.height() - pHeight.get(0)) / 2
-////            );
-//        }
+        if (glfwGetPlatform() != GLFW_PLATFORM_WAYLAND) {  // cause wayland is stupid
+            try (MemoryStack stack = stackPush()) {
+                IntBuffer winWidth = stack.mallocInt(1);
+                IntBuffer winHeight = stack.mallocInt(1);
+
+                glfwGetWindowSize(window, winWidth, winHeight);
+                GLFWVidMode screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
+                assert screen != null;
+
+                glfwSetWindowPos(
+                        window,
+                        (screen.width() - winWidth.get(0)) / 2,
+                        (screen.height() - winHeight.get(0)) / 2
+                );
+            }
+        }
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(vSync ? 1 : 0);
-
         glfwShowWindow(window);
     }
 
@@ -88,21 +86,21 @@ public class Main {
         glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 
         long lastTime = System.nanoTime();
-        int fCounter = 0;
-        float frameTime = 0;
+        int frameCounter = 0;
+        float accumulated = 0;
 
         // rendering loop
         while (!glfwWindowShouldClose(window)) {
-            if (frameTime >= 0.5f) {
-                System.out.println(fCounter * 2);
-                fCounter = 0;
-                frameTime = 0f;
+            if (accumulated >= 0.5f) {
+                fps = frameCounter * 2;
+                frameCounter = 0;
+                accumulated = 0f;
             }
-            long thisTime = System.nanoTime();
-            float dt = (thisTime - lastTime) * 1E-9f;
-            lastTime = thisTime;
-            fCounter++;
-            frameTime += dt;
+            long t = System.nanoTime();
+            float dt = (t - lastTime) * 1E-9f;
+            lastTime = t;
+            frameCounter++;
+            accumulated += dt;
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
             glfwSwapBuffers(window); // swap the color buffers
