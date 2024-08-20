@@ -40,6 +40,8 @@ public class Main {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_POSITION_X, 500);
+        glfwWindowHint(GLFW_POSITION_Y, 500);
 
         // Create the window
         window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
@@ -51,21 +53,27 @@ public class Main {
                 glfwSetWindowShouldClose(window, true);
         });
 
+        glfwSetWindowPosCallback(window, (window, xpos, ypos) -> {
+            System.out.println(xpos + ", " + ypos);
+        });
+
         // Get the thread stack and push a new frame
-        try (MemoryStack stack = stackPush()) {
-            IntBuffer pWidth = stack.mallocInt(1);
-            IntBuffer pHeight = stack.mallocInt(1);
-
-            glfwGetWindowSize(window, pWidth, pHeight);
-            GLFWVidMode screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            assert screen != null;
-
-            glfwSetWindowPos(
-                    window,
-                    (screen.width() - pWidth.get(0)) / 2,
-                    (screen.height() - pHeight.get(0)) / 2
-            );
-        }
+//        try (MemoryStack stack = stackPush()) {
+//            IntBuffer pWidth = stack.mallocInt(1);
+//            IntBuffer pHeight = stack.mallocInt(1);
+//
+//            glfwGetWindowSize(window, pWidth, pHeight);
+//            GLFWVidMode screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
+//            assert screen != null;
+//
+//            System.out.println(GLFW_PLATFORM_WAYLAND == glfwGetPlatform());
+//
+////            glfwSetWindowPos(
+////                    window,
+////                    (screen.width() - pWidth.get(0)) / 2,
+////                    (screen.height() - pHeight.get(0)) / 2
+////            );
+//        }
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(vSync ? 1 : 0);
@@ -77,7 +85,7 @@ public class Main {
         // critical for LWJGL's interoperation with GLFW's OpenGL context
         GL.createCapabilities();
 
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 
         long lastTime = System.nanoTime();
         int fCounter = 0;
