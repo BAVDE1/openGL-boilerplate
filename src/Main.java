@@ -16,7 +16,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main {
     private long window;  // handle
-    boolean vSync = false;
+    boolean vSync = true;
     int fps = 0;
 
     public void run() {
@@ -108,10 +108,11 @@ public class Main {
 
             // render here
             glBegin(GL_TRIANGLES);  // https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glBegin.xml
-            glColor3f(1, 1, 1);
+            double s = Math.sin(System.currentTimeMillis() * .001);
+            glColor3f(1, s > 0 ? 1 : .5f, 1);
             glVertex2f(0, 0);
-            glVertex2f(-.5f, -.5f);
-            glVertex2f(.5f, -.5f);
+            glVertex2d(s * -.5, -.5);
+            glVertex2d(s * .5, -.5);
             glEnd();
 
             glfwSwapBuffers(window); // swap the color buffers
