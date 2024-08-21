@@ -82,8 +82,10 @@ public class Main {
     private void loop() {
         // critical for LWJGL's interoperation with GLFW's OpenGL context
         GL.createCapabilities();
+        glClearColor(.0f, .0f, .0f, .0f);
 
-        glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
+        // for 2d like effect
+        glOrtho(0, 300, 300, 0, 1, 1);
 
         long lastTime = System.nanoTime();
         int frameCounter = 0;
@@ -103,8 +105,16 @@ public class Main {
             accumulated += dt;
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-            glfwSwapBuffers(window); // swap the color buffers
 
+            // render here
+            glBegin(GL_TRIANGLES);  // https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glBegin.xml
+            glColor3f(1, 1, 1);
+            glVertex2f(0, 0);
+            glVertex2f(-.5f, -.5f);
+            glVertex2f(.5f, -.5f);
+            glEnd();
+
+            glfwSwapBuffers(window); // swap the color buffers
             glfwPollEvents();
         }
     }

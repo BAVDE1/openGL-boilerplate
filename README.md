@@ -2,7 +2,9 @@
 
 ### lwjgl: https://www.lwjgl.org/
 
-window stuff: https://www.glfw.org/docs/latest/window_guide.html
+glfw window: https://www.glfw.org/docs/latest/window_guide.html
+
+openGL docs: https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/
 
 ---
 
