@@ -85,6 +85,7 @@ public class Main {
         glClearColor(.0f, .0f, .0f, .0f);
 
         // SHADER EXAMPLE
+        // https://docs.gl/gl4/glAttachShader
 //        int program = GL45.glCreateProgram();
 //        int shader = GL45.glCreateShader(GL45.GL_FRAGMENT_SHADER);
 //        GL45.glShaderSource(shader, chararray);  // load source code of shader as char array
