@@ -20,7 +20,7 @@ public class Main {
     int fps = 0;
 
     public void run() {
-        System.out.println("HARHARHAR");
+        System.out.printf("Running '%s'",  glfwGetVersionString());
 
         init();
         loop();
@@ -43,7 +43,7 @@ public class Main {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         // Create the window
-        window = glfwCreateWindow(300, 300, "ARGG IT HURTS", NULL, NULL);
+        window = glfwCreateWindow(400, 400, "ARGG IT HURTS", NULL, NULL);
         if (window == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
         // events
@@ -53,7 +53,7 @@ public class Main {
         });
 
         glfwSetWindowPosCallback(window, (window, xpos, ypos) -> {
-            System.out.println(xpos + ", " + ypos);
+            System.out.printf("%s, %s", xpos, ypos);
         });
 
         // Get the thread stack and push a new frame
@@ -84,6 +84,24 @@ public class Main {
         GL.createCapabilities();
         glClearColor(.0f, .0f, .0f, .0f);
 
+        // SHADER EXAMPLE
+//        int program = GL45.glCreateProgram();
+//        int shader = GL45.glCreateShader(GL45.GL_FRAGMENT_SHADER);
+//        GL45.glShaderSource(shader, chararray);  // load source code of shader as char array
+//        GL45.glCompileShader(shader);
+//        int[] shaderCompiled = new int[1];
+//        GL45.glGetShaderiv(shader, GL45.GL_COMPILE_STATUS, shaderCompiled);
+//        if (shaderCompiled[0] != GL_TRUE) {
+//            String errorMsg = GL45.glGetShaderInfoLog(shader, 1024);
+//        }
+//        GL45.glAttachShader(program, shader);
+//        GL45.glLinkProgram(program);
+//        int[] programLinked = new int[1];
+//        GL45.glGetProgramiv(program, GL45.GL_LINK_STATUS, programLinked);
+//        if (programLinked[0] != GL_TRUE) {
+//            String errorMsg = GL45.glGetProgramInfoLog(shader, 1024);
+//        }
+
         // for 2d like effect
         glOrtho(0, 300, 300, 0, 1, 1);
 
@@ -107,12 +125,17 @@ public class Main {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
             // render here
-            glBegin(GL_TRIANGLES);  // https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glBegin.xml
-            double s = Math.sin(System.currentTimeMillis() * .001);
-            glColor3f(1, s > 0 ? 1 : .5f, 1);
-            glVertex2f(0, 0);
-            glVertex2d(s * -.5, -.5);
-            glVertex2d(s * .5, -.5);
+            // switch to this https://docs.gl/gl2/glDrawArrays
+            glBegin(GL_TRIANGLE_STRIP);  // https://docs.gl/gl2/glBegin
+                glColor3f(1, 1, 0);
+                glVertex2d(.2, .7);
+                glVertex2d(-.5, 0);
+                glVertex2d(.5, 0);
+
+                glColor3f(1, 0, 1);
+                glVertex2d(-.5, -.2);
+                glVertex2d(0, -.4);
+                glVertex2d(-.8, -.3);
             glEnd();
 
             glfwSwapBuffers(window); // swap the color buffers

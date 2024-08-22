@@ -4,7 +4,7 @@
 
 glfw window: https://www.glfw.org/docs/latest/window_guide.html
 
-openGL docs: https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/
+openGL docs: https://docs.gl/gl2/glBegin
 
 ---
 
