@@ -11,7 +11,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
     public Window window;  // handle
-    public boolean optimiseTimeStepper = false;  // don't use with over 200 fps
+    public boolean optimiseTimeStepper = true;
     boolean vSync = false;  // probably keep off for now
 
     public double timeStarted = 0;
@@ -52,6 +52,7 @@ public class Game {
     }
 
     public void bindEvents() {
+        // key inputs
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true);
@@ -63,9 +64,8 @@ public class Game {
             }
         });
 
-        glfwSetWindowPosCallback(window.handle, (window, xpos, ypos) -> {
-            System.out.printf("%s, %s%n", xpos, ypos);
-        });
+        // window pos change
+        glfwSetWindowPosCallback(window.handle, (window, xpos, ypos) -> System.out.printf("%s, %s%n", xpos, ypos));
     }
 
     public void updateFps() {
@@ -73,8 +73,8 @@ public class Game {
         int newSeconds = (int) Math.floor(MathUtils.millisToSecond(System.currentTimeMillis()) - MathUtils.millisToSecond(timeStarted));
         if (newSeconds != secondsElapsed) {
             fps = frameCounter;
+            frameCounter = 0;
             secondsElapsed = newSeconds;
-            frameCounter = 0;  // so frame counter doesn't pass max int value
         }
     }
 
