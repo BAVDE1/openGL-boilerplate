@@ -20,9 +20,8 @@ public class Game {
     int fps = 0;
 
     public void start() {
-        Thread timeStepper = Main.newTimeStepper(Constants.DT, this);
         timeStarted = System.currentTimeMillis();
-        timeStepper.start();
+        Main.startTimeStepper(Constants.DT, this);
     }
 
     public void createCapabilitiesAndOpen() {
@@ -75,6 +74,7 @@ public class Game {
             fps = frameCounter;
             frameCounter = 0;
             secondsElapsed = newSeconds;
+            System.out.println(fps);
         }
     }
 
