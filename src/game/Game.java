@@ -74,6 +74,7 @@ public class Game {
 
     /** Must be called after window is visible */
     public void setupShaders() {
+        // https://learnopengl.com/Getting-started/Shaders
         program = GL45.glCreateProgram();
         File shaderFolder = new File(Constants.SHADERS_FOLDER);
         ShaderHelper.searchDirectory(shaderFolder, program);
