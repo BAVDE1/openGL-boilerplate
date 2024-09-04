@@ -96,7 +96,7 @@ public class Game {
         // render here
         // switch to this https://docs.gl/gl2/glDrawArrays
         glBegin(GL_TRIANGLE_STRIP);  // https://docs.gl/gl2/glBegin
-            glColor3f(1, 1, 0);
+            glColor3f(1, 1, 1);
             glVertex2d(0, 0);
             glVertex2d(Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
             glVertex2d(0, Constants.SCREEN_SIZE.height * .5);

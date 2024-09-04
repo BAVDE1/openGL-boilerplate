@@ -22,7 +22,10 @@ public class ShaderHelper {
         }
     }
 
-    /** adds new GL shader from given file (if applicable) */
+    /**
+     * adds new GL shader from given file (if applicable)
+     * <a href="https://docs.gl/gl2/glAttachShader">Shader setup example</a>
+     */
     public static void applyShader(File file, int program) {
         int shaderType = getShaderType(file);
         if (shaderType < 0) return;  // not a shader file
@@ -49,7 +52,7 @@ public class ShaderHelper {
         int[] shaderCompiled = new int[1];  // only needs size of 1
         GL45.glGetShaderiv(shader, GL45.GL_COMPILE_STATUS, shaderCompiled);
         if (shaderCompiled[0] != GL_TRUE) {
-            System.out.printf("Shader Compile Error: %s%n", GL45.glGetShaderInfoLog(shader, 1024));
+            System.out.printf("Shader Compile Error (%s): %s%n", file, GL45.glGetShaderInfoLog(shader, 1024));
             return;
         }
 
@@ -60,12 +63,13 @@ public class ShaderHelper {
         int[] programLinked = new int[1];
         GL45.glGetProgramiv(program, GL45.GL_LINK_STATUS, programLinked);
         if (programLinked[0] != GL_TRUE) {
-            System.out.printf("Shader Linking Error: %s%n", GL45.glGetProgramInfoLog(shader, 1024));
+            System.out.printf("Shader Linking Error (%s): %s%n", file, GL45.glGetProgramInfoLog(program, 1024));
             return;
         }
         System.out.printf("Shader Attached: '%s', %s chars (type %s)%n", file, charSequence.length(), shaderType);
     }
 
+    /** <a href="https://www.khronos.org/opengl/wiki/Shader">OpenGL shaders</a> */
     private static int getShaderType(File file) {
         String[] splitName = file.getName().split("\\.");
         String ext = splitName[splitName.length - 1];
