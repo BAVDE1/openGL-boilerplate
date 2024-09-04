@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL45;
 import src.Main;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -21,6 +22,8 @@ public class Game {
     public int secondsElapsed = 0;
     int frameCounter = 0;
     int fps = 0;
+
+    int uniformTimeInx;
 
     public void start() {
         timeStarted = System.currentTimeMillis();
@@ -82,7 +85,9 @@ public class Game {
 
         // place uniform values
         int resolutionLocation = GL45.glGetUniformLocation(program, "resolution");
-        GL45.glUniform2f(resolutionLocation, 500, 400);
+        uniformTimeInx = GL45.glGetUniformLocation(program, "time");
+
+        GL45.glUniform2f(resolutionLocation, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
     }
 
     public void updateFps() {
@@ -97,6 +102,8 @@ public class Game {
 
     public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
+        GL45.glUniform1f(uniformTimeInx, System.currentTimeMillis());
 
         // render here
         // switch to this https://docs.gl/gl2/glDrawArrays
