@@ -24,7 +24,7 @@ public class Window {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         // Create the window
-        handle = glfwCreateWindow(400, 400, "ARGG IT HURTS", NULL, NULL);
+        handle = glfwCreateWindow(Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height, "ARGG IT HURTS", NULL, NULL);
         if (handle == NULL) throw new RuntimeException("Failed to create the GLFW window");
     }
 

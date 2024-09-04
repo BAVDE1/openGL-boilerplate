@@ -10,7 +10,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
-    public Window window;  // handle
+    public Window window = new Window();  // handle
     public boolean optimiseTimeStepper = true;
     boolean vSync = false;  // probably keep off for now
 
@@ -25,7 +25,6 @@ public class Game {
     }
 
     public void createCapabilitiesAndOpen() {
-        window = new Window();
         window.show();
         window.setVSync(vSync);
         bindEvents();
@@ -33,8 +32,8 @@ public class Game {
         GL.createCapabilities();  // critical for LWJGL's interoperation with GLFW's OpenGL context
         glClearColor(.0f, .0f, .0f, .0f);
 
-        // for 2d like effect
-        glOrtho(0, 300, 300, 0, 1, 1);
+        // for pixel perfect coordinates of vertices
+        glOrtho(0, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height, 0, -1, 1);
     }
 
     public void close() {
@@ -84,15 +83,10 @@ public class Game {
         // render here
         // switch to this https://docs.gl/gl2/glDrawArrays
         glBegin(GL_TRIANGLE_STRIP);  // https://docs.gl/gl2/glBegin
-        glColor3f(1, 1, 0);
-        glVertex2d(.2, .7);
-        glVertex2d(-.5, 0);
-        glVertex2d(.5, 0);
-
-        glColor3f(1, 0, 1);
-        glVertex2d(-.5, -.2);
-        glVertex2d(0, -.4);
-        glVertex2d(-.8, -.3);
+            glColor3f(1, 1, 0);
+            glVertex2d(0, 0);
+            glVertex2d(Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+            glVertex2d(0, Constants.SCREEN_SIZE.height * .5);
         glEnd();
 
         glfwSwapBuffers(window.handle); // finish rendering
