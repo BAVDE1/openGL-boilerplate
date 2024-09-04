@@ -79,6 +79,10 @@ public class Game {
         File shaderFolder = new File(Constants.SHADERS_FOLDER);
         ShaderHelper.searchDirectory(shaderFolder, program);
         GL45.glUseProgram(program);  // hook the program into our current context
+
+        // place uniform values
+        int resolutionLocation = GL45.glGetUniformLocation(program, "resolution");
+        GL45.glUniform2f(resolutionLocation, 500, 400);
     }
 
     public void updateFps() {
@@ -98,9 +102,10 @@ public class Game {
         // switch to this https://docs.gl/gl2/glDrawArrays
         glBegin(GL_TRIANGLE_STRIP);  // https://docs.gl/gl2/glBegin
             glColor3f(1, 1, 1);
-            glVertex2d(0, 0);
-            glVertex2d(Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
-            glVertex2d(0, Constants.SCREEN_SIZE.height * .5);
+            glVertex2d(50, 50);
+            glVertex2d(Constants.SCREEN_SIZE.width, 0);
+            glVertex2d(0, Constants.SCREEN_SIZE.height);
+            glVertex2d(Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50);
         glEnd();
 
         glfwSwapBuffers(window.handle); // finish rendering

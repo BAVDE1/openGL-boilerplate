@@ -3,9 +3,8 @@
     precision mediump float;
 #endif
 
-vec2 resolution = vec2(500, 400);
+uniform vec2 resolution;
 
 void main() {
-    gl_FragColor = vec4(1, 0, 0, 1);
-//    gl_FragColor = gl_Color;
+    gl_FragColor = vec4(gl_FragCoord.xy / resolution.xy, 0, 1);
 }
