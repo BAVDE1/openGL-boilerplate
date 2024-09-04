@@ -28,7 +28,7 @@ public class Window {
         if (handle == NULL) throw new RuntimeException("Failed to create the GLFW window");
     }
 
-    public void show() {
+    public void setupContext() {
         // center the window (if it can)
         if (glfwGetPlatform() != GLFW_PLATFORM_WAYLAND) {  // cause wayland is stupid
             try (MemoryStack stack = stackPush()) {  // Get the thread stack and push a new frame
@@ -47,8 +47,11 @@ public class Window {
             }
         }
 
-        // make context current & show
+        // make context current
         glfwMakeContextCurrent(handle);
+    }
+
+    public void show() {
         glfwShowWindow(handle);
     }
 
