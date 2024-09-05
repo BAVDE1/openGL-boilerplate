@@ -6,8 +6,6 @@ import org.lwjgl.opengl.GL45;
 import src.Main;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -27,7 +25,7 @@ public class Game {
 
     int uniformTimeInx;
 
-    int VBO;  // vertex buffer object
+    int vertBuff1;  // vertex buffer object (VBO)
     int VAO;  // vertex array object
 
     float[] verts = {
@@ -104,16 +102,16 @@ public class Game {
     }
 
     public void setupPointers() {
-        VBO = GL45.glGenBuffers();
+        vertBuff1 = GL45.glGenBuffers();
         VAO = GL45.glGenVertexArrays();
 
         GL45.glBindVertexArray(VAO);  // bind VAO first, before VBOs
 
-        GL45.glBindBuffer(GL15.GL_ARRAY_BUFFER, VBO);
-        GL45.glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+        GL45.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertBuff1);
+        GL45.glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);  // define the format of the data
         GL45.glEnableVertexAttribArray(0);
         GL45.glBufferData(GL15.GL_ARRAY_BUFFER, verts, GL15.GL_STATIC_DRAW);
-        GL45.glBindVertexArray(0);
+        GL45.glBindVertexArray(0);;
     }
 
     public void updateFps() {
@@ -129,7 +127,7 @@ public class Game {
     public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-        GL45.glUniform1f(uniformTimeInx, System.currentTimeMillis());
+        GL45.glUniform1f(uniformTimeInx, (float) glfwGetTime());
 
         // render here
         // switch to this https://docs.gl/gl2/glDrawArrays
@@ -138,14 +136,6 @@ public class Game {
         GL45.glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         GL45.glBindVertexArray(0);
-
-//        glBegin(GL_TRIANGLE_STRIP);  // https://docs.gl/gl2/glBegin
-//            glColor3f(1, 1, 1);
-//            glVertex2d(50, 50);
-//            glVertex2d(Constants.SCREEN_SIZE.width, 0);
-//            glVertex2d(0, Constants.SCREEN_SIZE.height);
-//            glVertex2d(Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50);
-//        glEnd();
 
         glfwSwapBuffers(window.handle); // finish rendering
     }
