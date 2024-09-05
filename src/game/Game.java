@@ -1,10 +1,12 @@
 package src.game;
 
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL45;
 import src.Main;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -25,6 +27,16 @@ public class Game {
 
     int uniformTimeInx;
 
+    int VBO;  // vertex buffer object
+    int VAO;  // vertex array object
+
+    float[] verts = {
+            50, 50,
+            Constants.SCREEN_SIZE.width, 0,
+            0, Constants.SCREEN_SIZE.height,
+            Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50
+    };
+
     public void start() {
         timeStarted = System.currentTimeMillis();
         Main.startTimeStepper(Constants.DT, this);
@@ -43,6 +55,7 @@ public class Game {
 
         window.show();
         setupShaders();
+        setupPointers();
     }
 
     public void close() {
@@ -90,6 +103,19 @@ public class Game {
         GL45.glUniform2f(resolutionLocation, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
     }
 
+    public void setupPointers() {
+        VBO = GL45.glGenBuffers();
+        VAO = GL45.glGenVertexArrays();
+
+        GL45.glBindVertexArray(VAO);  // bind VAO first, before VBOs
+
+        GL45.glBindBuffer(GL15.GL_ARRAY_BUFFER, VBO);
+        GL45.glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+        GL45.glEnableVertexAttribArray(0);
+        GL45.glBufferData(GL15.GL_ARRAY_BUFFER, verts, GL15.GL_STATIC_DRAW);
+        GL45.glBindVertexArray(0);
+    }
+
     public void updateFps() {
         // update every second
         int newSeconds = (int) Math.floor(MathUtils.millisToSecond(System.currentTimeMillis()) - MathUtils.millisToSecond(timeStarted));
@@ -107,13 +133,19 @@ public class Game {
 
         // render here
         // switch to this https://docs.gl/gl2/glDrawArrays
-        glBegin(GL_TRIANGLE_STRIP);  // https://docs.gl/gl2/glBegin
-            glColor3f(1, 1, 1);
-            glVertex2d(50, 50);
-            glVertex2d(Constants.SCREEN_SIZE.width, 0);
-            glVertex2d(0, Constants.SCREEN_SIZE.height);
-            glVertex2d(Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50);
-        glEnd();
+        // https://www.songho.ca/opengl/gl_vertexarray.html
+
+        GL45.glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        GL45.glBindVertexArray(0);
+
+//        glBegin(GL_TRIANGLE_STRIP);  // https://docs.gl/gl2/glBegin
+//            glColor3f(1, 1, 1);
+//            glVertex2d(50, 50);
+//            glVertex2d(Constants.SCREEN_SIZE.width, 0);
+//            glVertex2d(0, Constants.SCREEN_SIZE.height);
+//            glVertex2d(Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50);
+//        glEnd();
 
         glfwSwapBuffers(window.handle); // finish rendering
     }
