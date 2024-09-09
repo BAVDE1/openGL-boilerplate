@@ -23,7 +23,8 @@ public class Game {
     int frameCounter = 0;
     int fps = 0;
 
-    int uniformTimeInx;
+    int uInxTime;
+    int aInxPosition;
 
     int vertBuff1;
     int VAO;
@@ -96,7 +97,8 @@ public class Game {
 
         // place uniform values
         int resolutionLocation = GL45.glGetUniformLocation(program, "resolution");
-        uniformTimeInx = GL45.glGetUniformLocation(program, "time");
+        uInxTime = GL45.glGetUniformLocation(program, "time");
+        aInxPosition = GL45.glGetAttribLocation(program, "position");
 
         GL45.glUniform2f(resolutionLocation, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
     }
@@ -127,7 +129,7 @@ public class Game {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
         // update shader uniforms
-        GL45.glUniform1f(uniformTimeInx, (float) glfwGetTime());
+        GL45.glUniform1f(uInxTime, (float) glfwGetTime());
 
         // render here
         // https://docs.gl/gl2/glDrawArrays
