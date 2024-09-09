@@ -25,8 +25,8 @@ public class Game {
 
     int uniformTimeInx;
 
-    int vertBuff1;  // vertex buffer object (VBO)
-    int VAO;  // vertex array object
+    int vertBuff1;
+    int VAO;
 
     float[] verts = {
             50, 50,
@@ -103,18 +103,14 @@ public class Game {
 
     public void setupPointers() {
         // https://www.khronos.org/opengl/wiki/Vertex_Specification#Vertex_Buffer_Object
+        // copy vertices into buffer
         vertBuff1 = GL45.glGenBuffers();
-        VAO = GL45.glGenVertexArrays();
-        GL45.glBindVertexArray(VAO);  // bind VAO first, before VBOs
-
-        // set array buffer VBOs
         GL45.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertBuff1);
-
-        GL45.glEnableVertexAttribArray(0);  // only need one as we only have vertex position
-        GL45.glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);  // define the format of the data
-
         GL45.glBufferData(GL15.GL_ARRAY_BUFFER, verts, GL15.GL_STATIC_DRAW);
-        GL45.glBindVertexArray(0);  // unset array buffer, no longer needed
+
+        // define the format of the buffer
+        GL45.glEnableVertexAttribArray(0);  // only need one as we only have vertex position
+        GL45.glVertexAttribPointer(0, 2, GL_FLOAT, false, Float.BYTES * 2, 0);
     }
 
     public void updateFps() {
@@ -137,9 +133,7 @@ public class Game {
         // https://docs.gl/gl2/glDrawArrays
         // https://www.songho.ca/opengl/gl_vertexarray.html
 
-        GL45.glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        GL45.glBindVertexArray(0);
 
         glfwSwapBuffers(window.handle); // finish rendering
     }
