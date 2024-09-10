@@ -24,9 +24,7 @@ public class Game {
     int fps = 0;
 
     int uInxTime;
-
     int vertBuff1;
-    int VAO;
 
     float[] verts = {
             50, 50,
@@ -48,12 +46,9 @@ public class Game {
         GL.createCapabilities();  // do before anything gl related
         glClearColor(.0f, .0f, .0f, .0f);
 
-        // for pixel perfect coordinates of vertices
-        glOrtho(0, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height, 0, -1, 1);
-
         window.show();
-        setupShaders();
         setupPointers();
+        setupShaders();
     }
 
     public void close() {
@@ -92,23 +87,13 @@ public class Game {
         program = GL45.glCreateProgram();
         File shaderFolder = new File(Constants.SHADERS_FOLDER);
         ShaderHelper.attachShadersInDir(shaderFolder, program);
-
-        GL45.glBindAttribLocation(program, 0, "position");
-
-        GL45.glLinkProgram(program);
-        int[] programLinked = new int[1];
-        GL45.glGetProgramiv(program, GL45.GL_LINK_STATUS, programLinked);
-        if (programLinked[0] != GL_TRUE) {
-            System.out.printf("Shader Linking Error: %s%n", GL45.glGetProgramInfoLog(program, 1024));
-            return;
-        }
+        ShaderHelper.linkProgram(program);
         GL45.glUseProgram(program);  // hook the program into our current context
 
         // place uniform values
         int resolutionLocation = GL45.glGetUniformLocation(program, "resolution");
-        uInxTime = GL45.glGetUniformLocation(program, "time");
-
         GL45.glUniform2f(resolutionLocation, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        uInxTime = GL45.glGetUniformLocation(program, "time");
     }
 
     public void setupPointers() {
@@ -121,8 +106,6 @@ public class Game {
         // define the format of the buffer
         GL45.glEnableVertexAttribArray(0);  // only need one as we only have vertex position
         GL45.glVertexAttribPointer(0, 2, GL_FLOAT, false, Float.BYTES * 2, 0);
-
-
     }
 
     public void updateFps() {

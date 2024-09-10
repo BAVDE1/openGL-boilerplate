@@ -15,6 +15,7 @@ public class ShaderHelper {
         for (final File fileEntry : Objects.requireNonNull(dir.listFiles())) {
             if (fileEntry.isDirectory()) {
                 if (fileEntry.getName().equals("ignore")) continue;
+
                 attachShadersInDir(fileEntry.getAbsoluteFile(), program);
                 continue;
             }
@@ -58,6 +59,16 @@ public class ShaderHelper {
 
         GL45.glAttachShader(program, shader);
         System.out.printf("Shader Attached: '%s', %s chars (type %s)%n", file, charSequence.length(), shaderType);
+    }
+
+    public static void linkProgram(int program) {
+        GL45.glLinkProgram(program);
+        int[] programLinked = new int[1];
+
+        GL45.glGetProgramiv(program, GL45.GL_LINK_STATUS, programLinked);
+        if (programLinked[0] != GL_TRUE) {
+            System.out.printf("Shader Linking Error: %s%n", GL45.glGetProgramInfoLog(program, 1024));
+        }
     }
 
     /** <a href="https://www.khronos.org/opengl/wiki/Shader">OpenGL shaders</a> */
