@@ -1,8 +1,7 @@
-#version 100
+#version 450
 
-attribute vec3 position;
-uniform float time;
+layout(location = 0) in vec4 position;
 
 void main() {
-    gl_Position = vec4(position, 1);
+    gl_Position = position;
 }

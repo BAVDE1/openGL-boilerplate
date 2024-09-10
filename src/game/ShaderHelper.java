@@ -4,7 +4,6 @@ import org.lwjgl.opengl.GL45;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -12,14 +11,14 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class ShaderHelper {
     /** Search entire directory (including folders within folders) until a file is found, and pass it to applyShader() */
-    public static void searchDirectory(File dir, int program) {
+    public static void attachShadersInDir(File dir, int program) {
         for (final File fileEntry : Objects.requireNonNull(dir.listFiles())) {
             if (fileEntry.isDirectory()) {
                 if (fileEntry.getName().equals("ignore")) continue;
-                searchDirectory(fileEntry.getAbsoluteFile(), program);
+                attachShadersInDir(fileEntry.getAbsoluteFile(), program);
                 continue;
             }
-            applyShader(fileEntry, program);
+            attachShader(fileEntry, program);
         }
     }
 
@@ -27,7 +26,7 @@ public class ShaderHelper {
      * adds new GL shader from given file (if applicable)
      * <a href="https://docs.gl/gl2/glAttachShader">Shader setup example</a>
      */
-    public static void applyShader(File file, int program) {
+    public static void attachShader(File file, int program) {
         int shaderType = getShaderType(file);
         if (shaderType < 0) return;  // not a shader file
 
@@ -48,8 +47,8 @@ public class ShaderHelper {
         // compile shader
         int shader = GL45.glCreateShader(shaderType);
         GL45.glShaderSource(shader, charSequence);
-        GL45.glCompileShader(shader);
 
+        GL45.glCompileShader(shader);
         int[] shaderCompiled = new int[1];  // only needs size of 1
         GL45.glGetShaderiv(shader, GL45.GL_COMPILE_STATUS, shaderCompiled);
         if (shaderCompiled[0] != GL_TRUE) {
@@ -57,16 +56,7 @@ public class ShaderHelper {
             return;
         }
 
-        // attach shader
         GL45.glAttachShader(program, shader);
-        GL45.glLinkProgram(program);
-
-        int[] programLinked = new int[1];
-        GL45.glGetProgramiv(program, GL45.GL_LINK_STATUS, programLinked);
-        if (programLinked[0] != GL_TRUE) {
-            System.out.printf("Shader Linking Error (%s): %s%n", file, GL45.glGetProgramInfoLog(program, 1024));
-            return;
-        }
         System.out.printf("Shader Attached: '%s', %s chars (type %s)%n", file, charSequence.length(), shaderType);
     }
 
