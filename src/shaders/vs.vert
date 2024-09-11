@@ -6,6 +6,7 @@ uniform vec2 resolution;
 uniform highp float time;
 
 /**
+ https://en.wikipedia.org/wiki/Orthographic_projection
  l = 0     r = width
  b = 0     t = height
  n = -1    f = 1
