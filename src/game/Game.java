@@ -27,9 +27,8 @@ public class Game {
     int vertBuff1;
 
     float[] verts = {
-            50, 50,
-            Constants.SCREEN_SIZE.width, 0,
-            0, Constants.SCREEN_SIZE.height,
+            (float) (Constants.SCREEN_SIZE.width * .5), 50,
+            50, Constants.SCREEN_SIZE.height - 50,
             Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50
     };
 
@@ -88,7 +87,7 @@ public class Game {
         File shaderFolder = new File(Constants.SHADERS_FOLDER);
         ShaderHelper.attachShadersInDir(shaderFolder, program);
         ShaderHelper.linkProgram(program);
-        GL45.glUseProgram(program);  // hook the program into our current context
+        GL45.glUseProgram(program);
 
         // place uniform values
         int resolutionLocation = GL45.glGetUniformLocation(program, "resolution");
@@ -128,7 +127,7 @@ public class Game {
         // https://docs.gl/gl2/glDrawArrays
         // https://www.songho.ca/opengl/gl_vertexarray.html
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, (int) Math.floor(verts.length * .5));
 
         glfwSwapBuffers(window.handle); // finish rendering
     }

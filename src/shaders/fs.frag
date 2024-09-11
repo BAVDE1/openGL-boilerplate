@@ -7,5 +7,5 @@ out vec4 colour;
 
 void main() {
     vec2 uv = gl_FragCoord.xy / resolution.xy;
-    colour = vec4(uv.xy, abs(sin(time)), 1);
+    colour = vec4(uv.xy, abs(sin(time - length(uv))), 1);
 }
