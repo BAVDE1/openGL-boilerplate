@@ -1,7 +1,6 @@
 package src.game;
 
 import org.lwjgl.opengl.*;
-import org.lwjgl.system.Callback;
 import src.Main;
 import src.utility.Vec2;
 
@@ -25,7 +24,8 @@ public class Game {
     int fps = 0;
 
     int uInxTime;
-    int vertBuff1;
+    int vertBuff;
+    int vao;
 
     public Vec2 mousePos = new Vec2();
 
@@ -50,7 +50,7 @@ public class Game {
         glClearColor(.0f, .0f, .0f, .0f);
 
         window.show();
-        setupPointers();
+        setupBuffers();
         setupShaders();
     }
 
@@ -83,6 +83,20 @@ public class Game {
         glfwSetCursorPosCallback(window.handle, (window, xpos, ypos) -> mousePos.set(xpos, ypos));
     }
 
+    public void setupBuffers() {
+        vao = GL45.glGenVertexArrays();
+        GL45.glBindVertexArray(vao);
+
+        // copy vertices into buffer
+        vertBuff = GL45.glGenBuffers();
+        GL45.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertBuff);
+        GL45.glBufferData(GL15.GL_ARRAY_BUFFER, verts, GL15.GL_STATIC_DRAW);
+
+        // define the format of the buffer
+        GL45.glEnableVertexAttribArray(0);  // only need one as we only have vertex position
+        GL45.glVertexAttribPointer(0, 2, GL_FLOAT, false, Float.BYTES * 2, 0);
+    }
+
     /** Must be called after window is visible */
     public void setupShaders() {
         program = GL45.glCreateProgram();
@@ -95,17 +109,6 @@ public class Game {
         int resolutionLocation = GL45.glGetUniformLocation(program, "resolution");
         GL45.glUniform2f(resolutionLocation, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
         uInxTime = GL45.glGetUniformLocation(program, "time");
-    }
-
-    public void setupPointers() {
-        // copy vertices into buffer
-        vertBuff1 = GL45.glGenBuffers();
-        GL45.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertBuff1);
-        GL45.glBufferData(GL15.GL_ARRAY_BUFFER, verts, GL15.GL_STATIC_DRAW);
-
-        // define the format of the buffer
-        GL45.glEnableVertexAttribArray(0);  // only need one as we only have vertex position
-        GL45.glVertexAttribPointer(0, 2, GL_FLOAT, false, Float.BYTES * 2, 0);
     }
 
     public void updateFps() {
