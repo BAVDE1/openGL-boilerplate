@@ -2,6 +2,8 @@ package src.game;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
@@ -22,6 +24,12 @@ public class Window {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+
+        // gl version 4.5
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         // Create the window
         handle = glfwCreateWindow(Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height, "ARGG IT HURTS", NULL, NULL);
@@ -52,6 +60,7 @@ public class Window {
     }
 
     public void show() {
+        System.out.printf("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'%n",  glfwGetVersionString(), GL45.glGetString(GL11.GL_VERSION));
         glfwShowWindow(handle);
     }
 

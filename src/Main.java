@@ -3,11 +3,8 @@ package src;
 import src.game.Game;
 import src.game.MathUtils;
 
-import static org.lwjgl.glfw.GLFW.*;
-
 public class Main {
     public static void main(String[] args) {
-        System.out.printf("Running '%s'%n",  glfwGetVersionString());
         new Game().start();
     }
 

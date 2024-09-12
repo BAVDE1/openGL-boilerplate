@@ -1,12 +1,12 @@
 package src.game;
 
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL45;
+import org.lwjgl.opengl.*;
+import org.lwjgl.system.Callback;
 import src.Main;
 import src.utility.Vec2;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -30,9 +30,9 @@ public class Game {
     public Vec2 mousePos = new Vec2();
 
     float[] verts = {
-        0, -100,
-        -100, 100,
-        100, 100
+        (float) (Constants.SCREEN_SIZE.width * .5), 50,
+        50, Constants.SCREEN_SIZE.height - 50,
+        Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50
     };
 
     public void start() {
@@ -46,6 +46,7 @@ public class Game {
         bindEvents();
 
         GL.createCapabilities();  // do before anything gl related
+        GLUtil.setupDebugMessageCallback(new PrintStream(System.err));  // errors please *-*
         glClearColor(.0f, .0f, .0f, .0f);
 
         window.show();
@@ -84,7 +85,6 @@ public class Game {
 
     /** Must be called after window is visible */
     public void setupShaders() {
-        // https://learnopengl.com/Getting-started/Shaders
         program = GL45.glCreateProgram();
         File shaderFolder = new File(Constants.SHADERS_FOLDER);
         ShaderHelper.attachShadersInDir(shaderFolder, program);
@@ -98,7 +98,6 @@ public class Game {
     }
 
     public void setupPointers() {
-        // https://www.khronos.org/opengl/wiki/Vertex_Specification#Vertex_Buffer_Object
         // copy vertices into buffer
         vertBuff1 = GL45.glGenBuffers();
         GL45.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertBuff1);
@@ -125,14 +124,6 @@ public class Game {
         // update shader uniforms
         GL45.glUniform1f(uInxTime, (float) glfwGetTime());
 
-        // render here
-        // https://docs.gl/gl2/glDrawArrays
-        // https://www.songho.ca/opengl/gl_vertexarray.html
-        float[] mouseRelativeVerts = new float[verts.length];
-        for (int i = 0; i < verts.length; i++) {
-            mouseRelativeVerts[i] = verts[i] + (float) (i % 2 == 0 ? mousePos.x : mousePos.y);
-        }
-        GL45.glBufferData(GL15.GL_ARRAY_BUFFER, mouseRelativeVerts, GL15.GL_STATIC_DRAW);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, (int) Math.floor(verts.length * .5));
 
         glfwSwapBuffers(window.handle); // finish rendering
