@@ -1,6 +1,7 @@
 package src.game;
 
 import org.lwjgl.opengl.GL45;
+import src.utility.Logging;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,7 +42,7 @@ public class ShaderHelper {
             }
             charSequence = fileContents.toString();
         } catch (FileNotFoundException e) {
-            System.out.printf("'%s' at '%s' could not be read.\nError message: %s%n", file.getName(), file.getAbsolutePath(), e);
+            Logging.danger(String.format("'%s' at '%s' could not be read.\nError message: %s%n", file.getName(), file.getAbsolutePath(), e));
             return;
         }
 
@@ -53,12 +54,12 @@ public class ShaderHelper {
         int[] shaderCompiled = new int[1];  // only needs size of 1
         GL45.glGetShaderiv(shader, GL45.GL_COMPILE_STATUS, shaderCompiled);
         if (shaderCompiled[0] != GL_TRUE) {
-            System.out.printf("Shader Compile Error (%s): %s%n", file, GL45.glGetShaderInfoLog(shader, 1024));
+            Logging.danger(String.format("Shader Compile Error (%s): %s", file, GL45.glGetShaderInfoLog(shader, 1024)));
             return;
         }
 
         GL45.glAttachShader(program, shader);
-        System.out.printf("Shader Attached: '%s', %s chars (type %s)%n", file, charSequence.length(), shaderType);
+        Logging.info(String.format("Shader Attached: '%s', %s chars (type %s)", file, charSequence.length(), shaderType));
     }
 
     public static void linkProgram(int program) {
@@ -67,7 +68,7 @@ public class ShaderHelper {
 
         GL45.glGetProgramiv(program, GL45.GL_LINK_STATUS, programLinked);
         if (programLinked[0] != GL_TRUE) {
-            System.out.printf("Shader Linking Error: %s%n", GL45.glGetProgramInfoLog(program, 1024));
+            Logging.danger(String.format("Shader Linking Error: %s", GL45.glGetProgramInfoLog(program, 1024)));
         }
     }
 

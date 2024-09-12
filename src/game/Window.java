@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryStack;
+import src.utility.Logging;
 
 import java.nio.IntBuffer;
 
@@ -60,7 +61,7 @@ public class Window {
     }
 
     public void show() {
-        System.out.printf("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'%n",  glfwGetVersionString(), GL45.glGetString(GL11.GL_VERSION));
+        Logging.info(String.format("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'",  glfwGetVersionString(), GL45.glGetString(GL11.GL_VERSION)));
         glfwShowWindow(handle);
     }
 

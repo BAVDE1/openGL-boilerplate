@@ -2,6 +2,7 @@ package src.game;
 
 import org.lwjgl.opengl.*;
 import src.Main;
+import src.utility.Logging;
 import src.utility.Vec2;
 
 import java.io.File;
@@ -55,7 +56,7 @@ public class Game {
     }
 
     public void close() {
-        System.out.println("Closing safely");
+        Logging.info("Closing safely");
         glfwFreeCallbacks(window.handle);
         glfwDestroyWindow(window.handle);
 
