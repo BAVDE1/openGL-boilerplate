@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL45;
 import src.Main;
+import src.utility.Vec2;
 
 import java.io.File;
 import java.util.Objects;
@@ -26,10 +27,12 @@ public class Game {
     int uInxTime;
     int vertBuff1;
 
+    public Vec2 mousePos = new Vec2();
+
     float[] verts = {
-            (float) (Constants.SCREEN_SIZE.width * .5), 50,
-            50, Constants.SCREEN_SIZE.height - 50,
-            Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50
+        0, -100,
+        -100, 100,
+        100, 100
     };
 
     public void start() {
@@ -76,8 +79,7 @@ public class Game {
             }
         });
 
-        // window pos change
-        glfwSetWindowPosCallback(window.handle, (window, xpos, ypos) -> {});
+        glfwSetCursorPosCallback(window.handle, (window, xpos, ypos) -> mousePos.set(xpos, ypos));
     }
 
     /** Must be called after window is visible */
@@ -126,7 +128,11 @@ public class Game {
         // render here
         // https://docs.gl/gl2/glDrawArrays
         // https://www.songho.ca/opengl/gl_vertexarray.html
-
+        float[] mouseRelativeVerts = new float[verts.length];
+        for (int i = 0; i < verts.length; i++) {
+            mouseRelativeVerts[i] = verts[i] + (float) (i % 2 == 0 ? mousePos.x : mousePos.y);
+        }
+        GL45.glBufferData(GL15.GL_ARRAY_BUFFER, mouseRelativeVerts, GL15.GL_STATIC_DRAW);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, (int) Math.floor(verts.length * .5));
 
         glfwSwapBuffers(window.handle); // finish rendering

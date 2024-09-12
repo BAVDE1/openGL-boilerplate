@@ -21,6 +21,6 @@ mat4 projectionMatrix = mat4(
 void main() {
     vec4 pos = position;
     float t = time + length(position);
-    pos += vec4(20 * sin(t), 20 * cos(t), 0, 0);
+    pos += vec4(10 * sin(t), 10 * cos(t), 0, 0);
     gl_Position = pos * projectionMatrix;
 }
