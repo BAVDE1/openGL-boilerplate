@@ -2,13 +2,15 @@ package src.utility;
 
 import src.game.Constants;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.PrintStream;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class Logging {
-    private static final Logger logger = Logger.getLogger("logger");
+    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+    private static final int tracebackInx = 3;
 
-    // ansi escape codes
+    // more ansi escape codes: https://talyian.github.io/ansicolors/
     private static final String black = "30";
     private static final String red = "31";
     private static final String green = "32";
@@ -19,35 +21,36 @@ public class Logging {
     private static final String grey = "37";
     private static final String white = "2";
 
-    private static void log(String msg) {
-        String callerFile = Thread.currentThread().getStackTrace()[3].getFileName();
-        int callersLineNumber = Thread.currentThread().getStackTrace()[3].getLineNumber();
-        logger.log(Level.INFO, String.format("<%s:%s> %s", callerFile, callersLineNumber, msg));
-    }
-
-    private static void setFormat(String col) {
-        System.setProperty("java.util.logging.SimpleFormatter.format", "\u001B[" + col + "m[%1$tT] %4$s %5$s%6$s%n");
+    private static void log(String col, String msg, String level) {
+        String callerFile = Thread.currentThread().getStackTrace()[tracebackInx].getFileName();
+        int callersLineNumber = Thread.currentThread().getStackTrace()[tracebackInx].getLineNumber();
+        System.out.printf("\u001B[" + col + "m%s %s [%s:%s] %s\u001B[0m%n", LocalTime.now().format(format), level, callerFile, callersLineNumber, msg);
     }
 
     public static void info(String msg) {
-        setFormat(white);
-        log(msg);
+        log(white, msg, "INFO");
     }
 
     public static void debug(String msg) {
         if (Constants.logDebug) {
-            setFormat(grey);
-            log(msg);
+            log(grey, msg, "DEBUG");
         }
     }
 
     public static void warn(String msg) {
-        setFormat(yellow);
-        log(msg);
+        log(yellow, msg, "WARN");
     }
 
     public static void danger(String msg) {
-        setFormat(red);
-        log(msg);
+        log(red, msg, "DANGER");
+    }
+
+    public static PrintStream errStream() {
+        return new PrintStream(System.err) {
+            @Override
+            public void print(Object obj) {
+                danger(String.valueOf(obj));
+            }
+        };
     }
 }

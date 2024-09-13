@@ -47,7 +47,7 @@ public class Game {
         bindEvents();
 
         GL.createCapabilities();  // do before anything gl related
-        GLUtil.setupDebugMessageCallback(new PrintStream(System.err));  // errors please *-*
+        GLUtil.setupDebugMessageCallback(Logging.errStream());  // errors please *-*
         glClearColor(.0f, .0f, .0f, .0f);
 
         window.show();
