@@ -6,7 +6,6 @@ import src.utility.Logging;
 import src.utility.Vec2;
 
 import java.io.File;
-import java.io.PrintStream;
 import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -30,11 +29,7 @@ public class Game {
 
     public Vec2 mousePos = new Vec2();
 
-    float[] verts = {
-        (float) (Constants.SCREEN_SIZE.width * .5), 50,
-        50, Constants.SCREEN_SIZE.height - 50,
-        Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50
-    };
+
 
     public void start() {
         timeStarted = System.currentTimeMillis();
@@ -91,7 +86,7 @@ public class Game {
         // copy vertices into buffer
         vertBuff = GL45.glGenBuffers();
         GL45.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertBuff);
-        GL45.glBufferData(GL15.GL_ARRAY_BUFFER, verts, GL15.GL_STATIC_DRAW);
+        GL45.glBufferData(GL15.GL_ARRAY_BUFFER, 1024, GL15.GL_DYNAMIC_DRAW);
 
         // define the format of the buffer
         GL45.glEnableVertexAttribArray(0);  // only need one as we only have vertex position
@@ -124,6 +119,13 @@ public class Game {
 
     public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
+        float[] verts = {
+                (float) mousePos.x, (float) mousePos.y,
+                50, Constants.SCREEN_SIZE.height - 50,
+                Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50
+        };
+        GL45.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, verts);
 
         // update shader uniforms
         GL45.glUniform1f(uInxTime, (float) glfwGetTime());
