@@ -1,5 +1,6 @@
 package src;
 
+import src.game.Constants;
 import src.game.Game;
 import src.game.MathUtils;
 import src.utility.Logging;
@@ -34,7 +35,7 @@ public class Main {
 
                 try {
                     double loopTime = game.mainLoop(static_dt);  // in seconds
-                    if (game.optimiseTimeStepper && accumulator + loopTime < halfDt) {  // only sleep if there is enough time
+                    if (Constants.OPTIMIZE_TIME_STEPPER && accumulator + loopTime < halfDt) {  // only sleep if there is enough time
                         Thread.sleep((long) Math.floor(halfDt * 1_000));  // give it a little break *-*
                     }
                 } catch (InterruptedException e) {

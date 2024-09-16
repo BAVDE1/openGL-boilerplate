@@ -12,4 +12,6 @@ public class Constants {
     public static final String SHADERS_FOLDER = "src/shaders";
 
     public static final Dimension SCREEN_SIZE = new Dimension(900, 400);
+    public static final boolean OPTIMIZE_TIME_STEPPER = true;
+    public static final boolean V_SYNC = false;
 }

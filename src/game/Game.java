@@ -6,38 +6,25 @@ import src.utility.Logging;
 import src.utility.Vec2;
 
 import java.io.File;
-import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.Linker;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
-import java.lang.invoke.MethodHandle;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import static org.lwjgl.system.MemoryUtil.*;
 
-import static javax.swing.text.html.parser.DTDConstants.MS;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
     public Window window = new Window();  // handle
-    public int program;
-    public boolean optimiseTimeStepper = true;
-    boolean vSync = false;  // probably keep off for now
+    public ShaderHelper sh = new ShaderHelper();
+
+    public Vec2 mousePos = new Vec2();
 
     public double timeStarted = 0;
     public int secondsElapsed = 0;
     int frameCounter = 0;
     int fps = 0;
 
-    int uInxTime;
     int vertBuff;
     int vao;
-
-    public Vec2 mousePos = new Vec2();
 
     public void start() {
         timeStarted = System.currentTimeMillis();
@@ -46,7 +33,7 @@ public class Game {
 
     public void createCapabilitiesAndOpen() {
         window.setupContext();
-        window.setVSync(vSync);
+        window.setVSync(Constants.V_SYNC);
 
         GL.createCapabilities();  // do before anything gl related
         glEnable(GL45.GL_DEBUG_OUTPUT);
@@ -78,12 +65,6 @@ public class Game {
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true);
-
-            if (action == GLFW_PRESS) {
-                if (key == GLFW_KEY_Q) {
-                    this.window.setVSync(vSync = !vSync);
-                }
-            }
         });
 
         glfwSetCursorPosCallback(window.handle, (window, xpos, ypos) -> mousePos.set(xpos, ypos));
@@ -105,18 +86,12 @@ public class Game {
 
     /** Must be called after window is visible */
     public void setupShaders() {
-        program = GL45.glCreateProgram();
-        ShaderHelper.setProgram(program);
+        sh.genProgram();
+        sh.attachShadersInDir(new File(Constants.SHADERS_FOLDER));
+        sh.linkProgram();
+        GL45.glUseProgram(sh.program);  // bind
 
-        File shaderFolder = new File(Constants.SHADERS_FOLDER);
-        ShaderHelper.attachShadersInDir(shaderFolder);
-        ShaderHelper.linkProgram();
-        GL45.glUseProgram(program);  // bind
-
-        // place uniform values
-        int resolutionLocation = GL45.glGetUniformLocation(program, "resolution");
-        GL45.glUniform2f(resolutionLocation, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
-        uInxTime = GL45.glGetUniformLocation(program, "time");
+        sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
     }
 
     public void updateFps() {
@@ -132,7 +107,7 @@ public class Game {
     public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-        ShaderHelper.uniform1f("time", (float) glfwGetTime());
+        sh.uniform1f("time", (float) glfwGetTime());
 
         float[] verts = {
                 (float) mousePos.x, (float) mousePos.y,
