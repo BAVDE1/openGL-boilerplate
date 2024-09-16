@@ -5,22 +5,37 @@ import src.utility.Logging;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Scanner;
 
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL11.*;
 
+/** State Machine */
 public class ShaderHelper {
+    private static int currentProgram = -1;
+    public static final HashMap<String, Integer> uniformCache = new HashMap<>();
+
+    public static void setProgram(int program) {
+        currentProgram = program;
+    }
+
     /** Search entire directory (including folders within folders) until a file is found, and pass it to applyShader() */
-    public static void attachShadersInDir(File dir, int program) {
+    public static void attachShadersInDir(File dir) {
+        if (currentProgram < 0) {
+            Logging.danger("No program set!");
+            return;
+        }
+
         for (final File fileEntry : Objects.requireNonNull(dir.listFiles())) {
             if (fileEntry.isDirectory()) {
                 if (fileEntry.getName().equals("ignore")) continue;
 
-                attachShadersInDir(fileEntry.getAbsoluteFile(), program);
+                attachShadersInDir(fileEntry.getAbsoluteFile());
                 continue;
             }
-            attachShader(fileEntry, program);
+            attachShader(fileEntry);
         }
     }
 
@@ -28,7 +43,7 @@ public class ShaderHelper {
      * adds new GL shader from given file (if applicable)
      * <a href="https://docs.gl/gl2/glAttachShader">Shader setup example</a>
      */
-    public static void attachShader(File file, int program) {
+    public static void attachShader(File file) {
         int shaderType = getShaderType(file);
         if (shaderType < 0) return;  // not a shader file
 
@@ -58,17 +73,17 @@ public class ShaderHelper {
             return;
         }
 
-        GL45.glAttachShader(program, shader);
+        GL45.glAttachShader(currentProgram, shader);
         Logging.info(String.format("Shader Attached: '%s', %s chars (type %s)", file, charSequence.length(), shaderType));
     }
 
-    public static void linkProgram(int program) {
-        GL45.glLinkProgram(program);
+    public static void linkProgram() {
+        GL45.glLinkProgram(currentProgram);
         int[] programLinked = new int[1];
 
-        GL45.glGetProgramiv(program, GL45.GL_LINK_STATUS, programLinked);
+        GL45.glGetProgramiv(currentProgram, GL45.GL_LINK_STATUS, programLinked);
         if (programLinked[0] != GL_TRUE) {
-            Logging.danger(String.format("Shader Linking Error: %s", GL45.glGetProgramInfoLog(program, 1024)));
+            Logging.danger(String.format("Shader Linking Error: %s", GL45.glGetProgramInfoLog(currentProgram, 1024)));
         }
     }
 
@@ -86,5 +101,19 @@ public class ShaderHelper {
             case "frag" -> shaderType = GL45.GL_FRAGMENT_SHADER;
         }
         return shaderType;
+    }
+
+    public static int getUniformLocation(String uniform) {
+        if (uniformCache.containsKey(uniform)) {
+            return uniformCache.get(uniform);
+        }
+
+        int location = GL45.glGetUniformLocation(currentProgram, uniform);
+        uniformCache.put(uniform, location);
+        return location;
+    }
+
+    public static void uniform1f(String uniform, float f) {
+        GL45.glUniform1f(getUniformLocation(uniform), f);
     }
 }

@@ -106,9 +106,11 @@ public class Game {
     /** Must be called after window is visible */
     public void setupShaders() {
         program = GL45.glCreateProgram();
+        ShaderHelper.setProgram(program);
+
         File shaderFolder = new File(Constants.SHADERS_FOLDER);
-        ShaderHelper.attachShadersInDir(shaderFolder, program);
-        ShaderHelper.linkProgram(program);
+        ShaderHelper.attachShadersInDir(shaderFolder);
+        ShaderHelper.linkProgram();
         GL45.glUseProgram(program);  // bind
 
         // place uniform values
@@ -130,6 +132,8 @@ public class Game {
     public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
+        ShaderHelper.uniform1f("time", (float) glfwGetTime());
+
         float[] verts = {
                 (float) mousePos.x, (float) mousePos.y,
                 50, Constants.SCREEN_SIZE.height - 50,
@@ -137,11 +141,7 @@ public class Game {
         };
         GL45.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, verts);
 
-        // update shader uniforms
-        GL45.glUniform1f(uInxTime, (float) glfwGetTime());
-
         glDrawArrays(GL_TRIANGLE_STRIP, 0, (int) Math.floor(verts.length * .5));
-
 
         glfwSwapBuffers(window.handle); // finish rendering
     }
