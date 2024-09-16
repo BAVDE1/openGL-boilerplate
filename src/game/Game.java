@@ -11,6 +11,7 @@ import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -38,8 +39,6 @@ public class Game {
 
     public Vec2 mousePos = new Vec2();
 
-
-
     public void start() {
         timeStarted = System.currentTimeMillis();
         Main.startTimeStepper(Constants.DT, this);
@@ -48,21 +47,13 @@ public class Game {
     public void createCapabilitiesAndOpen() {
         window.setupContext();
         window.setVSync(vSync);
-        bindEvents();
 
         GL.createCapabilities();  // do before anything gl related
-//        GLUtil.setupDebugMessageCallback(Logging.errStream());  // errors please *-*
         glEnable(GL45.GL_DEBUG_OUTPUT);
-        //http://forum.lwjgl.org/index.php?topic=5745.0
-        GL45.glDebugMessageCallback(new GLDebugMessageCallbackI() {
-            @Override
-            public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
-                System.out.println( memByteBuffer(message, length));
-            }
-        }, -1);
         glClearColor(.0f, .0f, .0f, .0f);
 
         window.show();
+        bindEvents();
         setupBuffers();
         setupShaders();
     }
@@ -81,6 +72,7 @@ public class Game {
     }
 
     public void bindEvents() {
+        GL45.glDebugMessageCallback(Logging.debugCallback(), -1);
 
         // key inputs
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
