@@ -11,8 +11,10 @@ import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import static org.lwjgl.system.MemoryUtil.*;
 
 import static javax.swing.text.html.parser.DTDConstants.MS;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -51,10 +53,11 @@ public class Game {
         GL.createCapabilities();  // do before anything gl related
 //        GLUtil.setupDebugMessageCallback(Logging.errStream());  // errors please *-*
         glEnable(GL45.GL_DEBUG_OUTPUT);
+        //http://forum.lwjgl.org/index.php?topic=5745.0
         GL45.glDebugMessageCallback(new GLDebugMessageCallbackI() {
             @Override
             public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
-                System.out.println(message);
+                System.out.println( memByteBuffer(message, length));
             }
         }, -1);
         glClearColor(.0f, .0f, .0f, .0f);
