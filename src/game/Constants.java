@@ -3,7 +3,7 @@ package src.game;
 import java.awt.*;
 
 public class Constants {
-    public static final Boolean logDebug = false;
+    public static final Boolean logDebug = true;
 
     public static final double EPSILON = 0.0001;
     public static final double EPSILON_SQ = EPSILON * EPSILON;

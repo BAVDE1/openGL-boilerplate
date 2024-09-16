@@ -6,8 +6,15 @@ import src.utility.Logging;
 import src.utility.Vec2;
 
 import java.io.File;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
+import static javax.swing.text.html.parser.DTDConstants.MS;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -42,7 +49,14 @@ public class Game {
         bindEvents();
 
         GL.createCapabilities();  // do before anything gl related
-        GLUtil.setupDebugMessageCallback(Logging.errStream());  // errors please *-*
+//        GLUtil.setupDebugMessageCallback(Logging.errStream());  // errors please *-*
+        glEnable(GL45.GL_DEBUG_OUTPUT);
+        GL45.glDebugMessageCallback(new GLDebugMessageCallbackI() {
+            @Override
+            public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
+                System.out.println(message);
+            }
+        }, -1);
         glClearColor(.0f, .0f, .0f, .0f);
 
         window.show();
@@ -64,6 +78,7 @@ public class Game {
     }
 
     public void bindEvents() {
+
         // key inputs
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
@@ -99,7 +114,7 @@ public class Game {
         File shaderFolder = new File(Constants.SHADERS_FOLDER);
         ShaderHelper.attachShadersInDir(shaderFolder, program);
         ShaderHelper.linkProgram(program);
-        GL45.glUseProgram(program);
+        GL45.glUseProgram(program);  // bind
 
         // place uniform values
         int resolutionLocation = GL45.glGetUniformLocation(program, "resolution");
@@ -131,6 +146,7 @@ public class Game {
         GL45.glUniform1f(uInxTime, (float) glfwGetTime());
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, (int) Math.floor(verts.length * .5));
+
 
         glfwSwapBuffers(window.handle); // finish rendering
     }
