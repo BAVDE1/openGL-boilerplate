@@ -9,6 +9,7 @@ import src.utility.Logging;
 
 import java.nio.IntBuffer;
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -37,7 +38,7 @@ public class Window {
         if (handle == NULL) throw new RuntimeException("Failed to create the GLFW window");
     }
 
-    public void setupContext() {
+    public void setupGLFWContext() {
         // center the window (if it can)
         if (glfwGetPlatform() != GLFW_PLATFORM_WAYLAND) {  // cause wayland is stupid
             try (MemoryStack stack = stackPush()) {  // Get the thread stack and push a new frame
@@ -63,6 +64,12 @@ public class Window {
     public void show() {
         Logging.info(String.format("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'",  glfwGetVersionString(), GL45.glGetString(GL11.GL_VERSION)));
         glfwShowWindow(handle);
+    }
+
+    public void close() {
+        glfwFreeCallbacks(handle);
+        glfwDestroyWindow(handle);
+        glfwTerminate();
     }
 
     public void setVSync(boolean vSync) {

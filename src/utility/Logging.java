@@ -7,12 +7,17 @@ import src.game.Constants;
 import java.io.PrintStream;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.lwjgl.system.MemoryUtil.memByteBuffer;
 
 public class Logging {
+    private static final ArrayList<Integer> ignoreList = new ArrayList<>(List.of(2));
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
     private static final int tracebackInx = 3;
 
@@ -53,14 +58,18 @@ public class Logging {
 
     public static GLDebugMessageCallbackI debugCallback() {
         return (source, type, id, severity, length, message, userParam) -> {
-            String format = "Source: %s\n    Type: %s\n    Severity: %s\n    %s";
-
             String sourceStr = getCallbackSourceString(source);
             String typeStr = getCallbackTypeString(type);
             String severityStr = getCallbackSeverityString(severity);
 
+            if (ignoreList.contains(id)) {
+                debug(String.format("Suppressing warning id: %s (src: %s, type: %s, severity: %s)", id, sourceStr, typeStr, severityStr));
+                return;
+            }
+
             CharBuffer decodedMeg = StandardCharsets.UTF_8.decode(memByteBuffer(message, length));
-            String finalMsg = String.format(format, sourceStr, typeStr, severityStr, decodedMeg);
+            String finalMsg = String.format("Source: %s (id: %s)\n    Type: (%s) %s\n    Severity: %s\n    %s",
+                    sourceStr, id, type, typeStr, severityStr, decodedMeg);
 
             switch (severity) {
                 case GL45.GL_DEBUG_SEVERITY_LOW, GL45.GL_DEBUG_SEVERITY_MEDIUM -> warn(finalMsg);

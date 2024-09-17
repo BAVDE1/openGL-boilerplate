@@ -4,6 +4,7 @@ import org.lwjgl.opengl.*;
 import src.Main;
 import src.rendering.Renderer;
 import src.rendering.ShaderHelper;
+import src.rendering.VertexBuffer;
 import src.utility.Logging;
 import src.utility.MathUtils;
 import src.utility.Vec2;
@@ -11,7 +12,6 @@ import src.utility.Vec2;
 import java.io.File;
 import java.util.Objects;
 
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -26,6 +26,7 @@ public class Game {
     int frameCounter = 0;
     int fps = 0;
 
+    VertexBuffer vb = new VertexBuffer();
     int vertBuff;
     int vao;
 
@@ -35,12 +36,10 @@ public class Game {
     }
 
     public void createCapabilitiesAndOpen() {
-        window.setupContext();
+        window.setupGLFWContext();
         window.setVSync(Constants.V_SYNC);
 
-        GL.createCapabilities();  // do before anything gl related
-        glEnable(GL45.GL_DEBUG_OUTPUT);
-        glClearColor(.0f, .0f, .0f, .0f);
+        Renderer.setupGLContext();  // do before anything gl related
 
         window.show();
         bindEvents();
@@ -50,10 +49,7 @@ public class Game {
 
     public void close() {
         Logging.info("Closing safely");
-        glfwFreeCallbacks(window.handle);
-        glfwDestroyWindow(window.handle);
-
-        glfwTerminate();
+        window.close();
         Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 
@@ -77,10 +73,8 @@ public class Game {
         vao = GL45.glGenVertexArrays();
         GL45.glBindVertexArray(vao);
 
-        // copy vertices into buffer
-        vertBuff = GL45.glGenBuffers();
-        GL45.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertBuff);
-        GL45.glBufferData(GL15.GL_ARRAY_BUFFER, 1024, GL15.GL_DYNAMIC_DRAW);
+        vb.genId();
+        vb.bufferSize(1024);
 
         // define the format of the buffer
         GL45.glEnableVertexAttribArray(0);  // only need one as we only have vertex position
@@ -92,7 +86,7 @@ public class Game {
         sh.genProgram();
         sh.attachShadersInDir(new File(Constants.SHADERS_FOLDER));
         sh.linkProgram();
-        GL45.glUseProgram(sh.program);  // bind
+        sh.bind();
 
         sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
     }
@@ -117,9 +111,9 @@ public class Game {
                 50, Constants.SCREEN_SIZE.height - 50,
                 Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50
         };
-        GL45.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, verts);
+        vb.BufferSubData(verts);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, (int) Math.floor(verts.length * .5));
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
 
         Renderer.finish(window);
     }
@@ -128,9 +122,9 @@ public class Game {
         double tStart = System.nanoTime();
         frameCounter++;
 
+        glfwPollEvents();
         updateFps();
         render();
-        glfwPollEvents();
 
         return MathUtils.nanoToSecond(System.nanoTime() - tStart);
     }

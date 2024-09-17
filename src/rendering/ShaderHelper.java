@@ -12,12 +12,16 @@ import java.util.Scanner;
 import static org.lwjgl.opengl.GL11.*;
 
 public class ShaderHelper {
-    public int program;
+    public Integer program;
     public final HashMap<String, Integer> uniformCache = new HashMap<>();
 
     public ShaderHelper() {}
 
     public void genProgram() {
+        if (program != null) {
+            Logging.warn("Attempting to re-generate already generated program, aborting");
+            return;
+        }
         program = GL45.glCreateProgram();
     }
 
@@ -105,6 +109,14 @@ public class ShaderHelper {
             case "frag" -> shaderType = GL45.GL_FRAGMENT_SHADER;
         }
         return shaderType;
+    }
+
+    public void bind() {
+        GL45.glUseProgram(program);
+    }
+
+    public void unbind() {
+        GL45.glUseProgram(0);
     }
 
     public int getUniformLocation(String uniform) {
