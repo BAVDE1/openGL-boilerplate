@@ -1,4 +1,4 @@
-package src.game;
+package src.rendering;
 
 import org.lwjgl.opengl.GL45;
 import src.utility.Logging;
@@ -9,14 +9,13 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Scanner;
 
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL11.*;
 
 public class ShaderHelper {
     public int program;
     public final HashMap<String, Integer> uniformCache = new HashMap<>();
 
-    ShaderHelper() {}
+    public ShaderHelper() {}
 
     public void genProgram() {
         program = GL45.glCreateProgram();
@@ -36,7 +35,7 @@ public class ShaderHelper {
                 attachShadersInDir(fileEntry.getAbsoluteFile());
                 continue;
             }
-            attachShader(program, fileEntry);
+            attachShader(fileEntry);
         }
     }
 
@@ -76,6 +75,10 @@ public class ShaderHelper {
 
         GL45.glAttachShader(program, shader);
         Logging.info(String.format("Shader Attached: '%s', %s chars (type %s)", file, charSequence.length(), shaderType));
+    }
+
+    public void attachShader(File file) {
+        attachShader(program, file);
     }
 
     public void linkProgram() {

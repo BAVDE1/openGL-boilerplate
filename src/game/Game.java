@@ -2,7 +2,10 @@ package src.game;
 
 import org.lwjgl.opengl.*;
 import src.Main;
+import src.rendering.Renderer;
+import src.rendering.ShaderHelper;
 import src.utility.Logging;
+import src.utility.MathUtils;
 import src.utility.Vec2;
 
 import java.io.File;
@@ -105,7 +108,7 @@ public class Game {
     }
 
     public void render() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+        Renderer.clearScreen();
 
         sh.uniform1f("time", (float) glfwGetTime());
 
@@ -118,7 +121,7 @@ public class Game {
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, (int) Math.floor(verts.length * .5));
 
-        glfwSwapBuffers(window.handle); // finish rendering
+        Renderer.finish(window);
     }
 
     public double mainLoop(double dt) {

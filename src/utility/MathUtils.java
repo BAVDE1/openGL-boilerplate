@@ -1,4 +1,4 @@
-package src.game;
+package src.utility;
 
 public class MathUtils {
     public static double nanoToSecond(double nanoSecs) {

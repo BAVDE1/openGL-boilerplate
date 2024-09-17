@@ -2,10 +2,8 @@ package src;
 
 import src.game.Constants;
 import src.game.Game;
-import src.game.MathUtils;
+import src.utility.MathUtils;
 import src.utility.Logging;
-
-import java.util.logging.Logger;
 
 public class Main {
     public static void main(String[] args) {

@@ -65,7 +65,7 @@ public class Logging {
             switch (severity) {
                 case GL45.GL_DEBUG_SEVERITY_LOW, GL45.GL_DEBUG_SEVERITY_MEDIUM -> warn(finalMsg);
                 case GL45.GL_DEBUG_SEVERITY_HIGH -> danger(finalMsg);
-                case GL45.GL_DEBUG_SEVERITY_NOTIFICATION -> info(finalMsg);
+                case GL45.GL_DEBUG_SEVERITY_NOTIFICATION -> debug(finalMsg);
             }
         };
     }
