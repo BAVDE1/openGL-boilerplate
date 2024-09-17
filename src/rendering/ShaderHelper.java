@@ -12,7 +12,7 @@ import java.util.Scanner;
 import static org.lwjgl.opengl.GL11.*;
 
 public class ShaderHelper {
-    public Integer program;
+    private Integer program;
     public final HashMap<String, Integer> uniformCache = new HashMap<>();
 
     public ShaderHelper() {}

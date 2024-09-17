@@ -5,10 +5,10 @@ import org.lwjgl.opengl.GL45;
 import src.utility.Logging;
 
 public class VertexBuffer {
-    private boolean isBound = false;
     private final int bufferType = GL45.GL_ARRAY_BUFFER;
-    public int drawMethod = GL15.GL_DYNAMIC_DRAW;
-    public Integer bufferId;
+    private final int drawMethod = GL15.GL_DYNAMIC_DRAW;
+    private boolean isBound = false;
+    private Integer bufferId;
 
     public VertexBuffer(){}
 

@@ -8,6 +8,7 @@ import org.lwjgl.system.MemoryStack;
 import src.utility.Logging;
 
 import java.nio.IntBuffer;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -70,6 +71,7 @@ public class Window {
         glfwFreeCallbacks(handle);
         glfwDestroyWindow(handle);
         glfwTerminate();
+        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 
     public void setVSync(boolean vSync) {

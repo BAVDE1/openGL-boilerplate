@@ -9,12 +9,12 @@ import static org.lwjgl.opengl.GL11.*;
 
 
 public class VertexArray {
-    public class VertexBufferElement {
+    public static class VertexArrayElement {
         public int type;
         public int count;
         public boolean normalized;
 
-        public VertexBufferElement(int type, int count, boolean normalized) {
+        public VertexArrayElement(int type, int count, boolean normalized) {
             this.type = type;
             this.count = count;
             this.normalized = normalized;
@@ -36,15 +36,15 @@ public class VertexArray {
         }
     }
 
-    public class VertexBufferLayout {
-        private final ArrayList<VertexBufferElement> elements = new ArrayList<>();
+    public static class VertexArrayLayout {
+        private final ArrayList<VertexArrayElement> elements = new ArrayList<>();
         private int stride = 0;
 
-        public VertexBufferLayout(){}
+        public VertexArrayLayout(){}
 
-        public void push(int type, int count, boolean normalized) {
-            elements.add(new VertexBufferElement(type, count, normalized));
-            stride += count * VertexBufferElement.getByteSizeForType(type);
+        private void push(int type, int count, boolean normalized) {
+            elements.add(new VertexArrayElement(type, count, normalized));
+            stride += count * VertexArrayElement.getByteSizeForType(type);
         }
 
         public void pushFloat(int count) {
@@ -55,12 +55,13 @@ public class VertexArray {
             push(GL_UNSIGNED_INT, count, false);
         }
 
-        public ArrayList<VertexBufferElement> getElements() {
+        public ArrayList<VertexArrayElement> getElements() {
             return elements;
         }
     }
 
-    public Integer arrayId;
+    private boolean isBound = false;
+    private Integer arrayId;
     public int attribCount = 0;
 
     public VertexArray(){}
@@ -73,26 +74,31 @@ public class VertexArray {
         arrayId = GL45.glGenVertexArrays();
     }
 
-    public void addBuffer(VertexBuffer vb, VertexBufferLayout layout) {
+    public void addBuffer(VertexBuffer vb, VertexArrayLayout layout) {
+        bind();
         vb.bind();
 
-        ArrayList<VertexBufferElement> allElements = layout.getElements();
         int offset = 0;
-
+        ArrayList<VertexArrayElement> allElements = layout.getElements();
         for (int i = 0; i < allElements.size(); i++) {
-            VertexBufferElement element = allElements.get(i);
+            VertexArrayElement element = allElements.get(i);
             GL45.glEnableVertexAttribArray(i);
             GL45.glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.stride, offset);
+
             offset += element.count * element.getByteSizeForType();
             attribCount++;
         }
     }
 
     public void bind() {
+        if (isBound) return;
+        isBound = true;
         GL45.glBindVertexArray(arrayId);
     }
 
     public void unbind() {
+        if (!isBound) return;
+        isBound = false;
         GL45.glBindVertexArray(0);
     }
 }

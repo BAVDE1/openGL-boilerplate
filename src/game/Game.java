@@ -4,31 +4,30 @@ import org.lwjgl.opengl.*;
 import src.Main;
 import src.rendering.Renderer;
 import src.rendering.ShaderHelper;
+import src.rendering.VertexArray;
 import src.rendering.VertexBuffer;
 import src.utility.Logging;
 import src.utility.MathUtils;
 import src.utility.Vec2;
 
 import java.io.File;
-import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
-    public Window window = new Window();  // handle
-    public ShaderHelper sh = new ShaderHelper();
+    public Window window = new Window();
 
-    public Vec2 mousePos = new Vec2();
+    ShaderHelper sh = new ShaderHelper();
+    VertexArray va = new VertexArray();
+    VertexBuffer vb = new VertexBuffer();
 
-    public double timeStarted = 0;
-    public int secondsElapsed = 0;
+    Vec2 mousePos = new Vec2();
+
+    double timeStarted = 0;
+    int secondsElapsed = 0;
     int frameCounter = 0;
     int fps = 0;
-
-    VertexBuffer vb = new VertexBuffer();
-    int vertBuff;
-    int vao;
 
     public void start() {
         timeStarted = System.currentTimeMillis();
@@ -39,7 +38,7 @@ public class Game {
         window.setupGLFWContext();
         window.setVSync(Constants.V_SYNC);
 
-        Renderer.setupGLContext();  // do before anything gl related
+        Renderer.setupGLContext();
 
         window.show();
         bindEvents();
@@ -50,7 +49,6 @@ public class Game {
     public void close() {
         Logging.info("Closing safely");
         window.close();
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 
     public boolean shouldClose() {
@@ -70,15 +68,14 @@ public class Game {
     }
 
     public void setupBuffers() {
-        vao = GL45.glGenVertexArrays();
-        GL45.glBindVertexArray(vao);
-
         vb.genId();
         vb.bufferSize(1024);
 
         // define the format of the buffer
-        GL45.glEnableVertexAttribArray(0);  // only need one as we only have vertex position
-        GL45.glVertexAttribPointer(0, 2, GL_FLOAT, false, Float.BYTES * 2, 0);
+        va.genId();
+        VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
+        layout.pushFloat(2);
+        va.addBuffer(vb, layout);
     }
 
     /** Must be called after window is visible */
@@ -92,7 +89,7 @@ public class Game {
     }
 
     public void updateFps() {
-        // update every second
+        // updates every second
         int newSeconds = (int) Math.floor(MathUtils.millisToSecond(System.currentTimeMillis()) - MathUtils.millisToSecond(timeStarted));
         if (newSeconds != secondsElapsed) {
             fps = frameCounter;
@@ -113,7 +110,7 @@ public class Game {
         };
         vb.BufferSubData(verts);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+        Renderer.draw(GL_TRIANGLE_STRIP, va, 3);
 
         Renderer.finish(window);
     }
