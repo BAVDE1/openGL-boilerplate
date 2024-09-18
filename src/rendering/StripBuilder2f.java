@@ -5,8 +5,8 @@ import src.utility.Logging;
 public class StripBuilder2f {
     private float[] vertices;
     private final int size;
-    private int count = 0;
-    private int separations = 0;
+    public int count = 0;
+    public int separations = 0;
 
     public StripBuilder2f(){this(1024);}
     public StripBuilder2f(int size){

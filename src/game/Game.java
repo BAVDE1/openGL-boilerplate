@@ -28,12 +28,6 @@ public class Game {
     int fps = 0;
 
     public void start() {
-        StripBuilder2f s = new StripBuilder2f();
-        s.pushSeparatedVertices(new float[] {0, 1, 2, 3, 4, 5});
-        System.out.println(Arrays.toString(s.getSetVertices()));
-        s.pushSeparatedVertices(new float[] {6, 7, 8, 9, 10, 11});
-        System.out.println(Arrays.toString(s.getSetVertices()));
-
         timeStarted = System.currentTimeMillis();
         Main.startTimeStepper(Constants.DT, this);
     }
@@ -73,7 +67,10 @@ public class Game {
 
     public void setupBuffers() {
         vb.genId();
-        vb.bufferSize(1024);
+        StripBuilder2f s = new StripBuilder2f();
+        s.pushSeparatedVertices(new float[] {100, 100, 200, 100, 100, 200});
+        s.pushSeparatedVertices(new float[] {300, 100, 400, 100, 300, 200, 400, 200, 300, 300});
+        vb.bufferData(s.getSetVertices());
 
         va.genId();
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
@@ -104,16 +101,11 @@ public class Game {
     public void render() {
         Renderer.clearScreen();
 
+        vb.BufferSubData(14 * Float.BYTES, new float[] {(float) mousePos.x, (float) mousePos.y});
+
         sh.uniform1f("time", (float) glfwGetTime());
 
-        float[] verts = {
-                (float) mousePos.x, (float) mousePos.y,
-                50, Constants.SCREEN_SIZE.height - 50,
-                Constants.SCREEN_SIZE.width - 50, Constants.SCREEN_SIZE.height - 50
-        };
-        vb.BufferSubData(verts);
-
-        Renderer.draw(GL_TRIANGLE_STRIP, va, 3);
+        Renderer.draw(GL_TRIANGLE_STRIP, va, 10);
 
         Renderer.finish(window);
     }

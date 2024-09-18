@@ -26,9 +26,9 @@ public class VertexBuffer {
         BufferSubData(0, data);
     }
 
-    public void BufferSubData(int offset, float[] data) {
+    public void BufferSubData(int bytesOffset, float[] data) {
         bind();
-        GL45.glBufferSubData(GL15.GL_ARRAY_BUFFER, offset, data);
+        GL45.glBufferSubData(GL15.GL_ARRAY_BUFFER, bytesOffset, data);
     }
 
     public void genId() {
