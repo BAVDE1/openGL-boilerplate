@@ -28,22 +28,22 @@ public class StripBuilder2f {
         pushSeparatedVertices(verts, verts.length);
     }
 
-    public void pushSeparatedVertices(float[] verts, int additionCount) {
+    public void pushSeparatedVertices(float[] verts, int vertCount) {
         assert verts.length > 1;
         if (count > 0) addSeparation(verts[0], verts[1]);
-        pushVertices(verts, additionCount);
+        pushVertices(verts, vertCount);
     }
 
     public void pushVertices(float[] verts) {
         pushVertices(verts, verts.length);
     }
 
-    public void pushVertices(float[] verts, int additionCount) {
+    public void pushVertices(float[] verts, int vertCount) {
         assert verts.length > 0;
-        if (count + additionCount > size) {
+        if (count + vertCount > size) {
             Logging.danger(String.format(
                     "Attempting to add too many items to primitive array! Array max size: %s, current array count %s, attempted addition: %s. Aborting",
-                    size, count, additionCount));
+                    size, count, vertCount));
             return;
         }
 
@@ -59,7 +59,13 @@ public class StripBuilder2f {
         separations = 0;
     }
 
-    public float[] getVertices() {
+    public float[] getAllVertices() {
         return vertices;
+    }
+
+    public float[] getSetVertices() {
+        float[] v = new float[count];
+        System.arraycopy(vertices, 0, v, 0, count);
+        return v;
     }
 }

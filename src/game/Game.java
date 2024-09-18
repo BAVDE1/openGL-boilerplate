@@ -2,15 +2,13 @@ package src.game;
 
 import org.lwjgl.opengl.*;
 import src.Main;
-import src.rendering.Renderer;
-import src.rendering.ShaderHelper;
-import src.rendering.VertexArray;
-import src.rendering.VertexBuffer;
+import src.rendering.*;
 import src.utility.Logging;
 import src.utility.MathUtils;
 import src.utility.Vec2;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -30,6 +28,12 @@ public class Game {
     int fps = 0;
 
     public void start() {
+        StripBuilder2f s = new StripBuilder2f();
+        s.pushSeparatedVertices(new float[] {0, 1, 2, 3, 4, 5});
+        System.out.println(Arrays.toString(s.getSetVertices()));
+        s.pushSeparatedVertices(new float[] {6, 7, 8, 9, 10, 11});
+        System.out.println(Arrays.toString(s.getSetVertices()));
+
         timeStarted = System.currentTimeMillis();
         Main.startTimeStepper(Constants.DT, this);
     }
