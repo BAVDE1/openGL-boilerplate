@@ -71,7 +71,6 @@ public class Game {
         vb.genId();
         vb.bufferSize(1024);
 
-        // define the format of the buffer
         va.genId();
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
         layout.pushFloat(2);
