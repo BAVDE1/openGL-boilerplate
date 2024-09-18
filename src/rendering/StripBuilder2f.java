@@ -2,14 +2,14 @@ package src.rendering;
 
 import src.utility.Logging;
 
-public class StripBufferBuilder2f {
+public class StripBuilder2f {
     private float[] vertices;
     private final int size;
     private int count = 0;
     private int separations = 0;
 
-    public StripBufferBuilder2f(){this(1024);}
-    public StripBufferBuilder2f(int size){
+    public StripBuilder2f(){this(1024);}
+    public StripBuilder2f(int size){
         vertices = new float[size];
         this.size = size;
     }
@@ -30,10 +30,7 @@ public class StripBufferBuilder2f {
 
     public void pushSeparatedVertices(float[] verts, int additionCount) {
         assert verts.length > 1;
-        if (count > 0) {
-            addSeparation(verts[0], verts[1]);
-        }
-
+        if (count > 0) addSeparation(verts[0], verts[1]);
         pushVertices(verts, additionCount);
     }
 
