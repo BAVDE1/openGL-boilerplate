@@ -26,7 +26,7 @@ public class StripBuilder2f {
         f[0] = vertices[count-2];
         f[1] = vertices[count-1];
         f[2+additionalVerts] = toX;
-        f[2+additionalVerts+1] = toX;
+        f[2+additionalVerts+1] = toY;
         pushVertices(f);
     }
 

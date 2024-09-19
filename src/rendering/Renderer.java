@@ -15,6 +15,7 @@ public class Renderer {
     public static void setupGLContext() {
         GL.createCapabilities();
         glEnable(GL45.GL_DEBUG_OUTPUT);
+        glEnable(GL_TEXTURE_2D);
         glClearColor(.0f, .0f, .0f, .0f);
     }
 

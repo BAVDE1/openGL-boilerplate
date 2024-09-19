@@ -3,6 +3,8 @@
 
 ---
 
+general lwjgl: https://github.com/mattdesl/lwjgl-basics/wiki
+
 glfw: https://www.glfw.org/docs/latest/window_guide.html
 
 openGL: https://docs.gl/
