@@ -1,5 +1,6 @@
 package src.rendering;
 
+import src.game.Constants;
 import src.utility.Logging;
 
 public class StripBuilder2f {
@@ -8,7 +9,9 @@ public class StripBuilder2f {
     public int count = 0;
     public int separations = 0;
 
-    public StripBuilder2f(){this(1024);}
+    private int additionalVerts = 0;
+
+    public StripBuilder2f(){this(Constants.BUFF_SIZE_GENERAL);}
     public StripBuilder2f(int size){
         vertices = new float[size];
         this.size = size;
@@ -18,10 +21,13 @@ public class StripBuilder2f {
     private void addSeparation(float toX, float toY) {
         assert count > 1;
         separations++;
-        pushVertices(new float[] {
-                vertices[count-2], vertices[count-1],
-                toX, toY
-        });
+
+        float[] f = new float[4 + (additionalVerts * 2)];
+        f[0] = vertices[count-2];
+        f[1] = vertices[count-1];
+        f[2+additionalVerts] = toX;
+        f[2+additionalVerts+1] = toX;
+        pushVertices(f);
     }
 
     public void pushSeparatedVertices(float[] verts) {
@@ -67,5 +73,11 @@ public class StripBuilder2f {
         float[] v = new float[count];
         System.arraycopy(vertices, 0, v, 0, count);
         return v;
+    }
+
+    public void setAdditionalVerts(int num) {
+        if (additionalVerts != 0)
+            Logging.warn("Changing already set 'additional vertices'. This could warp the buffer");
+        additionalVerts = num;
     }
 }

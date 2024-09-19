@@ -7,18 +7,17 @@ import src.utility.Logging;
 public class VertexBuffer {
     private final int bufferType = GL45.GL_ARRAY_BUFFER;
     private final int drawMethod = GL15.GL_DYNAMIC_DRAW;
-    private boolean isBound = false;
     private Integer bufferId;
 
     public VertexBuffer(){}
 
     public void bufferData(float[] data) {
-        bind();
+        Renderer.bindBuffer(this);
         GL45.glBufferData(bufferType, data, drawMethod);
     }
 
     public void bufferSize(int size) {
-        bind();
+        Renderer.bindBuffer(this);
         GL45.glBufferData(bufferType, size, drawMethod);
     }
 
@@ -27,7 +26,7 @@ public class VertexBuffer {
     }
 
     public void BufferSubData(int bytesOffset, float[] data) {
-        bind();
+        Renderer.bindBuffer(this);
         GL45.glBufferSubData(GL15.GL_ARRAY_BUFFER, bytesOffset, data);
     }
 
@@ -39,15 +38,7 @@ public class VertexBuffer {
         bufferId = GL45.glGenBuffers();
     }
 
-    public void bind() {
-        if (isBound) return;
-        isBound = true;
-        GL45.glBindBuffer(bufferType, bufferId);
-    }
-
-    public void unbind() {
-        if (!isBound) return;
-        isBound = false;
-        GL45.glBindBuffer(bufferType, 0);
-    }
+    public int getId() {return bufferId;}
+    public int getBufferType() {return bufferType;}
+    public int getDrawMethod() {return drawMethod;}
 }

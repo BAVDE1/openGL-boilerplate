@@ -76,6 +76,8 @@ public class Game {
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
         layout.pushFloat(2);
         va.addBuffer(vb, layout);
+
+        TextRenderer r = new TextRenderer();
     }
 
     /** Must be called after window is visible */
@@ -100,9 +102,6 @@ public class Game {
 
     public void render() {
         Renderer.clearScreen();
-
-        vb.BufferSubData(14 * Float.BYTES, new float[] {(float) mousePos.x, (float) mousePos.y});
-
         sh.uniform1f("time", (float) glfwGetTime());
 
         Renderer.draw(GL_TRIANGLE_STRIP, va, 10);

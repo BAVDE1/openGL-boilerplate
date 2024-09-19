@@ -60,7 +60,6 @@ public class VertexArray {
         }
     }
 
-    private boolean isBound = false;
     private Integer arrayId;
     public int attribCount = 0;
 
@@ -75,8 +74,8 @@ public class VertexArray {
     }
 
     public void addBuffer(VertexBuffer vb, VertexArrayLayout layout) {
-        bind();
-        vb.bind();
+        Renderer.bindArray(this);
+        Renderer.bindBuffer(vb);
 
         int offset = 0;
         ArrayList<VertexArrayElement> allElements = layout.getElements();
@@ -90,15 +89,7 @@ public class VertexArray {
         }
     }
 
-    public void bind() {
-        if (isBound) return;
-        isBound = true;
-        GL45.glBindVertexArray(arrayId);
-    }
-
-    public void unbind() {
-        if (!isBound) return;
-        isBound = false;
-        GL45.glBindVertexArray(0);
+    public int getId() {
+        return arrayId;
     }
 }

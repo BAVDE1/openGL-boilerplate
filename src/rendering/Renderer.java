@@ -8,6 +8,9 @@ import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Renderer {
+    private static int boundArray = 0;
+    private static int boundBuffer = 0;
+
     /** Do before anything GL related */
     public static void setupGLContext() {
         GL.createCapabilities();
@@ -20,11 +23,29 @@ public class Renderer {
     }
 
     public static void draw(int mode, VertexArray va, int count) {
-        va.bind();
+        Renderer.bindArray(va);
         glDrawArrays(mode, 0, count);
     }
 
     public static void finish(Window window) {
         glfwSwapBuffers(window.handle);
+    }
+
+    public static void bindArray(VertexArray va) {
+        bindArray(va.getId());
+    }
+    public static void bindArray(int id) {
+        if (id == boundArray) return;
+        boundArray = id;
+        GL45.glBindVertexArray(id);
+    }
+
+    public static void bindBuffer(VertexBuffer vb) {
+        bindBuffer(vb.getBufferType(), vb.getId());
+    }
+    public static void bindBuffer(int bufferType, int id) {
+        if (id == boundBuffer) return;
+        boundBuffer = id;
+        GL45.glBindBuffer(bufferType, id);
     }
 }
