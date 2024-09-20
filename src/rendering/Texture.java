@@ -2,6 +2,7 @@ package src.rendering;
 
 import modules.PNGDecoder.PNGDecoder;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL45;
 import src.utility.Logging;
 
 import java.io.FileInputStream;
@@ -38,8 +39,11 @@ public class Texture {
         glBindTexture(GL_TEXTURE_2D, texId);
         setupTextureDefaults();
 
+        // potentially required: https://www.khronos.org/opengl/wiki/Common_Mistakes#Texture_upload_and_pixel_reads
+        // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
         // pass to openGL
-        glTexImage2D();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgBuffer);
     }
 
     private void setupTextureDefaults() {
