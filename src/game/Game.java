@@ -66,6 +66,8 @@ public class Game {
     }
 
     public void setupBuffers() {
+        Texture t = new Texture("res/textures/explosion.png");
+
         vb.genId();
         StripBuilder2f s = new StripBuilder2f();
         s.pushSeparatedVertices(new float[] {100, 100, 200, 100, 100, 200});

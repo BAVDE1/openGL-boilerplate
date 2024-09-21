@@ -9,27 +9,27 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL45.*;
 
 public class Texture {
     private int texId;
-
-    ByteBuffer imgBuffer;
 
     int width;
     int height;
     int bpp = 4;  // bytes per pixel
 
     public Texture(String filePath) {
+        ByteBuffer buffer;
+
         try (FileInputStream file = new FileInputStream(filePath)) {
             PNGDecoder decoder = new PNGDecoder(file);
 
             width = decoder.getWidth();
             height = decoder.getHeight();
-            imgBuffer = BufferUtils.createByteBuffer(bpp * width * height);
-            decoder.decodeFlipped(imgBuffer, width * bpp, PNGDecoder.Format.RGBA);  // flip it right way round lol
+            buffer = BufferUtils.createByteBuffer(bpp * width * height);
+            decoder.decodeFlipped(buffer, width * bpp, PNGDecoder.Format.RGBA);  // flip it right way round lol
 
-            imgBuffer.flip();  // flip to read mode for gl
+            buffer.flip();  // flip to read mode for gl
         } catch (IOException ioe) {
             Logging.danger(String.format("PNG at location '%s' could not be loaded. Thrown message:\n%s", filePath, ioe));
             return;
@@ -42,8 +42,12 @@ public class Texture {
         // potentially required: https://www.khronos.org/opengl/wiki/Common_Mistakes#Texture_upload_and_pixel_reads
         // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-        // pass to openGL
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgBuffer);
+        // pass to openGL (internalFormat: format to be stored in, format: format of supplied image)
+        // use GL_RGBA8?
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        unbind();
+
+        buffer.clear();  // may want to keep for later though :shrug:
     }
 
     private void setupTextureDefaults() {
@@ -52,15 +56,17 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         // no wrap
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);  // GL_CLAMP_TO_EDGE?
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // GL_CLAMP_TO_EDGE?
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
     public void bind() {bind(0);}
     public void bind(int slot) {
+        GL45.glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, texId);
     }
 
     public void unbind() {
-
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
