@@ -8,7 +8,6 @@ import src.utility.MathUtils;
 import src.utility.Vec2;
 
 import java.io.File;
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -40,8 +39,8 @@ public class Game {
 
         window.show();
         bindEvents();
-        setupBuffers();
         setupShaders();
+        setupBuffers();
     }
 
     public void close() {
@@ -66,17 +65,20 @@ public class Game {
     }
 
     public void setupBuffers() {
-        Texture t = new Texture("res/textures/explosion.png");
-
         vb.genId();
         StripBuilder2f s = new StripBuilder2f();
-        s.pushSeparatedVertices(new float[] {100, 100, 200, 100, 100, 200});
-        s.pushSeparatedVertices(new float[] {300, 100, 400, 100, 300, 200, 400, 200, 300, 300});
+        s.pushSeparatedVertices(new float[] {
+                100, 100, 0, 0,
+                300, 100, 1, 0,
+                100, 300, 0, 1,
+                300, 300, 1, 1
+        });
         vb.bufferData(s.getSetVertices());
 
         va.genId();
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
-        layout.pushFloat(2);
+        layout.pushFloat(2);  // 0: pos
+        layout.pushFloat(2);  // 1: tex coord
         va.addBuffer(vb, layout);
 
         TextRenderer r = new TextRenderer();
@@ -90,6 +92,9 @@ public class Game {
         sh.bind();
 
         sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+
+        new Texture("res/textures/explosion.png").bind();
+        sh.uniform1i("sampleTexture", 0);
     }
 
     public void updateFps() {
@@ -106,7 +111,7 @@ public class Game {
         Renderer.clearScreen();
         sh.uniform1f("time", (float) glfwGetTime());
 
-        Renderer.draw(GL_TRIANGLE_STRIP, va, 10);
+        Renderer.draw(GL_TRIANGLE_STRIP, va, 4);
 
         Renderer.finish(window);
     }

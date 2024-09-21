@@ -27,7 +27,7 @@ public class Texture {
             width = decoder.getWidth();
             height = decoder.getHeight();
             buffer = BufferUtils.createByteBuffer(bpp * width * height);
-            decoder.decodeFlipped(buffer, width * bpp, PNGDecoder.Format.RGBA);  // flip it right way round lol
+            decoder.decode(buffer, width * bpp, PNGDecoder.Format.RGBA);
 
             buffer.flip();  // flip to read mode for gl
         } catch (IOException ioe) {
@@ -39,11 +39,7 @@ public class Texture {
         glBindTexture(GL_TEXTURE_2D, texId);
         setupTextureDefaults();
 
-        // potentially required: https://www.khronos.org/opengl/wiki/Common_Mistakes#Texture_upload_and_pixel_reads
-        // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
         // pass to openGL (internalFormat: format to be stored in, format: format of supplied image)
-        // use GL_RGBA8?
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
         unbind();
 

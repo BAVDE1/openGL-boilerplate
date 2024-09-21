@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Scanner;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL45.*;
 
 public class ShaderHelper {
     private Integer program;
@@ -22,7 +22,7 @@ public class ShaderHelper {
             Logging.warn("Attempting to re-generate already generated program, aborting");
             return;
         }
-        program = GL45.glCreateProgram();
+        program = glCreateProgram();
     }
 
     /** Search entire directory (including folders within folders) until a file is found, and pass it to applyShader() */
@@ -66,18 +66,18 @@ public class ShaderHelper {
         }
 
         // compile shader
-        int shader = GL45.glCreateShader(shaderType);
-        GL45.glShaderSource(shader, charSequence);
+        int shader = glCreateShader(shaderType);
+        glShaderSource(shader, charSequence);
 
-        GL45.glCompileShader(shader);
+        glCompileShader(shader);
         int[] shaderCompiled = new int[1];  // only needs size of 1
-        GL45.glGetShaderiv(shader, GL45.GL_COMPILE_STATUS, shaderCompiled);
+        glGetShaderiv(shader, GL_COMPILE_STATUS, shaderCompiled);
         if (shaderCompiled[0] != GL_TRUE) {
-            Logging.danger(String.format("Shader Compile Error (%s): %s", file, GL45.glGetShaderInfoLog(shader, 1024)));
+            Logging.danger(String.format("Shader Compile Error (%s): %s", file, glGetShaderInfoLog(shader, 1024)));
             return;
         }
 
-        GL45.glAttachShader(program, shader);
+        glAttachShader(program, shader);
         Logging.info(String.format("Shader Attached: '%s', %s chars (type %s)", file, charSequence.length(), shaderType));
     }
 
@@ -86,12 +86,12 @@ public class ShaderHelper {
     }
 
     public void linkProgram() {
-        GL45.glLinkProgram(program);
+        glLinkProgram(program);
         int[] programLinked = new int[1];
 
-        GL45.glGetProgramiv(program, GL45.GL_LINK_STATUS, programLinked);
+        glGetProgramiv(program, GL_LINK_STATUS, programLinked);
         if (programLinked[0] != GL_TRUE) {
-            Logging.danger(String.format("Shader Linking Error: %s", GL45.glGetProgramInfoLog(program, 1024)));
+            Logging.danger(String.format("Shader Linking Error: %s", glGetProgramInfoLog(program, 1024)));
         }
     }
 
@@ -102,35 +102,38 @@ public class ShaderHelper {
 
         int shaderType = -1;
         switch (ext) {
-            case "vert" -> shaderType = GL45.GL_VERTEX_SHADER;
-            case "tesc" -> shaderType = GL45.GL_TESS_CONTROL_SHADER;
-            case "tese" -> shaderType = GL45.GL_TESS_EVALUATION_SHADER;
-            case "geom" -> shaderType = GL45.GL_GEOMETRY_SHADER;
-            case "frag" -> shaderType = GL45.GL_FRAGMENT_SHADER;
+            case "vert" -> shaderType = GL_VERTEX_SHADER;
+            case "tesc" -> shaderType = GL_TESS_CONTROL_SHADER;
+            case "tese" -> shaderType = GL_TESS_EVALUATION_SHADER;
+            case "geom" -> shaderType = GL_GEOMETRY_SHADER;
+            case "frag" -> shaderType = GL_FRAGMENT_SHADER;
         }
         return shaderType;
     }
 
     public void bind() {
-        GL45.glUseProgram(program);
+        glUseProgram(program);
     }
 
     public void unbind() {
-        GL45.glUseProgram(0);
+        glUseProgram(0);
     }
 
     public int getUniformLocation(String uniform) {
         if (!uniformCache.containsKey(uniform)) {
-            uniformCache.put(uniform, GL45.glGetUniformLocation(program, uniform));
+            uniformCache.put(uniform, glGetUniformLocation(program, uniform));
         }
         return uniformCache.get(uniform);
     }
 
+    public void uniform1i(String uniform, int i) {
+        glUniform1i(getUniformLocation(uniform), i);
+    }
     public void uniform1f(String uniform, float f) {
-        GL45.glUniform1f(getUniformLocation(uniform), f);
+        glUniform1f(getUniformLocation(uniform), f);
     }
 
     public void uniform2f(String uniform, float f1, float f2) {
-        GL45.glUniform2f(getUniformLocation(uniform), f1, f2);
+        glUniform2f(getUniformLocation(uniform), f1, f2);
     }
 }

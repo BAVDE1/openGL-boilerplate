@@ -5,7 +5,7 @@ import src.utility.Logging;
 
 import java.util.ArrayList;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL45.*;
 
 
 public class VertexArray {
@@ -70,7 +70,7 @@ public class VertexArray {
             Logging.warn("Attempting to re-generate already generated array id, aborting");
             return;
         }
-        arrayId = GL45.glGenVertexArrays();
+        arrayId = glGenVertexArrays();
     }
 
     public void addBuffer(VertexBuffer vb, VertexArrayLayout layout) {
@@ -81,8 +81,8 @@ public class VertexArray {
         ArrayList<VertexArrayElement> allElements = layout.getElements();
         for (int i = 0; i < allElements.size(); i++) {
             VertexArrayElement element = allElements.get(i);
-            GL45.glEnableVertexAttribArray(i);
-            GL45.glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.stride, offset);
+            glEnableVertexAttribArray(i);
+            glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.stride, offset);
 
             offset += element.count * element.getByteSizeForType();
             attribCount++;
