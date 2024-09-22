@@ -22,7 +22,6 @@ public class TextRenderer {
 
         int ySpacing = 10;
 
-        // todo: different sizes
         public TextObject(String string, Vec2f pos) {
             this.string = string;
             this.pos = pos;
@@ -59,6 +58,11 @@ public class TextRenderer {
                 // all chars
                 int accumulatedX = 0;
                 for (char c : line.toCharArray()) {
+                    if (!font.canDisplay(c)) {
+                        Logging.warn("Character '%s' does not exist in the currently loaded ttf, will use '0' instead", c);
+                        c = '0';
+                    }
+
                     sb.pushVertices(new float[] {
                             pos.x + accumulatedX,              lineY,
                             pos.x + accumulatedX + charSize.x, lineY + charSize.y
