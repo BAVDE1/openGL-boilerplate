@@ -2,21 +2,41 @@ package src.rendering;
 
 import static org.lwjgl.opengl.GL11.*;
 import src.game.Constants;
+import src.utility.Logging;
 import src.utility.Vec2f;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class TextRenderer {
     public static class TextObject {
+        private Font font;
+        public float fontSize = 25;
+        public int fontStyle = Font.PLAIN;
+
         public int index = -1;
         String string;
         Vec2f pos;
 
         int ySpacing = 10;
 
+        // todo: different sizes
         public TextObject(String string, Vec2f pos) {
             this.string = string;
             this.pos = pos;
+
+            prepareFont(Constants.DEFAULT_FONT);
+        }
+
+        public void prepareFont(String fontFile) {
+            try {
+                font = Font.createFont(Font.TRUETYPE_FONT, new File(fontFile));
+                font.deriveFont(fontStyle, fontSize);
+            } catch (IOException | FontFormatException e) {
+                Logging.danger("Error preparing font, aborting. Thrown message:\n%s", e);
+            }
         }
 
         public float[] buildStrip() {
