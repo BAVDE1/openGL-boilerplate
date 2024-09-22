@@ -6,6 +6,7 @@ import src.rendering.*;
 import src.utility.Logging;
 import src.utility.MathUtils;
 import src.utility.Vec2;
+import src.utility.Vec2f;
 
 import java.io.File;
 
@@ -18,6 +19,8 @@ public class Game {
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
     VertexBuffer vb = new VertexBuffer();
+
+    TextRenderer tr = new TextRenderer();
 
     Vec2 mousePos = new Vec2();
 
@@ -68,20 +71,23 @@ public class Game {
         vb.genId();
         StripBuilder2f s = new StripBuilder2f();
         s.pushSeparatedVertices(new float[] {
-                100, 100, 0, 0,
-                300, 100, 1, 0,
-                100, 300, 0, 1,
-                300, 300, 1, 1
+                200, 200,
+                300, 200,
+                200, 300,
+                300, 300,
         });
         vb.bufferData(s.getSetVertices());
 
         va.genId();
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
         layout.pushFloat(2);  // 0: pos
-        layout.pushFloat(2);  // 1: tex coord
+//        layout.pushFloat(2);  // 1: tex coord
         va.addBuffer(vb, layout);
 
-        TextRenderer r = new TextRenderer();
+        tr.setupBufferObjects();
+        TextRenderer.TextObject to = new TextRenderer.TextObject("a\nstring", new Vec2f(50, 50));
+        tr.addTextObject(to);
+        tr.buildBuffer();
     }
 
     /** Must be called after window is visible */
@@ -93,8 +99,8 @@ public class Game {
 
         sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
 
-        new Texture("res/textures/explosion.png").bind();
-        sh.uniform1i("sampleTexture", 0);
+//        new Texture("res/textures/explosion.png").bind();
+//        sh.uniform1i("sampleTexture", 0);
     }
 
     public void updateFps() {
@@ -111,6 +117,7 @@ public class Game {
         Renderer.clearScreen();
         sh.uniform1f("time", (float) glfwGetTime());
 
+        tr.draw();
         Renderer.draw(GL_TRIANGLE_STRIP, va, 4);
 
         Renderer.finish(window);

@@ -1,12 +1,12 @@
 #version 330
 
 layout(location = 0) in vec4 position;
-layout(location = 1) in vec4 texCoord;
+//layout(location = 1) in vec4 texCoord;
 
 uniform vec2 resolution;
 uniform highp float time;
 
-out vec2 v_texCoord;
+//out vec2 v_texCoord;
 
 /**
  https://en.wikipedia.org/wiki/Orthographic_projection
@@ -23,9 +23,9 @@ mat4 projectionMatrix = mat4(
 
 void main() {
     vec4 pos = position;
-    float t = time + length(position.xy) * .01;
-    pos += vec4(20 * sin(t), 20 * cos(t), 0, 0);
+//    float t = time + length(position.xy) * .01;
+//    pos += vec4(20 * sin(t), 20 * cos(t), 0, 0);
     gl_Position = pos * projectionMatrix;
 
-    v_texCoord = texCoord.xy;
+//    v_texCoord = texCoord.xy;
 }

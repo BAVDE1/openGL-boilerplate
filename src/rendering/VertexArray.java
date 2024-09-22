@@ -48,10 +48,12 @@ public class VertexArray {
         }
 
         public void pushFloat(int count) {
+            if (count == 0) return;
             push(GL_FLOAT, count, false);
         }
 
         public void pushInt(int count) {
+            if (count == 0) return;
             push(GL_UNSIGNED_INT, count, false);
         }
 
