@@ -63,7 +63,7 @@ public class Window {
     }
 
     public void show() {
-        Logging.info(String.format("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'",  glfwGetVersionString(), GL45.glGetString(GL11.GL_VERSION)));
+        Logging.mystical("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'",  glfwGetVersionString(), GL45.glGetString(GL11.GL_VERSION));
         glfwShowWindow(handle);
     }
 

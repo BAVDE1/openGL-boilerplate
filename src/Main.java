@@ -20,7 +20,7 @@ public class Main {
         double lastFrame = System.nanoTime();
 
         game.createCapabilitiesAndOpen();
-        Logging.debug(String.format("Capabilities created, starting time stepper with a dt of %s", static_dt));
+        Logging.debug("Capabilities created, starting time stepper with a dt of %s", static_dt);
 
         while (!game.shouldClose()) {
             double t = System.nanoTime();

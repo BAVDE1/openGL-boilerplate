@@ -7,10 +7,10 @@ import src.game.Constants;
 import java.io.PrintStream;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.lwjgl.system.MemoryUtil.memByteBuffer;
@@ -25,34 +25,57 @@ public class Logging {
     private static final String red = "31";
     private static final String green = "32";
     private static final String yellow = "38;5;11";
-    private static final String blue = "34";
-    private static final String magenta = "35";
-    private static final String cyan = "36";
+    private static final String blue = "38;5;51";
+    private static final String purple = "38;5;98";
+    private static final String pink = "38;5;201";
     private static final String grey = "37";
     private static final String white = "2";
 
-    private static void log(String col, String msg, String level) {
+    private static void log(String col, String msg, String level, Object... args) {
         String callerFile = Thread.currentThread().getStackTrace()[tracebackInx].getFileName();
         int callersLineNumber = Thread.currentThread().getStackTrace()[tracebackInx].getLineNumber();
-        System.out.printf("\u001B[" + col + "m%s %s [%s:%s] %s\u001B[0m%n", LocalTime.now().format(format), level, callerFile, callersLineNumber, msg);
+        System.out.printf(
+                "\u001B[" + col + "m%s %s [%s:%s] %s\u001B[0m%n",
+                LocalTime.now().format(format),
+                level,
+                callerFile,
+                callersLineNumber,
+                String.format(msg, args)
+        );
     }
 
-    public static void info(String msg) {
-        log(white, msg, "INFO");
-    }
-
-    public static void debug(String msg) {
+    public static void debug(String msg, Object... args) {
         if (Constants.logDebug) {
-            log(grey, msg, "DEBUG");
+            log(grey, msg, "DEBUG", args);
         }
     }
 
-    public static void warn(String msg) {
-        log(yellow, msg, "WARN");
+    public static void info(String msg, Object... args) {
+        log(white, msg, "INFO", args);
     }
 
-    public static void danger(String msg) {
-        log(red, msg, "DANGER");
+    public static void warn(String msg, Object... args) {
+        log(yellow, msg, "WARN", args);
+    }
+
+    public static void danger(String msg, Object... args) {
+        log(red, msg, "DANGER", args);
+    }
+
+    public static void puke(String msg, Object... args) {
+        log(green, msg, "PUKE", args);
+    }
+
+    public static void mystical(String msg, Object... args) {
+        log(blue, msg, "MYSTICAL", args);
+    }
+
+    public static void expensive(String msg, Object... args) {
+        log(purple, msg, "EXPENSIVE", args);
+    }
+
+    public static void drag(String msg, Object... args) {
+        log(pink, msg, "DRAG", args);
     }
 
     public static GLDebugMessageCallbackI debugCallback() {
@@ -62,7 +85,7 @@ public class Logging {
             String severityStr = getCallbackSeverityString(severity);
 
             if (ignoreList.contains(id)) {
-                debug(String.format("Suppressing warning id: %s (src: %s, type: %s, severity: %s)", id, sourceStr, typeStr, severityStr));
+                debug("Suppressing warning id: %s (src: %s, type: %s, severity: %s)", id, sourceStr, typeStr, severityStr);
                 return;
             }
 

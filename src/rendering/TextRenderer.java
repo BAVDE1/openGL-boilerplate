@@ -2,15 +2,13 @@ package src.rendering;
 
 import static org.lwjgl.opengl.GL11.*;
 import src.game.Constants;
-import src.utility.Vec2;
 import src.utility.Vec2f;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class TextRenderer {
     public static class TextObject {
-        public int index = 0;
+        public int index = -1;
         String string;
         Vec2f pos;
 
@@ -34,7 +32,7 @@ public class TextRenderer {
                     continue;
                 }
 
-                // add starting vert
+                // starting vert
                 float lineY = pos.y + accumulatedY;
                 sb.pushSeparatedVertices(new float[] {pos.x, lineY + charSize.y});
 
@@ -48,7 +46,7 @@ public class TextRenderer {
                     accumulatedX += (int) charSize.x;
                 }
 
-                // add ending vert
+                // ending vert
                 sb.pushVertices(new float[] {pos.x + accumulatedX, lineY});
                 accumulatedY += (int) charSize.y + ySpacing;
             }
@@ -63,12 +61,12 @@ public class TextRenderer {
     VertexBuffer vb;
     StripBuilder2f sb;
 
-    int posSize = 2;
-    int texCoordSize = 0;  // todo: 2
+    int posNumCount = 2;
+    int texCoordNumCount = 0;  // todo: 2
 
     int bufferSize;
 
-    public TextRenderer() {this(Constants.BUFF_SIZE_GENERAL);}
+    public TextRenderer() {this(Constants.BUFF_SIZE_DEFAULT);}
     public TextRenderer(int size) {
         this.bufferSize = size;
     }
@@ -78,18 +76,19 @@ public class TextRenderer {
         va = new VertexArray();   va.genId();
         vb = new VertexBuffer();  vb.genId();
         sb = new StripBuilder2f(bufferSize);
-        sb.setAdditionalVerts(texCoordSize);
+        sb.setAdditionalVerts(texCoordNumCount);
 
         vb.bufferSize(bufferSize);
 
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
-        layout.pushFloat(posSize);  // position
-        layout.pushFloat(texCoordSize);  // texture coord
+        layout.pushFloat(posNumCount);  // position
+        layout.pushFloat(texCoordNumCount);  // texture coord
         va.addBuffer(vb, layout);
     }
 
     public void addTextObject(TextObject to) {
         textObjects.add(to);
+        to.index = textObjects.size() - 1;
     }
 
     public void buildBuffer() {
@@ -103,6 +102,6 @@ public class TextRenderer {
     }
 
     public void draw() {
-        Renderer.draw(GL_TRIANGLE_STRIP, va, sb.count / (posSize + texCoordSize));
+        Renderer.draw(GL_TRIANGLE_STRIP, va, sb.count / va.layout.getTotalItems());
     }
 }

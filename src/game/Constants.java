@@ -5,7 +5,10 @@ import java.awt.*;
 public class Constants {
     public static final Boolean logDebug = true;
 
-    public static final int BUFF_SIZE_GENERAL = 1024;
+    public static final int BUFF_SIZE_DEFAULT = 1024;
+    public static final int BUFF_SIZE_LARGE = 2048;
+    public static final int BUFF_SIZE_LARGER = 4096;
+
     public static final double EPSILON = 0.0001;
     public static final double EPSILON_SQ = EPSILON * EPSILON;
     public static final int FPS = 60;

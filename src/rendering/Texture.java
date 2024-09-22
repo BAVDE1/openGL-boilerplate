@@ -31,7 +31,7 @@ public class Texture {
 
             buffer.flip();  // flip to read mode for gl
         } catch (IOException ioe) {
-            Logging.danger(String.format("PNG at location '%s' could not be loaded. Thrown message:\n%s", filePath, ioe));
+            Logging.danger("PNG at location '%s' could not be loaded. Thrown message:\n%s", filePath, ioe);
             return;
         }
 

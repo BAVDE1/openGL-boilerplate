@@ -11,7 +11,7 @@ public class StripBuilder2f {
 
     private int additionalVerts = 0;
 
-    public StripBuilder2f(){this(Constants.BUFF_SIZE_GENERAL);}
+    public StripBuilder2f(){this(Constants.BUFF_SIZE_DEFAULT);}
     public StripBuilder2f(int size){
         vertices = new float[size];
         this.size = size;
@@ -47,9 +47,8 @@ public class StripBuilder2f {
     public void pushVertices(float[] verts, int vertCount) {
         assert verts.length > 0;
         if (count + vertCount > size) {
-            Logging.danger(String.format(
-                    "Attempting to add too many items to primitive array! Array max size: %s, current array count %s, attempted addition: %s. Aborting",
-                    size, count, vertCount));
+            Logging.danger("Attempting to add too many items to primitive array! Array max size: %s, current array count %s, attempted addition: %s. Aborting",
+                    size, count, vertCount);
             return;
         }
 

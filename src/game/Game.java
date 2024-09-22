@@ -81,7 +81,7 @@ public class Game {
         va.genId();
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
         layout.pushFloat(2);  // 0: pos
-//        layout.pushFloat(2);  // 1: tex coord
+        layout.pushFloat(0);  // 1: tex coord
         va.addBuffer(vb, layout);
 
         tr.setupBufferObjects();
@@ -99,8 +99,8 @@ public class Game {
 
         sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
 
-//        new Texture("res/textures/explosion.png").bind();
-//        sh.uniform1i("sampleTexture", 0);
+        new Texture("res/textures/explosion.png").bind();
+        sh.uniform1i("sampleTexture", 0);
     }
 
     public void updateFps() {

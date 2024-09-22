@@ -61,7 +61,7 @@ public class ShaderHelper {
             }
             charSequence = fileContents.toString();
         } catch (FileNotFoundException e) {
-            Logging.danger(String.format("'%s' at '%s' could not be read.\nError message: %s%n", file.getName(), file.getAbsolutePath(), e));
+            Logging.danger("'%s' at '%s' could not be read.\nError message: %s%n", file.getName(), file.getAbsolutePath(), e);
             return;
         }
 
@@ -73,12 +73,12 @@ public class ShaderHelper {
         int[] shaderCompiled = new int[1];  // only needs size of 1
         glGetShaderiv(shader, GL_COMPILE_STATUS, shaderCompiled);
         if (shaderCompiled[0] != GL_TRUE) {
-            Logging.danger(String.format("Shader Compile Error (%s): %s", file, glGetShaderInfoLog(shader, 1024)));
+            Logging.danger("Shader Compile Error (%s): %s", file, glGetShaderInfoLog(shader, 1024));
             return;
         }
 
         glAttachShader(program, shader);
-        Logging.info(String.format("Shader Attached: '%s', %s chars (type %s)", file, charSequence.length(), shaderType));
+        Logging.info("Shader Attached: '%s', %s chars (type %s)", file, charSequence.length(), shaderType);
     }
 
     public void attachShader(File file) {
@@ -91,7 +91,7 @@ public class ShaderHelper {
 
         glGetProgramiv(program, GL_LINK_STATUS, programLinked);
         if (programLinked[0] != GL_TRUE) {
-            Logging.danger(String.format("Shader Linking Error: %s", glGetProgramInfoLog(program, 1024)));
+            Logging.danger("Shader Linking Error: %s", glGetProgramInfoLog(program, 1024));
         }
     }
 

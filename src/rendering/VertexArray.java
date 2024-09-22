@@ -38,6 +38,7 @@ public class VertexArray {
 
     public static class VertexArrayLayout {
         private final ArrayList<VertexArrayElement> elements = new ArrayList<>();
+        private int totalItems = 0;
         private int stride = 0;
 
         public VertexArrayLayout(){}
@@ -45,6 +46,7 @@ public class VertexArray {
         private void push(int type, int count, boolean normalized) {
             elements.add(new VertexArrayElement(type, count, normalized));
             stride += count * VertexArrayElement.getByteSizeForType(type);
+            totalItems += count;
         }
 
         public void pushFloat(int count) {
@@ -60,8 +62,13 @@ public class VertexArray {
         public ArrayList<VertexArrayElement> getElements() {
             return elements;
         }
+
+        public int getTotalItems() {
+            return totalItems;
+        }
     }
 
+    public VertexArrayLayout layout;
     private Integer arrayId;
     public int attribCount = 0;
 
@@ -76,6 +83,8 @@ public class VertexArray {
     }
 
     public void addBuffer(VertexBuffer vb, VertexArrayLayout layout) {
+        this.layout = layout;
+
         Renderer.bindArray(this);
         Renderer.bindBuffer(vb);
 
