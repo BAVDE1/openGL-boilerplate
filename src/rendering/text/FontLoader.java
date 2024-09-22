@@ -1,4 +1,4 @@
-package src.rendering.font;
+package src.rendering.text;
 
 import src.utility.Logging;
 

@@ -1,4 +1,4 @@
-package src.rendering.font;
+package src.rendering.text;
 
 import static org.lwjgl.opengl.GL11.*;
 import src.game.Constants;
@@ -6,13 +6,9 @@ import src.rendering.Renderer;
 import src.rendering.StripBuilder2f;
 import src.rendering.VertexArray;
 import src.rendering.VertexBuffer;
-import src.utility.Logging;
 import src.utility.Vec2f;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class TextRenderer {
