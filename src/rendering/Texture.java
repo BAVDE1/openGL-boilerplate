@@ -5,6 +5,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL45;
 import src.utility.Logging;
 
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -44,6 +45,10 @@ public class Texture {
         unbind();
 
         buffer.clear();  // may want to keep for later though :shrug:
+    }
+
+    public Texture(BufferedImage buffImg) {
+
     }
 
     private void setupTextureDefaults() {

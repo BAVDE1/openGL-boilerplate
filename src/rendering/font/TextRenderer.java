@@ -1,18 +1,22 @@
-package src.rendering;
+package src.rendering.font;
 
 import static org.lwjgl.opengl.GL11.*;
 import src.game.Constants;
+import src.rendering.Renderer;
+import src.rendering.StripBuilder2f;
+import src.rendering.VertexArray;
+import src.rendering.VertexBuffer;
 import src.utility.Logging;
 import src.utility.Vec2f;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class TextRenderer {
     public static class TextObject {
-        private Font font;
         public float fontSize = 25;
         public int fontStyle = Font.PLAIN;
 
@@ -25,17 +29,6 @@ public class TextRenderer {
         public TextObject(String string, Vec2f pos) {
             this.string = string;
             this.pos = pos;
-
-            prepareFont(Constants.DEFAULT_FONT);
-        }
-
-        public void prepareFont(String fontFile) {
-            try {
-                font = Font.createFont(Font.TRUETYPE_FONT, new File(fontFile));
-                font.deriveFont(fontStyle, fontSize);
-            } catch (IOException | FontFormatException e) {
-                Logging.danger("Error preparing font, aborting. Thrown message:\n%s", e);
-            }
         }
 
         public float[] buildStrip() {
@@ -58,10 +51,10 @@ public class TextRenderer {
                 // all chars
                 int accumulatedX = 0;
                 for (char c : line.toCharArray()) {
-                    if (!font.canDisplay(c)) {
-                        Logging.warn("Character '%s' does not exist in the currently loaded ttf, will use '0' instead", c);
-                        c = '0';
-                    }
+//                    if (!font.canDisplay(c)) {
+//                        Logging.warn("Character '%s' does not exist in the currently loaded ttf, will use '0' instead", c);
+//                        c = '0';
+//                    }
 
                     sb.pushVertices(new float[] {
                             pos.x + accumulatedX,              lineY,

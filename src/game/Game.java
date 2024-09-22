@@ -3,6 +3,7 @@ package src.game;
 import org.lwjgl.opengl.*;
 import src.Main;
 import src.rendering.*;
+import src.rendering.font.TextRenderer;
 import src.utility.Logging;
 import src.utility.MathUtils;
 import src.utility.Vec2;

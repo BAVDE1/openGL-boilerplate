@@ -14,7 +14,6 @@ public class Constants {
     public static final int FPS = 60;
     public static final double DT = 1 / (double) FPS;
 
-    public static final String DEFAULT_FONT = "res/fonts/Lora/Lora-VariableFont_wght.ttf";
     public static final String SHADERS_FOLDER = "res/shaders";
 
     public static final Dimension SCREEN_SIZE = new Dimension(900, 400);

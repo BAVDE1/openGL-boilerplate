@@ -7,7 +7,7 @@
 
 openGL: https://docs.gl/ \
 general lwjgl 1: https://github.com/mattdesl/lwjgl-basics/wiki \
-general lwjgl 2: https://github.com/SilverTiger/lwjgl3-tutorial/wiki/Introduction
+general lwjgl 2: https://github.com/SilverTiger/lwjgl3-tutorial/wiki
 
 ---
 
