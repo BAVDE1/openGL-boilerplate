@@ -5,12 +5,10 @@ import org.lwjgl.opengl.GLDebugMessageCallbackI;
 import src.game.Constants;
 
 import java.io.PrintStream;
-import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.lwjgl.system.MemoryUtil.memByteBuffer;
@@ -84,14 +82,15 @@ public class Logging {
             String typeStr = getCallbackTypeString(type);
             String severityStr = getCallbackSeverityString(severity);
 
+            String decodedMsg = String.valueOf(StandardCharsets.UTF_8.decode(memByteBuffer(message, length)));
             if (ignoreList.contains(id)) {
-                debug("Suppressing warning id: %s (src: %s, type: %s, severity: %s)", id, sourceStr, typeStr, severityStr);
+                debug("Suppressing warning id: %s (src: %s, type: %s, severity: %s, msg: %s)",
+                        id, sourceStr, typeStr, severityStr, decodedMsg.replaceAll("\n", ". "));
                 return;
             }
 
-            CharBuffer decodedMeg = StandardCharsets.UTF_8.decode(memByteBuffer(message, length));
             String finalMsg = String.format("Source: %s (id: %s)\n    Type: (%s) %s\n    Severity: %s\n    %s",
-                    sourceStr, id, type, typeStr, severityStr, decodedMeg);
+                    sourceStr, id, type, typeStr, severityStr, decodedMsg);
 
             switch (severity) {
                 case GL45.GL_DEBUG_SEVERITY_LOW, GL45.GL_DEBUG_SEVERITY_MEDIUM -> warn(finalMsg);

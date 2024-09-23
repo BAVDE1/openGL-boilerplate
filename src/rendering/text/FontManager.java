@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /** State Machine */
-public class FontLoader {
+public class FontManager {
     public static final int DEFAULT_TEXTURE_SLOT = 0;
     public static final int LORA = 0;
 
