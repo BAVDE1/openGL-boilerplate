@@ -80,8 +80,7 @@ public class FontManager {
             return;
         }
 
-        generateFontImage(loadedFont).bind(0);
-        sh.uniform1i("fontTexture", 0);
+        generateFontImage(loadedFont).bind(DEFAULT_TEXTURE_SLOT);
     }
 
     private static Texture generateFontImage(Font font) {

@@ -1,12 +1,14 @@
-#version 330
+#version 450 core
 
 layout(location = 0) in vec4 position;
 layout(location = 1) in vec4 texCoord;
+layout(location = 2) in float texSlot;
 
 uniform vec2 resolution;
 uniform highp float time;
 
 out vec2 v_texCoord;
+out float v_texSlot;
 
 /**
  https://en.wikipedia.org/wiki/Orthographic_projection
@@ -28,4 +30,5 @@ void main() {
     gl_Position = pos * projectionMatrix;
 
     v_texCoord = texCoord.xy;
+    v_texSlot = texSlot;
 }

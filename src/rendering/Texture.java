@@ -1,67 +1,65 @@
 package src.rendering;
 
-import modules.PNGDecoder.PNGDecoder;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL45;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import src.utility.Logging;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL45.*;
+import static org.lwjgl.stb.STBImage.stbi_failure_reason;
+import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class Texture {
-    private int texId;
+    static final ArrayList<Integer> boundSlots = new ArrayList<>();
+    static final int BPP = 4;  // bytes per pixel
 
+    private int texId;
     int width, height;
-    int bpp = 4;  // bytes per pixel
 
     public Texture(String filePath) {
         ByteBuffer buffer;
-        try (FileInputStream file = new FileInputStream(filePath)) {
-            PNGDecoder decoder = new PNGDecoder(file);
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Prepare image buffers
+            IntBuffer w = stack.mallocInt(1);
+            IntBuffer h = stack.mallocInt(1);
+            IntBuffer comp = stack.mallocInt(1);
 
-            width = decoder.getWidth();
-            height = decoder.getHeight();
-            buffer = BufferUtils.createByteBuffer(bpp * width * height);
-            decoder.decode(buffer, width * bpp, PNGDecoder.Format.RGBA);
-        } catch (IOException ioe) {
-            Logging.danger("PNG at location '%s' could not be loaded. Thrown message:\n%s", filePath, ioe);
-            return;
+            buffer = stbi_load(filePath, w, h, comp, BPP);
+            if (buffer == null) {
+                Logging.danger("Failed to load a texture file! %s: %s",  System.lineSeparator(), stbi_failure_reason());
+                return;
+            }
+
+            width = w.get();
+            height = h.get();
         }
         createTexture(buffer);
     }
 
     public Texture(BufferedImage buffImg) {
         // essentially: BufferedImage to ByteBuffer
-//        int w = buffImg.getWidth();
-//        int h = buffImg.getHeight();
-//
-//        // write pixels into an int array
-//        int[] pixels = new int[w * h];
-//        buffImg.getRGB(0, 0, w, h, pixels, 0, w);
-//
-//        ByteBuffer buffer = BufferUtils.createByteBuffer(w * h * 4);  // 4 bytes per pixel
-//        for (int y = 0; y < h; y++) {
-//            for (int x = 0; x < w; x++) {
-//                int pixel = pixels[y * w + x];
-//                buffer.put((byte) ((pixel >> 16) & 0xFF));  // Red component
-//                buffer.put((byte) ((pixel >> 8) & 0xFF));   // Green component
-//                buffer.put((byte) (pixel & 0xFF));          // Blue component
-//                buffer.put((byte) ((pixel >> 24) & 0xFF));  // Alpha component
-//            }
-//        }
-//        createTexture(buffer);
-        try {
-            File outputfile = new File("image.png");
-            ImageIO.write(buffImg, "png", outputfile);
-        } catch (IOException _) {}
-        this("image.png");
+        width = buffImg.getWidth();
+        height = buffImg.getHeight();
+
+        // write pixels into an int array
+        int[] pixels = new int[width * height];
+        buffImg.getRGB(0, 0, width, height, pixels, 0, width);
+
+        ByteBuffer buffer = MemoryUtil.memAlloc(width * height * BPP);  // 4 bytes per pixel
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int pixel = pixels[y * width + x];
+                buffer.put((byte) ((pixel >> 16) & 0xFF));  // Red component
+                buffer.put((byte) ((pixel >> 8) & 0xFF));   // Green component
+                buffer.put((byte) (pixel & 0xFF));          // Blue component
+                buffer.put((byte) ((pixel >> 24) & 0xFF));  // Alpha component
+            }
+        }
+        createTexture(buffer);
     }
 
     private void createTexture(ByteBuffer buffer) {
@@ -88,14 +86,15 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    public int bind() {
-        return bind(1);
-    }
+    public void bind() {bind(1);}
+    public void bind(int slot) {
+        if (boundSlots.contains(slot)) {
+            Logging.warn("Overriding already set texture slot '%s'", slot);
+            boundSlots.remove(slot);
+        }
 
-    public int bind(int slot) {
-        GL45.glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, texId);
-        return slot;
+        glBindTextureUnit(slot, texId);
+        boundSlots.add(slot);
     }
 
     public void unbind() {
