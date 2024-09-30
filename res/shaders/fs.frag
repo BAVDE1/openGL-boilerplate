@@ -7,6 +7,7 @@ uniform sampler2D sampleTexture;
 uniform sampler2D fontTexture;
 
 in vec2 v_texCoord;
+
 out vec4 colour;
 
 vec2 invResolution = 1 / resolution;

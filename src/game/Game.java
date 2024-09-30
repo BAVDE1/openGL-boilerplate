@@ -75,11 +75,10 @@ public class Game {
         vb.genId();
         StripBuilder2f s = new StripBuilder2f();
         s.pushSeparatedVertices(new float[] {
-                200, 300, 0, 1,
-                200, 100, 0, 0,
-                700, 300, 1, 1,
-                700, 100, 1, 0
-
+                100, 300, 0, 1,
+                100, 100, 0, 0,
+                800, 300, 1, 1,
+                800, 100, 1, 0
         });
         vb.bufferData(s.getSetVertices());
 
@@ -104,9 +103,10 @@ public class Game {
 
         sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
 
+        new Texture("res/textures/explosion.png").bind(1);
         FontManager.generateAndBindFontTexture(sh);
-        int slot = new Texture("res/textures/explosion.png").bind();
-        sh.uniform1i("sampleTexture", slot);
+        sh.uniform1i("sampleTexture", 1);
+//        sh.uniform1iv("textures", new int[] {0, 1});
     }
 
     public void updateFps() {

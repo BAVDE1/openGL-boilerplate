@@ -80,8 +80,8 @@ public class FontManager {
             return;
         }
 
-        int slot = generateFontImage(loadedFont).bind(DEFAULT_TEXTURE_SLOT);
-        sh.uniform1i("fontTexture", slot);
+        generateFontImage(loadedFont).bind(0);
+        sh.uniform1i("fontTexture", 0);
     }
 
     private static Texture generateFontImage(Font font) {
@@ -112,10 +112,6 @@ public class FontManager {
             glyphMap.put((char) i, new Glyph(charWidth, charHeight, x, image.getHeight() - charHeight));
         }
 
-        try {
-            File outputfile = new File("image.png");
-            ImageIO.write(image, "png", outputfile);
-        } catch (IOException _) {}
         return new Texture(image);
     }
 }

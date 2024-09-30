@@ -6,13 +6,12 @@ import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryUtil;
 import src.utility.Logging;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -35,30 +34,34 @@ public class Texture {
             Logging.danger("PNG at location '%s' could not be loaded. Thrown message:\n%s", filePath, ioe);
             return;
         }
-
         createTexture(buffer);
     }
 
     public Texture(BufferedImage buffImg) {
         // essentially: BufferedImage to ByteBuffer
-        int w = buffImg.getWidth();
-        int h = buffImg.getHeight();
-
-        // write pixels into an int array
-        int[] pixels = new int[w * h];
-        buffImg.getRGB(0, 0, w, h, pixels, 0, w);
-
-        ByteBuffer buffer = MemoryUtil.memAlloc(w * h * 4);  // 4 bytes per pixel
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                int pixel = pixels[y * w + x];
-                buffer.put((byte) ((pixel >> 16) & 0xFF));  // Red component
-                buffer.put((byte) ((pixel >> 8) & 0xFF));   // Green component
-                buffer.put((byte) (pixel & 0xFF));          // Blue component
-                buffer.put((byte) ((pixel >> 24) & 0xFF));  // Alpha component
-            }
-        }
-        createTexture(buffer);
+//        int w = buffImg.getWidth();
+//        int h = buffImg.getHeight();
+//
+//        // write pixels into an int array
+//        int[] pixels = new int[w * h];
+//        buffImg.getRGB(0, 0, w, h, pixels, 0, w);
+//
+//        ByteBuffer buffer = BufferUtils.createByteBuffer(w * h * 4);  // 4 bytes per pixel
+//        for (int y = 0; y < h; y++) {
+//            for (int x = 0; x < w; x++) {
+//                int pixel = pixels[y * w + x];
+//                buffer.put((byte) ((pixel >> 16) & 0xFF));  // Red component
+//                buffer.put((byte) ((pixel >> 8) & 0xFF));   // Green component
+//                buffer.put((byte) (pixel & 0xFF));          // Blue component
+//                buffer.put((byte) ((pixel >> 24) & 0xFF));  // Alpha component
+//            }
+//        }
+//        createTexture(buffer);
+        try {
+            File outputfile = new File("image.png");
+            ImageIO.write(buffImg, "png", outputfile);
+        } catch (IOException _) {}
+        this("image.png");
     }
 
     private void createTexture(ByteBuffer buffer) {
@@ -85,7 +88,10 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    public int bind() {return bind(1);}
+    public int bind() {
+        return bind(1);
+    }
+
     public int bind(int slot) {
         GL45.glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texId);

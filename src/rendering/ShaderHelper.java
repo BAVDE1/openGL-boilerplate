@@ -129,6 +129,9 @@ public class ShaderHelper {
     public void uniform1i(String uniform, int i) {
         glUniform1i(getUniformLocation(uniform), i);
     }
+    public void uniform1iv(String uniform, int[] intArray) {
+        glUniform1iv(getUniformLocation(uniform), intArray);
+    }
     public void uniform1f(String uniform, float f) {
         glUniform1f(getUniformLocation(uniform), f);
     }
