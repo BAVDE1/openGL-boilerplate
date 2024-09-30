@@ -84,10 +84,11 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    public void bind() {bind(0);}
-    public void bind(int slot) {
+    public int bind() {return bind(1);}
+    public int bind(int slot) {
         GL45.glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texId);
+        return slot;
     }
 
     public void unbind() {

@@ -115,6 +115,6 @@ public class TextRenderer {
     }
 
     public void draw() {
-        Renderer.draw(GL_TRIANGLE_STRIP, va, sb.count / va.layout.getTotalItems());
+        Renderer.draw(GL_LINE_STRIP, va, sb.count / va.layout.getTotalItems());
     }
 }

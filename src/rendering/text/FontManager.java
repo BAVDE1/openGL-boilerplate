@@ -1,14 +1,22 @@
 package src.rendering.text;
 
+import src.rendering.ShaderHelper;
+import src.rendering.Texture;
 import src.utility.Logging;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
 /** State Machine */
 public class FontManager {
+    private static final int AsciiFrom = 32;
+    private static final int AsciiTo = 256;
+    private static final boolean antiAlias = false;
+
     public static class Glyph {
         public final int width, height;
         public final int x, y;
@@ -23,12 +31,13 @@ public class FontManager {
     public static final int LORA = 0;
 
     private static int fontStyle = Font.PLAIN;
-    private static int fontSize = 16;
+    private static int fontSize = 20;
 
-    HashMap<Character, Glyph> glyphMap = new HashMap<>();
+    static Font loadedFont;
+    static HashMap<Character, Glyph> glyphMap = new HashMap<>();
 
     public static void loadFont(String font) {
-        Font loadedFont = new Font(font, fontStyle, fontSize);
+        loadedFont = new Font(font, fontStyle, fontSize);
 
         if (!loadedFont.getFamily().equalsIgnoreCase(font)) {
             Logging.warn("Font '%s' could not be found, using '%s' instead", font, loadedFont.getFamily());
@@ -37,8 +46,8 @@ public class FontManager {
 
     public static void loadCustomFont(int font) {
         try {
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File(getFileForFont(font)));
-            customFont.deriveFont(fontStyle, fontSize);
+            loadedFont = Font.createFont(Font.TRUETYPE_FONT, new File(getFileForFont(font)));
+            loadedFont.deriveFont(fontStyle, fontSize);
         } catch (IOException | FontFormatException e) {
             Logging.danger("Error preparing font, aborting. Thrown message:\n%s", e);
         }
@@ -58,12 +67,56 @@ public class FontManager {
         setFontStyle(newFontStyle);
         setFontSize(newFontSize);
     }
-
     public static void setFontStyle(int newFontStyle) {
         fontStyle = newFontStyle;
     }
-
     public static void setFontSize(int newFontSize) {
         fontSize = newFontSize;
+    }
+
+    public static void generateAndBindFontTexture(ShaderHelper sh) {
+        if (loadedFont == null) {
+            Logging.danger("No font is loaded. Aborting image generation.");
+            return;
+        }
+
+        Texture texture = generateFontImage(loadedFont);
+        int slot = texture.bind(DEFAULT_TEXTURE_SLOT);
+        sh.uniform1i("fontTexture", slot);
+    }
+
+    private static Texture generateFontImage(Font font) {
+        int imgWidth = 0, imgHeight = 0;
+
+        // find the dimensions of image
+        for (int i = AsciiFrom; i < AsciiTo; i++) {
+            CharFondler.CharMetrics charSize = CharFondler.getCharSize(font, (char) i, antiAlias);
+            imgWidth += charSize.width;
+            imgHeight = Math.max(imgHeight, charSize.height);
+        }
+
+        // actual image
+        BufferedImage image = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+
+        // draw glyphs
+        int x = 0;
+        for (int i = AsciiFrom; i < AsciiTo; i++) {
+            BufferedImage charImage = CharFondler.createCharImage(font, (char) i, antiAlias);
+            if (charImage == null) continue;
+
+            int charWidth = charImage.getWidth();
+            int charHeight = charImage.getHeight();
+            graphics.drawImage(charImage, x, 0, null);
+
+            x += charWidth;
+            glyphMap.put((char) i, new Glyph(charWidth, charHeight, x, image.getHeight() - charHeight));
+        }
+
+        try {
+            File outputfile = new File("image.png");
+            ImageIO.write(image, "png", outputfile);
+        } catch (IOException _) {}
+        return new Texture(image);
     }
 }
