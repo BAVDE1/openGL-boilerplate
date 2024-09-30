@@ -12,6 +12,7 @@ import java.awt.image.DataBufferByte;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -47,7 +48,7 @@ public class Texture {
         int[] pixels = new int[w * h];
         buffImg.getRGB(0, 0, w, h, pixels, 0, w);
 
-        ByteBuffer buffer = BufferUtils.createByteBuffer(w * h * 4);  // 4 bytes per pixel
+        ByteBuffer buffer = MemoryUtil.memAlloc(w * h * 4);  // 4 bytes per pixel
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 int pixel = pixels[y * w + x];
