@@ -3,6 +3,8 @@ package src.rendering;
 import src.game.Constants;
 import src.utility.Logging;
 
+import java.util.Arrays;
+
 public class StripBuilder2f {
     private float[] vertices;
     private final int size;
@@ -23,8 +25,8 @@ public class StripBuilder2f {
         separations++;
 
         float[] f = new float[4 + (additionalVerts * 2)];
-        f[0] = vertices[count-2];
-        f[1] = vertices[count-1];
+        f[0] = vertices[count-2-additionalVerts];  // just trust me here bro
+        f[1] = vertices[count-1-additionalVerts];
         f[2+additionalVerts] = toX;
         f[2+additionalVerts+1] = toY;
         pushVertices(f);

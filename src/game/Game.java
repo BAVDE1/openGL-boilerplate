@@ -12,6 +12,7 @@ import src.utility.Vec2f;
 
 import java.awt.*;
 import java.io.File;
+import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -42,7 +43,6 @@ public class Game {
         window.setVSync(Constants.V_SYNC);
 
         Renderer.setupGLContext();
-        FontManager.loadFont(Font.DIALOG);
 
         window.show();
         bindEvents();
@@ -74,11 +74,18 @@ public class Game {
     public void setupBuffers() {
         vb.genId();
         StripBuilder2f s = new StripBuilder2f();
+        s.setAdditionalVerts(3);
         s.pushSeparatedVertices(new float[] {
-                200, 300, 0, 1, 1,
-                200, 100, 0, 0, 1,
-                700, 300, 1, 1, 1,
-                700, 100, 1, 0, 1
+                200, 300, 0, 1, 0,
+                200, 100, 0, 0, 0,
+                700, 300, 1, 1, 0,
+                700, 100, 1, 0, 0
+        });
+        s.pushSeparatedVertices(new float[] {
+                50,  200, 0, 1, 1,
+                50,  50,  0, 0, 1,
+                300, 200, 1, 1, 1,
+                300, 50,  1, 0, 1
         });
         vb.bufferData(s.getSetVertices());
 
@@ -104,9 +111,8 @@ public class Game {
 
         sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
 
-        new Texture("res/textures/explosion.png").bind();
-        FontManager.generateAndBindFontTexture(sh);
-        sh.uniform1iv("textures", new int[] {0, 1});
+        new Texture("res/textures/closed.png").bind(1, sh);
+        new Texture("res/textures/explosion.png").bind(0, sh);
     }
 
     public void updateFps() {
@@ -124,7 +130,7 @@ public class Game {
         sh.uniform1f("time", (float) glfwGetTime());
 
 //        tr.draw();
-        Renderer.draw(GL_TRIANGLE_STRIP, va, 4);
+        Renderer.draw(GL_TRIANGLE_STRIP, va, 10);
 
         Renderer.finish(window);
     }

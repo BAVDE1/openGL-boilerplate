@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import static org.lwjgl.opengl.GL45.*;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
@@ -86,8 +87,8 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    public void bind() {bind(1);}
-    public void bind(int slot) {
+    public void bind(ShaderHelper sh) {bind(1, sh);}
+    public void bind(int slot, ShaderHelper sh) {
         if (boundSlots.contains(slot)) {
             Logging.warn("Overriding already set texture slot '%s'", slot);
             boundSlots.remove(slot);
@@ -95,6 +96,9 @@ public class Texture {
 
         glBindTextureUnit(slot, texId);
         boundSlots.add(slot);
+        boundSlots.sort(Comparator.naturalOrder());
+
+        sh.uniform1iv("textures", boundSlots.stream().mapToInt(i -> i).toArray());
     }
 
     public void unbind() {
