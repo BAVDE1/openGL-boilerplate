@@ -15,6 +15,17 @@ import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class Texture {
+    public static class Image {
+        public ByteBuffer buffer;
+        public int width, height;
+
+        Image(ByteBuffer i, int w, int h) {
+            buffer = i;
+            width = w;
+            height = h;
+        }
+    }
+
     static final ArrayList<Integer> boundSlots = new ArrayList<>();
     static final int BPP = 4;  // bytes per pixel
 
@@ -22,23 +33,12 @@ public class Texture {
     int width, height;
 
     public Texture(String filePath) {
-        ByteBuffer buffer;
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Prepare image buffers
-            IntBuffer w = stack.mallocInt(1);
-            IntBuffer h = stack.mallocInt(1);
-            IntBuffer comp = stack.mallocInt(1);
+        Image image = loadImageFromFilePath(filePath);
+        assert image != null;
 
-            buffer = stbi_load(filePath, w, h, comp, BPP);
-            if (buffer == null) {
-                Logging.danger("Failed to load a texture file! %s: %s",  System.lineSeparator(), stbi_failure_reason());
-                return;
-            }
-
-            width = w.get();
-            height = h.get();
-        }
-        createTexture(buffer);
+        width = image.width;
+        height = image.height;
+        createTexture(image.buffer);
     }
 
     public Texture(BufferedImage buffImg) {
@@ -70,7 +70,8 @@ public class Texture {
         glBindTexture(GL_TEXTURE_2D, texId);
         setupTextureDefaults();
 
-        // pass to openGL (internalFormat: format to be stored in, format: format of supplied image)
+        // internalFormat: format to be stored in
+        // format: format of supplied image
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
         unbind();
 
@@ -85,6 +86,22 @@ public class Texture {
         // no wrap
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // GL_CLAMP_TO_EDGE?
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+
+    public static Image loadImageFromFilePath(String filePath) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Prepare image buffers
+            IntBuffer w = stack.mallocInt(1);
+            IntBuffer h = stack.mallocInt(1);
+            IntBuffer comp = stack.mallocInt(1);
+
+            ByteBuffer buffer = stbi_load(filePath, w, h, comp, BPP);
+            if (buffer == null) {
+                Logging.danger("Failed to load a texture file! %s: %s",  System.lineSeparator(), stbi_failure_reason());
+                return null;
+            }
+            return new Image(buffer, w.get(), h.get());
+        }
     }
 
     /** We add 1 to slot secretly cause GL doesn't actually like slot 0 apparently */

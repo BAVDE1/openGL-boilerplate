@@ -14,8 +14,14 @@ public class Renderer {
     /** Do before anything GL related */
     public static void setupGLContext() {
         GL.createCapabilities();
+
         glEnable(GL45.GL_DEBUG_OUTPUT);
         glEnable(GL_TEXTURE_2D);
+
+        // transparency
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glClearColor(.0f, .0f, .0f, .0f);
     }
 

@@ -12,7 +12,6 @@ import src.utility.Vec2f;
 
 import java.awt.*;
 import java.io.File;
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -43,11 +42,14 @@ public class Game {
         window.setVSync(Constants.V_SYNC);
 
         Renderer.setupGLContext();
+        FontManager.loadFont(Font.DIALOG);
 
         window.show();
         bindEvents();
         setupShaders();
         setupBuffers();
+
+        FontManager.generateAndBindFonts(sh);
     }
 
     public void close() {
@@ -77,14 +79,14 @@ public class Game {
         s.setAdditionalVerts(3);
         s.pushSeparatedVertices(new float[] {
                 200, 300, 0, 1, 0,
-                200, 100, 0, 0, 0,
-                700, 300, 1, 1, 0,
+                200, 140, 0, 0, 0,
+                750, 300, 1, 1, 0,
                 700, 100, 1, 0, 0
         });
         s.pushSeparatedVertices(new float[] {
-                50,  200, 0, 1, 1,
+                50,  350, 0, 1, 1,
                 50,  50,  0, 0, 1,
-                300, 200, 1, 1, 1,
+                300, 340, 1, 1, 1,
                 300, 50,  1, 0, 1
         });
         vb.bufferData(s.getSetVertices());

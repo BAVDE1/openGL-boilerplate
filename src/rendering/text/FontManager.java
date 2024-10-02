@@ -4,7 +4,6 @@ import src.rendering.ShaderHelper;
 import src.rendering.Texture;
 import src.utility.Logging;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -15,7 +14,7 @@ import java.util.HashMap;
 public class FontManager {
     private static final int AsciiFrom = 32;
     private static final int AsciiTo = 256;
-    private static final boolean antiAlias = false;
+    private static final boolean antiAlias = true;
 
     public static class Glyph {
         public final int width, height;
@@ -74,7 +73,7 @@ public class FontManager {
         fontSize = newFontSize;
     }
 
-    public static void generateAndBindFontTexture(ShaderHelper sh) {
+    public static void generateAndBindFonts(ShaderHelper sh) {
         if (loadedFont == null) {
             Logging.danger("No font is loaded. Aborting image generation.");
             return;

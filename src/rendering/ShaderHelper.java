@@ -120,6 +120,10 @@ public class ShaderHelper {
     }
 
     public int getUniformLocation(String uniform) {
+        if (program == null) {
+            Logging.danger("ShaderHelper's program has not been generated yes. Aborting");
+            return -1;
+        }
         if (!uniformCache.containsKey(uniform)) {
             uniformCache.put(uniform, glGetUniformLocation(program, uniform));
         }
