@@ -111,8 +111,8 @@ public class Game {
 
         sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
 
-        new Texture("res/textures/closed.png").bind(1, sh);
         new Texture("res/textures/explosion.png").bind(0, sh);
+        new Texture("res/textures/closed.png").bind(1, sh);
     }
 
     public void updateFps() {

@@ -87,18 +87,18 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    public void bind(ShaderHelper sh) {bind(1, sh);}
+    /** We add 1 to slot secretly cause GL doesn't actually like slot 0 apparently */
     public void bind(int slot, ShaderHelper sh) {
         if (boundSlots.contains(slot)) {
             Logging.warn("Overriding already set texture slot '%s'", slot);
             boundSlots.remove(slot);
         }
 
-        glBindTextureUnit(slot, texId);
+        glBindTextureUnit(slot + 1, texId);
         boundSlots.add(slot);
         boundSlots.sort(Comparator.naturalOrder());
 
-        sh.uniform1iv("textures", boundSlots.stream().mapToInt(i -> i).toArray());
+        sh.uniform1iv("textures", boundSlots.stream().mapToInt(i -> ++i).toArray());
     }
 
     public void unbind() {
