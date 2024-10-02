@@ -60,6 +60,7 @@ public class Window {
 
         // make context current
         glfwMakeContextCurrent(handle);
+        Logging.debug("GLFW context created and current");
     }
 
     public void show() {

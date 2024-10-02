@@ -29,24 +29,21 @@ public class FontManager {
     public static final int DEFAULT_TEXTURE_SLOT = 0;
     public static final int LORA = 0;
 
-    private static int fontStyle = Font.PLAIN;
-    private static int fontSize = 20;
-
     static Font loadedFont;
     static HashMap<Character, Glyph> glyphMap = new HashMap<>();
 
-    public static void loadFont(String font) {
-        loadedFont = new Font(font, fontStyle, fontSize);
+    public static void loadFont(String font, int style, int size) {
+        loadedFont = new Font(font, style, size);
 
         if (!loadedFont.getFamily().equalsIgnoreCase(font)) {
             Logging.warn("Font '%s' could not be found, using '%s' instead", font, loadedFont.getFamily());
         }
     }
 
-    public static void loadCustomFont(int font) {
+    public static void loadCustomFont(int font, int style, int size) {
         try {
             loadedFont = Font.createFont(Font.TRUETYPE_FONT, new File(getFileForFont(font)));
-            loadedFont.deriveFont(fontStyle, fontSize);
+            loadedFont.deriveFont(style, size);
         } catch (IOException | FontFormatException e) {
             Logging.danger("Error preparing font, aborting. Thrown message:\n%s", e);
         }
@@ -62,24 +59,14 @@ public class FontManager {
         };
     }
 
-    public static void setFontAttributes(int newFontStyle, int newFontSize) {
-        setFontStyle(newFontStyle);
-        setFontSize(newFontSize);
-    }
-    public static void setFontStyle(int newFontStyle) {
-        fontStyle = newFontStyle;
-    }
-    public static void setFontSize(int newFontSize) {
-        fontSize = newFontSize;
-    }
-
     public static void generateAndBindFonts(ShaderHelper sh) {
         if (loadedFont == null) {
             Logging.danger("No font is loaded. Aborting image generation.");
             return;
         }
 
-        generateFontImage(loadedFont).bind(DEFAULT_TEXTURE_SLOT, sh);
+        // combine all generated font images into one image atlas here
+//        generateFontImage(loadedFont).bind(DEFAULT_TEXTURE_SLOT, sh);
     }
 
     private static Texture generateFontImage(Font font) {

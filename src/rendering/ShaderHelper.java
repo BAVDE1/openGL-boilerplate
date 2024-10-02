@@ -78,7 +78,7 @@ public class ShaderHelper {
         }
 
         glAttachShader(program, shader);
-        Logging.info("Shader Attached: '%s', %s chars (type %s)", file, charSequence.length(), shaderType);
+        Logging.debug("Shader Attached: '%s', %s chars (type %s)", file, charSequence.length(), shaderType);
     }
 
     public void attachShader(File file) {

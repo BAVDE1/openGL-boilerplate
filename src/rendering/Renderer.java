@@ -3,6 +3,7 @@ package src.rendering;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL45;
 import src.game.Window;
+import src.utility.Logging;
 
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL11.*;
@@ -23,6 +24,7 @@ public class Renderer {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glClearColor(.0f, .0f, .0f, .0f);
+        Logging.debug("OpenGL capabilities created");
     }
 
     public static void clearScreen() {

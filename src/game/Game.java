@@ -42,7 +42,7 @@ public class Game {
         window.setVSync(Constants.V_SYNC);
 
         Renderer.setupGLContext();
-        FontManager.loadFont(Font.DIALOG);
+        FontManager.loadFont(Font.DIALOG, Font.PLAIN, 16);
 
         window.show();
         bindEvents();
