@@ -29,6 +29,7 @@ public class CharFondler {
         return new ImgContainer(graphics, image);
     }
 
+    /** todo: the width doesn't take into account the lean of italicised characters */
     public static CharMetrics getCharSize(Font font, char ch, boolean antiAlias) {
         Graphics2D graphics = generateImg(font, 1, 1, antiAlias).graphics;
         FontMetrics metrics = graphics.getFontMetrics();

@@ -86,26 +86,27 @@ public class FontManager {
     public static int fullWidth = 0, fullHeight = 0;
     private static Texture finalTexture;
 
-    /** Load given font. */
-    public static void loadFont(String font, int style, int size) {
+    /** Load given font. Returns the font id / index */
+    public static int loadFont(String font, int style, int size) {
         if (finalTexture != null) {
             Logging.danger("The font image atlas has already been generated, and so can't be appended to. Aborting.");
-            return;
+            return -1;
         }
 
         LoadedFont newFont = new LoadedFont(font, style, size);
-
         String fn = newFont.loadedFontName;
         if (loadedFontUids.containsKey(fn)) {
             Logging.warn("The font '%s' has already been loaded with uid '%s'. Aborting loading duplicate font", fn, loadedFontUids.get(fn));
-            return;
+            return -1;
         }
 
         fullWidth = Math.max(newFont.imgWidth, fullWidth);
         fullHeight += newFont.imgHeight;
 
+        int id = allLoadedFonts.size();
         allLoadedFonts.add(newFont);
-        loadedFontUids.put(fn, allLoadedFonts.size() - 1);
+        loadedFontUids.put(fn, id);
+        return id;
     }
 
     /** generate all font images onto one universal image atlas at their y offsets */
@@ -119,8 +120,9 @@ public class FontManager {
             yOffset += lFont.imgHeight;
         }
 
-        Texture.writeToFile(fullImage);
+        graphics.dispose();
         finalTexture = new Texture(fullImage);
         finalTexture.bind(DEFAULT_TEXTURE_SLOT, sh);
+        Texture.writeToFile(fullImage);
     }
 }
