@@ -6,16 +6,11 @@ import src.utility.Logging;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /** State Machine */
 public class FontManager {
-    private static final int AsciiFrom = 32;
-    private static final int AsciiTo = 256;
-    private static final boolean antiAlias = true;
-
     public static class Glyph {
         public final int width, height;
         public final int x, y;
@@ -26,77 +21,106 @@ public class FontManager {
         }
     }
 
-    public static final int DEFAULT_TEXTURE_SLOT = 0;
-    public static final int LORA = 0;
+    public static class LoadedFont {
+        public int atlasOffset;
+        public final HashMap<Character, Glyph> glyphMap = new HashMap<>();
 
-    static Font loadedFont;
-    static HashMap<Character, Glyph> glyphMap = new HashMap<>();
+        private final boolean aa;  // anti-aliasing
+        public final Font loadedFont;
+        public final String fontName;
+        public final int fontStyle, fontSize;
+        public final String loadedFontName;
 
-    public static void loadFont(String font, int style, int size) {
-        loadedFont = new Font(font, style, size);
+        public int imgWidth = 0, imgHeight = 0;
 
-        if (!loadedFont.getFamily().equalsIgnoreCase(font)) {
-            Logging.warn("Font '%s' could not be found, using '%s' instead", font, loadedFont.getFamily());
-        }
-    }
+        public LoadedFont(String fontName, int fontStyle, int fontSize) {
+            this.aa = FontManager.antiAlias;
+            this.fontName = fontName;
+            this.fontStyle = fontStyle; this.fontSize = fontSize;
 
-    public static void loadCustomFont(int font, int style, int size) {
-        try {
-            loadedFont = Font.createFont(Font.TRUETYPE_FONT, new File(getFileForFont(font)));
-            loadedFont.deriveFont(style, size);
-        } catch (IOException | FontFormatException e) {
-            Logging.danger("Error preparing font, aborting. Thrown message:\n%s", e);
-        }
-    }
+            this.loadedFontName = String.format("%s_%s_%s_%s", fontName, fontStyle, fontSize, aa);
+            this.loadedFont = new Font(fontName, fontStyle, fontSize);
+            findImageDimensions();
 
-    public static String getFileForFont(int font) {
-        return switch (font) {
-            case LORA -> "res/fonts/Lora/Lora-VariableFont_wght.ttf";
-            default -> {
-                Logging.danger("Font '%s' does not exist and could not be loaded", font);
-                yield "";
+            if (!loadedFont.getFamily().equalsIgnoreCase(fontName)) {
+                Logging.warn("Font '%s' could not be found, using '%s' instead", fontName, loadedFont.getFamily());
             }
-        };
+        }
+
+        /** Find the dimensions of the image */
+        private void findImageDimensions() {
+            for (int i = AsciiFrom; i < AsciiTo; i++) {
+                CharFondler.CharMetrics charSize = CharFondler.getCharSize(loadedFont, (char) i, aa);
+                imgWidth += charSize.width;
+                imgHeight = Math.max(imgHeight, charSize.height);
+            }
+        }
+
+        /** Draw the fonts glyphs at the y offset onto the given image */
+        public void drawOntoFinalImage(BufferedImage image, Graphics2D graphics, int yOffset) {
+            this.atlasOffset = yOffset;int x = 0;
+
+            for (int i = AsciiFrom; i < AsciiTo; i++) {
+                BufferedImage charImage = CharFondler.createCharImage(loadedFont, (char) i, aa);
+                if (charImage == null) continue;
+
+                int charWidth = charImage.getWidth();
+                int charHeight = charImage.getHeight();
+                graphics.drawImage(charImage, x, yOffset, null);
+
+                x += charWidth;
+                glyphMap.put((char) i, new Glyph(charWidth, charHeight, x, image.getHeight() - charHeight));
+            }
+        }
     }
 
-    public static void generateAndBindFonts(ShaderHelper sh) {
-        if (loadedFont == null) {
-            Logging.danger("No font is loaded. Aborting image generation.");
+    public static final int DEFAULT_TEXTURE_SLOT = 0;
+
+    private static final int AsciiFrom = 32;
+    private static final int AsciiTo = 256;
+    public static boolean antiAlias = true;
+
+    public static ArrayList<LoadedFont> allLoadedFonts = new ArrayList<>();
+    public static HashMap<String, Integer> loadedFontUids = new HashMap<>();
+
+    public static int fullWidth = 0, fullHeight = 0;
+    private static Texture finalTexture;
+
+    /** Load given font. */
+    public static void loadFont(String font, int style, int size) {
+        if (finalTexture != null) {
+            Logging.danger("The font image atlas has already been generated, and so can't be appended to. Aborting.");
             return;
         }
 
-        // combine all generated font images into one image atlas here
-//        generateFontImage(loadedFont).bind(DEFAULT_TEXTURE_SLOT, sh);
+        LoadedFont newFont = new LoadedFont(font, style, size);
+
+        String fn = newFont.loadedFontName;
+        if (loadedFontUids.containsKey(fn)) {
+            Logging.warn("The font '%s' has already been loaded with uid '%s'. Aborting loading duplicate font", fn, loadedFontUids.get(fn));
+            return;
+        }
+
+        fullWidth = Math.max(newFont.imgWidth, fullWidth);
+        fullHeight += newFont.imgHeight;
+
+        allLoadedFonts.add(newFont);
+        loadedFontUids.put(fn, allLoadedFonts.size() - 1);
     }
 
-    private static Texture generateFontImage(Font font) {
-        int imgWidth = 0, imgHeight = 0;
+    /** generate all font images onto one universal image atlas at their y offsets */
+    public static void generateAndBindAllFonts(ShaderHelper sh) {
+        BufferedImage fullImage = new BufferedImage(fullWidth, fullHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = fullImage.createGraphics();
 
-        // find the dimensions of image
-        for (int i = AsciiFrom; i < AsciiTo; i++) {
-            CharFondler.CharMetrics charSize = CharFondler.getCharSize(font, (char) i, antiAlias);
-            imgWidth += charSize.width;
-            imgHeight = Math.max(imgHeight, charSize.height);
+        int yOffset = 0;
+        for (LoadedFont lFont : allLoadedFonts) {
+            lFont.drawOntoFinalImage(fullImage, graphics, yOffset);
+            yOffset += lFont.imgHeight;
         }
 
-        // actual image
-        BufferedImage image = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = image.createGraphics();
-
-        // draw glyphs
-        int x = 0;
-        for (int i = AsciiFrom; i < AsciiTo; i++) {
-            BufferedImage charImage = CharFondler.createCharImage(font, (char) i, antiAlias);
-            if (charImage == null) continue;
-
-            int charWidth = charImage.getWidth();
-            int charHeight = charImage.getHeight();
-            graphics.drawImage(charImage, x, 0, null);
-
-            x += charWidth;
-            glyphMap.put((char) i, new Glyph(charWidth, charHeight, x, image.getHeight() - charHeight));
-        }
-
-        return new Texture(image);
+        Texture.writeToFile(fullImage);
+        finalTexture = new Texture(fullImage);
+        finalTexture.bind(DEFAULT_TEXTURE_SLOT, sh);
     }
 }

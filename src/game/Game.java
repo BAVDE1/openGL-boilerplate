@@ -42,14 +42,16 @@ public class Game {
         window.setVSync(Constants.V_SYNC);
 
         Renderer.setupGLContext();
-        FontManager.loadFont(Font.DIALOG, Font.PLAIN, 16);
 
         window.show();
         bindEvents();
         setupShaders();
         setupBuffers();
 
-        FontManager.generateAndBindFonts(sh);
+        FontManager.loadFont(Font.DIALOG, Font.PLAIN, 16);
+        FontManager.loadFont(Font.DIALOG, Font.ITALIC, 16);
+        FontManager.loadFont(Font.DIALOG, Font.BOLD, 16);
+        FontManager.generateAndBindAllFonts(sh);
     }
 
     public void close() {
@@ -79,13 +81,13 @@ public class Game {
         s.setAdditionalVerts(3);
         s.pushSeparatedVertices(new float[] {
                 200, 300, 0, 1, 0,
-                200, 140, 0, 0, 0,
-                750, 300, 1, 1, 0,
+                200, 100, 0, 0, 0,
+                700, 300, 1, 1, 0,
                 700, 100, 1, 0, 0
         });
         s.pushSeparatedVertices(new float[] {
-                50,  350, 0, 1, 1,
-                50,  50,  0, 0, 1,
+                50,  400, 0, 1, 1,
+                50,  0,   0, 0, 1,
                 300, 340, 1, 1, 1,
                 300, 50,  1, 0, 1
         });
@@ -113,7 +115,7 @@ public class Game {
 
         sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
 
-        new Texture("res/textures/explosion.png").bind(0, sh);
+//        new Texture("res/textures/explosion.png").bind(0, sh);
         new Texture("res/textures/closed.png").bind(1, sh);
     }
 

@@ -4,7 +4,10 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import src.utility.Logging;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -30,7 +33,7 @@ public class Texture {
     static final int BPP = 4;  // bytes per pixel
 
     private int texId;
-    int width, height;
+    public int width, height;
 
     public Texture(String filePath) {
         Image image = loadImageFromFilePath(filePath);
@@ -120,5 +123,15 @@ public class Texture {
 
     public void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    /** debug function writes given image to src/image.png */
+    public static void writeToFile(BufferedImage img) {
+        File outputfile = new File("image.png");
+        try {
+            ImageIO.write(img, "png", outputfile);
+        } catch (IOException e) {
+            Logging.danger("Failed to write given image to file 'src/image.png'\nError message thrown:\n%s", e);
+        }
     }
 }
