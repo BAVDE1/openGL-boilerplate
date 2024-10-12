@@ -6,62 +6,67 @@ import src.rendering.Renderer;
 import src.rendering.StripBuilder2f;
 import src.rendering.VertexArray;
 import src.rendering.VertexBuffer;
+import src.utility.Logging;
 import src.utility.Vec2f;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 public class TextRenderer {
     public static class TextObject {
-        public float fontSize = 25;
-        public int fontStyle = Font.PLAIN;
+        private float scale = 1;
+        private int ySpacing = 5;
 
-        public int index = -1;
-        String string;
-        Vec2f pos;
+        private int loadedFontId;
+        private String string;
+        private Vec2f pos;
 
-        int ySpacing = 10;
+        private final StripBuilder2f sb = new StripBuilder2f();
 
-        public TextObject(String string, Vec2f pos) {
+        public TextObject(int loadedFontId, String string, Vec2f pos, float scale, int ySpacing) {
+            this(loadedFontId, string, pos);
+            this.scale = scale;
+            this.ySpacing = ySpacing;
+        }
+        public TextObject(int loadedFontId, String string, Vec2f pos) {
+            this.loadedFontId = loadedFontId;
             this.string = string;
             this.pos = pos;
         }
 
-        public float[] buildStrip() {
-            StripBuilder2f sb = new StripBuilder2f();
-            sb.setAdditionalVerts(0);  // todo: 2
+        public float[] buildStrip(int additionalVerts) {
+            sb.clear();
+            sb.setAdditionalVerts(additionalVerts);
 
-            Vec2f charSize = new Vec2f(20, 30);  // todo: remove
+            FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
+            FontManager.Glyph spaceGlyph = font.glyphMap.get(' ');
 
             int accumulatedY = 0;
             for (String line : string.split("\n")) {
                 if (line.isEmpty()) {
-                    accumulatedY += (int) charSize.y + ySpacing;  // todo: just use height of 'A'
+                    accumulatedY += spaceGlyph.height + ySpacing;
                     continue;
                 }
 
-                // starting vert
+                // all chars in line
                 float lineY = pos.y + accumulatedY;
-                sb.pushSeparatedVertices(new float[] {pos.x, lineY + charSize.y});
-
-                // all chars
                 int accumulatedX = 0;
                 for (char c : line.toCharArray()) {
-//                    if (!font.canDisplay(c)) {
-//                        Logging.warn("Character '%s' does not exist in the currently loaded ttf, will use '0' instead", c);
-//                        c = '0';
-//                    }
+                    if (!font.glyphMap.containsKey(c)) {
+                        Logging.danger("Character '%s' does not exist in the currently loaded font. Using '0' instead.", c);
+                        c = '0';
+                    }
 
-                    sb.pushVertices(new float[] {
-                            pos.x + accumulatedX,              lineY,
-                            pos.x + accumulatedX + charSize.x, lineY + charSize.y
+                    FontManager.Glyph glyph = font.glyphMap.get(c);
+                    sb.pushSeparatedVertices(new float[] {
+                            pos.x,                              lineY + glyph.height, 0, 0, 0,
+                            pos.x + accumulatedX,               lineY,                0, 0, 0,
+                            pos.x + accumulatedX + glyph.width, lineY + glyph.height, 0, 0, 0,
+                            pos.x + accumulatedX,               lineY,                0, 0, 0
                     });
-                    accumulatedX += (int) charSize.x;
+                    accumulatedX += glyph.width;
                 }
 
-                // ending vert
-                sb.pushVertices(new float[] {pos.x + accumulatedX, lineY});
-                accumulatedY += (int) charSize.y + ySpacing;
+                accumulatedY += spaceGlyph.height + ySpacing;
             }
 
             return sb.getSetVertices();
@@ -70,51 +75,91 @@ public class TextRenderer {
 
     private final ArrayList<TextObject> textObjects = new ArrayList<>();
 
-    VertexArray va;
-    VertexBuffer vb;
-    StripBuilder2f sb;
+    private VertexArray va;
+    private VertexBuffer vb;
+    private StripBuilder2f sb;
 
-    int posNumCount = 2;
-    int texCoordNumCount = 0;  // todo: 2
+    private int bufferSize = Constants.BUFF_SIZE_DEFAULT;
+    private final int posVertsCount = 2;
+    private final int texCoordCount = 2;
+    private final int slotCount = 1;
+    private boolean hasBeenModified = false;
 
-    int bufferSize;
-
-    public TextRenderer() {this(Constants.BUFF_SIZE_DEFAULT);}
-    public TextRenderer(int size) {
-        this.bufferSize = size;
-    }
+    public TextRenderer() {}
+    public TextRenderer(int size) {this.bufferSize = size;}
 
     /** after GL context created */
     public void setupBufferObjects() {
         va = new VertexArray();   va.genId();
         vb = new VertexBuffer();  vb.genId();
         sb = new StripBuilder2f(bufferSize);
-        sb.setAdditionalVerts(texCoordNumCount);
+        sb.setAdditionalVerts(texCoordCount + slotCount);
 
         vb.bufferSize(bufferSize);
 
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
-        layout.pushFloat(posNumCount);  // position
-        layout.pushFloat(texCoordNumCount);  // texture coord
+        layout.pushFloat(posVertsCount);  // pos
+        layout.pushFloat(texCoordCount);  // tex coord
+        layout.pushFloat(slotCount);  // slot
         va.addBuffer(vb, layout);
     }
 
-    public void addTextObject(TextObject to) {
-        textObjects.add(to);
-        to.index = textObjects.size() - 1;
-    }
-
-    public void buildBuffer() {
+    private void buildBuffer() {
         sb.clear();
         for (TextObject to : textObjects) {
-            sb.pushSeparatedVertices(to.buildStrip());
+            sb.pushSeparatedVertices(to.buildStrip(texCoordCount + slotCount));
         }
 
         Renderer.bindBuffer(vb);
-        vb.BufferSubData(sb.getSetVertices());
+        vb.bufferSubData(sb.getSetVertices());
+        hasBeenModified = false;
     }
 
     public void draw() {
-        Renderer.draw(GL_LINE_STRIP, va, sb.count / va.layout.getTotalItems());
+        if (hasBeenModified) buildBuffer();
+
+        if (sb.count > 0) {
+            Renderer.draw(GL_LINE_STRIP, va, sb.count / va.layout.getTotalItems());
+        }
+    }
+
+    public void pushTextObject(TextObject to) {
+        textObjects.add(to);
+        hasBeenModified = true;
+    }
+
+    public void removeTextObject(TextObject to) {
+        textObjects.remove(to);
+        hasBeenModified = true;
+    }
+
+    public void clearAllTextObjects() {
+        textObjects.clear();
+        hasBeenModified = true;
+    }
+
+    public void setString(TextObject to, String newString) {
+        to.string = newString;
+        hasBeenModified = true;
+    }
+
+    public void setPos(TextObject to, Vec2f newPos) {
+        to.pos = newPos;
+        hasBeenModified = true;
+    }
+
+    public void setFontId(TextObject to, int newFontId) {
+        to.loadedFontId = newFontId;
+        hasBeenModified = true;
+    }
+
+    public void setScale(TextObject to, float newScale) {
+        to.scale = newScale;
+        hasBeenModified = true;
+    }
+
+    public void setYSpacing(TextObject to, int newYSpacing) {
+        to.ySpacing = newYSpacing;
+        hasBeenModified = true;
     }
 }

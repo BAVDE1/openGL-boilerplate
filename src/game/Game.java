@@ -48,8 +48,8 @@ public class Game {
         setupShaders();
         setupBuffers();
 
-        FontManager.loadFont(Font.DIALOG, Font.PLAIN, 16);
-        FontManager.loadFont(Font.DIALOG, Font.ITALIC, 16);
+        FontManager.init();
+        FontManager.loadFont(Font.DIALOG, Font.ITALIC, 24);
         FontManager.loadFont(Font.DIALOG, Font.BOLD, 16);
         FontManager.generateAndBindAllFonts(sh);
     }
@@ -80,16 +80,16 @@ public class Game {
         StripBuilder2f s = new StripBuilder2f();
         s.setAdditionalVerts(3);
         s.pushSeparatedVertices(new float[] {
-                200, 300, 0, 1, 0,
-                200, 100, 0, 0, 0,
-                700, 300, 1, 1, 0,
-                700, 100, 1, 0, 0
-        });
-        s.pushSeparatedVertices(new float[] {
                 50,  400, 0, 1, 1,
                 50,  0,   0, 0, 1,
                 300, 340, 1, 1, 1,
                 300, 50,  1, 0, 1
+        });
+        s.pushSeparatedVertices(new float[] {
+                200, 300, 0, 1, 0,
+                200, 100, 0, 0, 0,
+                7000, 300, 1, 1, 0,
+                7000, 100, 1, 0, 0
         });
         vb.bufferData(s.getSetVertices());
 
@@ -101,9 +101,8 @@ public class Game {
         va.addBuffer(vb, layout);
 
         tr.setupBufferObjects();
-        TextRenderer.TextObject to = new TextRenderer.TextObject("a\nstring", new Vec2f(50, 50));
-        tr.addTextObject(to);
-        tr.buildBuffer();
+        TextRenderer.TextObject to = new TextRenderer.TextObject(0, "a\nstring", new Vec2f(50, 50));
+        tr.pushTextObject(to);
     }
 
     /** Must be called after window is visible */

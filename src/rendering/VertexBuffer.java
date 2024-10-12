@@ -21,11 +21,11 @@ public class VertexBuffer {
         GL45.glBufferData(bufferType, size, drawMethod);
     }
 
-    public void BufferSubData(float[] data) {
-        BufferSubData(0, data);
+    public void bufferSubData(float[] data) {
+        bufferSubData(0, data);
     }
 
-    public void BufferSubData(int bytesOffset, float[] data) {
+    public void bufferSubData(int bytesOffset, float[] data) {
         Renderer.bindBuffer(this);
         GL45.glBufferSubData(GL15.GL_ARRAY_BUFFER, bytesOffset, data);
     }
