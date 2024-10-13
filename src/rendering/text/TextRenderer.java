@@ -77,15 +77,16 @@ public class TextRenderer {
                     // 2 4
                     // 1 3
                     float charX = pos.x + accumulatedX;
-                    sb.pushSeparatedVertices(new float[] {
+                    float[] charVertices = new float[] {
                             charX,          lineY + size.y, glyph.topLeft.x,     glyph.bottomRight.y, 0,
                             charX,          lineY,          glyph.topLeft.x,     glyph.topLeft.y,     0,
                             charX + size.x, lineY + size.y, glyph.bottomRight.x, glyph.bottomRight.y, 0,
                             charX + size.x, lineY,          glyph.bottomRight.x, glyph.topLeft.y,     0
-                    });
+                    };
+                    if (accumulatedX == 0) sb.pushSeparatedVertices(charVertices);
+                    else sb.pushVertices(charVertices);
                     accumulatedX += (int) size.x;
                 }
-
                 accumulatedY += genericHeight + ySpacing;
             }
 
@@ -168,7 +169,6 @@ public class TextRenderer {
         Renderer.bindBuffer(vb);
         vb.bufferData(sb.getSetVertices());
         hasBeenModified = false;
-        System.out.println("build");
     }
 
     public void draw() {

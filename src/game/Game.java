@@ -72,7 +72,7 @@ public class Game {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true);
             if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-                to1.setScale(2);
+                to1.setScale(2.5f);
             }
         });
 
