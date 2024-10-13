@@ -49,11 +49,11 @@ public class Texture {
         width = buffImg.getWidth();
         height = buffImg.getHeight();
 
-        // write pixels into an int array
+        // get all pixels
         int[] pixels = new int[width * height];
         buffImg.getRGB(0, 0, width, height, pixels, 0, width);
 
-        ByteBuffer buffer = MemoryUtil.memAlloc(width * height * BPP);  // 4 bytes per pixel
+        ByteBuffer buffer = MemoryUtil.memAlloc(width * height * BPP);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int pixel = pixels[y * width + x];
@@ -87,7 +87,7 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         // no wrap
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // GL_CLAMP_TO_EDGE?
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
@@ -107,7 +107,7 @@ public class Texture {
         }
     }
 
-    /** We add 1 to slot secretly cause GL doesn't actually like slot 0 apparently */
+    /** We add 1 to slot secretly cause slot 0 unbinds */
     public void bind(int slot, ShaderHelper sh) {
         if (boundSlots.contains(slot)) {
             Logging.warn("Overriding already set texture slot '%s'", slot);

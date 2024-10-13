@@ -15,6 +15,8 @@ public class FontManager {
     public static class Glyph {
         public final int width, height;
         public final int x, y;
+
+        // texture coordinates
         public final Vec2f topLeft;
         public final Vec2f bottomRight;
 
@@ -70,7 +72,7 @@ public class FontManager {
         }
 
         /** Draw the fonts glyphs at the y offset onto the given image */
-        public void drawOntoFinalImage(BufferedImage image, Graphics2D graphics, int yOffset) {
+        public void drawOntoFinalImage(Graphics2D graphics, int yOffset) {
             this.atlasOffset = yOffset;
             int x = 0;
 
@@ -104,10 +106,10 @@ public class FontManager {
     /** Loads the default font first */
     public static void init() {
         initialized = true;
-        loadFont(Font.DIALOG, Font.PLAIN, 16);
+        loadFont(Font.DIALOG, Font.PLAIN, 32);
     }
 
-    /** Load given font. Returns the font id / index */
+    /** Load given font. Returns the loaded font id / index */
     public static int loadFont(String font, int style, int size) {
         if (!initialized) {
             Logging.danger("FontManager has not been initialized! Aborting");
@@ -142,14 +144,14 @@ public class FontManager {
 
         int yOffset = 0;
         for (LoadedFont lFont : allLoadedFonts) {
-            lFont.drawOntoFinalImage(fullImage, graphics, yOffset);
+            lFont.drawOntoFinalImage(graphics, yOffset);
             yOffset += lFont.imgHeight;
         }
 
         graphics.dispose();
         finalTexture = new Texture(fullImage);
         finalTexture.bind(DEFAULT_TEXTURE_SLOT, sh);
-        Texture.writeToFile(fullImage);
+        Logging.debug("%s fonts generated, bound to slot %s", allLoadedFonts.size(), DEFAULT_TEXTURE_SLOT);
     }
 
     public static LoadedFont getLoadedFont(int loadedFontId) {

@@ -48,9 +48,9 @@ public class TextRenderer {
             this.parent = null;
         }
 
-        private float[] buildStrip(int additionalVerts) {
+        private float[] buildStrip() {
             sb.clear();
-            sb.setAdditionalVerts(additionalVerts);
+            sb.setAdditionalVerts(3);
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
             int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
@@ -91,6 +91,10 @@ public class TextRenderer {
             }
 
             return sb.getSetVertices();
+        }
+
+        public void setString(String newString, Object... args) {
+            setString(String.format(newString, args));
         }
 
         public void setString(String newString) {
@@ -136,9 +140,6 @@ public class TextRenderer {
     private StripBuilder2f sb;
 
     private int bufferSize = Constants.BUFF_SIZE_DEFAULT;
-    private final int posVertsCount = 2;
-    private final int texCoordCount = 2;
-    private final int slotCount = 1;
     private boolean hasBeenModified = false;
 
     public TextRenderer() {}
@@ -149,21 +150,19 @@ public class TextRenderer {
         va = new VertexArray();   va.genId();
         vb = new VertexBuffer();  vb.genId();
         sb = new StripBuilder2f(bufferSize);
-        sb.setAdditionalVerts(texCoordCount + slotCount);
 
+        sb.setAdditionalVerts(3);
         vb.bufferSize(bufferSize);
 
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
-        layout.pushFloat(posVertsCount);  // pos
-        layout.pushFloat(texCoordCount);  // tex coord
-        layout.pushFloat(slotCount);  // slot
+        layout.setupDefaultLayout();
         va.addBuffer(vb, layout);
     }
 
     private void buildBuffer() {
         sb.clear();
         for (TextObject to : textObjects) {
-            sb.pushSeparatedVertices(to.buildStrip(texCoordCount + slotCount));
+            sb.pushSeparatedVertices(to.buildStrip());
         }
 
         Renderer.bindBuffer(vb);

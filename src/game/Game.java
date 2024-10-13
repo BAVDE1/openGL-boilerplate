@@ -50,8 +50,7 @@ public class Game {
         setupBuffers();
 
         FontManager.init();
-        FontManager.loadFont(Font.DIALOG, Font.ITALIC, 24);
-        FontManager.loadFont(Font.DIALOG, Font.BOLD, 16);
+        FontManager.loadFont(Font.DIALOG, Font.BOLD, 32);
         FontManager.generateAndBindAllFonts(sh);
     }
 
@@ -72,7 +71,7 @@ public class Game {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true);
             if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-                to1.setScale(2.5f);
+                to1.setString("fps: %s", fps);
             }
         });
 
@@ -81,27 +80,25 @@ public class Game {
 
     public void setupBuffers() {
         vb.genId();
-        StripBuilder2f s = new StripBuilder2f();
-        s.setAdditionalVerts(3);
-        s.pushSeparatedVertices(new float[] {
-                50,  400, 0, 1, 2,
-                50,  0,   0, 0, 2,
-                300, 340, 1, 1, 2,
-                300, 50,  1, 0, 2
-        });
-        s.pushSeparatedVertices(new float[] {
+        StripBuilder2f sb = new StripBuilder2f();
+        sb.setAdditionalVerts(3);
+        sb.pushSeparatedVertices(new float[] {
                 200, 300, 0, 1, 1,
                 200, 100, 0, 0, 1,
                 700, 300, 1, 1, 1,
                 700, 100, 1, 0, 1
         });
-        vb.bufferData(s.getSetVertices());
+        sb.pushSeparatedVertices(new float[] {
+                50,  400, 0, 1, 2,
+                50,  0,   0, 0, 2,
+                300, 340, 1, 1, 2,
+                300, 50,  1, 0, 2
+        });
+        vb.bufferData(sb.getSetVertices());
 
         va.genId();
         VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
-        layout.pushFloat(2);  // 0: pos
-        layout.pushFloat(2);  // 1: tex coord
-        layout.pushFloat(1);  // 2: tex slot
+        layout.setupDefaultLayout();
         va.addBuffer(vb, layout);
 
         tr.setupBufferObjects();

@@ -61,6 +61,13 @@ public class VertexArray {
         public int getTotalItems() {
             return totalItems;
         }
+
+        /** Push the default vertex layout: 2 pos, 2 texCoords, 1 slot */
+        public void setupDefaultLayout() {
+            pushFloat(2);  // pos
+            pushFloat(2);  // tex coord
+            pushFloat(1);  // slot
+        }
     }
 
     public VertexArrayLayout layout;

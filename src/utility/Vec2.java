@@ -231,6 +231,13 @@ public class Vec2 {
         return new Vec2(vec1.x * vec2.x, vec1.y * vec2.y);
     }
 
+    public Vec2f toVec2f() {
+        return toVec2f(this);
+    }
+    public static Vec2f toVec2f(Vec2 vec2) {
+        return new Vec2f((float) vec2.x, (float) vec2.y);
+    }
+
     @Override
     public String toString() {
         return String.format("Vec2(x=%.2f, y=%.2f)", x, y);
