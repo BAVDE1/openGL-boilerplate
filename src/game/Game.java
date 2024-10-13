@@ -23,6 +23,7 @@ public class Game {
     VertexArray va = new VertexArray();
     VertexBuffer vb = new VertexBuffer();
 
+    TextRenderer.TextObject to1;
     TextRenderer tr = new TextRenderer();
 
     Vec2 mousePos = new Vec2();
@@ -70,6 +71,9 @@ public class Game {
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true);
+            if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+                to1.setScale(2);
+            }
         });
 
         glfwSetCursorPosCallback(window.handle, (window, xpos, ypos) -> mousePos.set(xpos, ypos));
@@ -101,8 +105,8 @@ public class Game {
         va.addBuffer(vb, layout);
 
         tr.setupBufferObjects();
-        TextRenderer.TextObject to = new TextRenderer.TextObject(2, "stringg!\na STRING@!!!!\n\nit's alive!", new Vec2f(10, 100));
-        tr.pushTextObject(to);
+        to1 = new TextRenderer.TextObject(0, "stringg!\na STRING@!!!!\n\nit's alive!", new Vec2f(10, 100));
+        tr.pushTextObject(to1);
     }
 
     /** Must be called after window is visible */

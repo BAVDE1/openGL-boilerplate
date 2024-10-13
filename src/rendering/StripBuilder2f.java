@@ -77,7 +77,7 @@ public class StripBuilder2f {
     }
 
     public void setAdditionalVerts(int num) {
-        if (additionalVerts != 0)
+        if (additionalVerts != 0 && additionalVerts != num)
             Logging.warn("Changing already set 'additional vertices'. This could warp the buffer");
         additionalVerts = num;
     }

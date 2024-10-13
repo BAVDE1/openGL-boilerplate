@@ -10,10 +10,14 @@ import src.utility.Logging;
 import src.utility.Vec2f;
 
 import javax.annotation.processing.SupportedSourceVersion;
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class TextRenderer {
     public static class TextObject {
+        private TextRenderer parent;
         private float scale = 1;
         private int ySpacing = 5;
 
@@ -34,17 +38,27 @@ public class TextRenderer {
             this.pos = pos;
         }
 
-        public float[] buildStrip(int additionalVerts) {
+        private void addParent(TextRenderer parent) {
+            assert this.parent == null;
+            this.parent = parent;
+        }
+
+        private void removeParent() {
+            assert this.parent != null;
+            this.parent = null;
+        }
+
+        private float[] buildStrip(int additionalVerts) {
             sb.clear();
             sb.setAdditionalVerts(additionalVerts);
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
-            FontManager.Glyph spaceGlyph = font.glyphMap.get(' ');
+            int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
 
             int accumulatedY = 0;
             for (String line : string.split("\n")) {
                 if (line.isEmpty()) {
-                    accumulatedY += spaceGlyph.height + ySpacing;
+                    accumulatedY += genericHeight + ySpacing;
                     continue;
                 }
 
@@ -53,27 +67,64 @@ public class TextRenderer {
                 int accumulatedX = 0;
                 for (char c : line.toCharArray()) {
                     if (!font.glyphMap.containsKey(c)) {
-                        Logging.danger("Character '%s' does not exist in the currently loaded font. Using '0' instead.", c);
+                        Logging.warn("Character '%s' does not exist in the currently loaded font. Using '0' instead.", c);
                         c = '0';
                     }
 
                     FontManager.Glyph glyph = font.glyphMap.get(c);
+                    Vec2f size = new Vec2f(glyph.width, glyph.height).mul(scale);
 
                     // 2 4
                     // 1 3
+                    float charX = pos.x + accumulatedX;
                     sb.pushSeparatedVertices(new float[] {
-                            pos.x + accumulatedX,               lineY + glyph.height, glyph.topLeft.x,     glyph.bottomRight.y, 0,
-                            pos.x + accumulatedX,               lineY,                glyph.topLeft.x,     glyph.topLeft.y,     0,
-                            pos.x + accumulatedX + glyph.width, lineY + glyph.height, glyph.bottomRight.x, glyph.bottomRight.y, 0,
-                            pos.x + accumulatedX + glyph.width, lineY,                glyph.bottomRight.x, glyph.topLeft.y,     0
+                            charX,          lineY + size.y, glyph.topLeft.x,     glyph.bottomRight.y, 0,
+                            charX,          lineY,          glyph.topLeft.x,     glyph.topLeft.y,     0,
+                            charX + size.x, lineY + size.y, glyph.bottomRight.x, glyph.bottomRight.y, 0,
+                            charX + size.x, lineY,          glyph.bottomRight.x, glyph.topLeft.y,     0
                     });
-                    accumulatedX += glyph.width;
+                    accumulatedX += (int) size.x;
                 }
 
-                accumulatedY += spaceGlyph.height + ySpacing;
+                accumulatedY += genericHeight + ySpacing;
             }
 
             return sb.getSetVertices();
+        }
+
+        public void setString(String newString) {
+            if (!Objects.equals(newString, string)) {
+                string = newString;
+                parent.hasBeenModified = true;
+            }
+        }
+
+        public void setPos(Vec2f newPos) {
+            if (newPos != pos) {
+                pos = newPos;
+                parent.hasBeenModified = true;
+            }
+        }
+
+        public void setFontId(int newFontId) {
+            if (newFontId != loadedFontId) {
+                loadedFontId = newFontId;
+                parent.hasBeenModified = true;
+            }
+        }
+
+        public void setScale(float newScale) {
+            if (newScale != scale) {
+                scale = newScale;
+                parent.hasBeenModified = true;
+            }
+        }
+
+        public void setYSpacing(int newYSpacing) {
+            if (newYSpacing != ySpacing) {
+                ySpacing = newYSpacing;
+                parent.hasBeenModified = true;
+            }
         }
     }
 
@@ -128,43 +179,25 @@ public class TextRenderer {
         }
     }
 
+    public ArrayList<TextObject> getTextObjects() {
+        return textObjects;
+    }
+
     public void pushTextObject(TextObject to) {
+        to.addParent(this);
         textObjects.add(to);
         hasBeenModified = true;
     }
 
     public void removeTextObject(TextObject to) {
+        to.removeParent();
         textObjects.remove(to);
         hasBeenModified = true;
     }
 
     public void clearAllTextObjects() {
+        for (TextObject to : textObjects) to.removeParent();
         textObjects.clear();
-        hasBeenModified = true;
-    }
-
-    public void setString(TextObject to, String newString) {
-        to.string = newString;
-        hasBeenModified = true;
-    }
-
-    public void setPos(TextObject to, Vec2f newPos) {
-        to.pos = newPos;
-        hasBeenModified = true;
-    }
-
-    public void setFontId(TextObject to, int newFontId) {
-        to.loadedFontId = newFontId;
-        hasBeenModified = true;
-    }
-
-    public void setScale(TextObject to, float newScale) {
-        to.scale = newScale;
-        hasBeenModified = true;
-    }
-
-    public void setYSpacing(TextObject to, int newYSpacing) {
-        to.ySpacing = newYSpacing;
         hasBeenModified = true;
     }
 }
