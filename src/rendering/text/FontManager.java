@@ -82,8 +82,8 @@ public class FontManager {
                 int charHeight = charImage.getHeight();
                 graphics.drawImage(charImage, x, yOffset, null);
 
-                x += charWidth;
                 glyphMap.put((char) i, new Glyph(x, yOffset, charWidth, charHeight));
+                x += charWidth;
             }
         }
     }

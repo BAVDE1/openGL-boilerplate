@@ -62,10 +62,10 @@ public class TextRenderer {
                     // 2 4
                     // 1 3
                     sb.pushSeparatedVertices(new float[] {
-                            pos.x + accumulatedX,               lineY + glyph.height, 0, 0, -1,
-                            pos.x + accumulatedX,               lineY,                0, 0, -1,
-                            pos.x + accumulatedX + glyph.width, lineY + glyph.height, 0, 0, -1,
-                            pos.x + accumulatedX + glyph.width, lineY,                0, 0, -1
+                            pos.x + accumulatedX,               lineY + glyph.height, glyph.topLeft.x,     glyph.bottomRight.y, 0,
+                            pos.x + accumulatedX,               lineY,                glyph.topLeft.x,     glyph.topLeft.y,     0,
+                            pos.x + accumulatedX + glyph.width, lineY + glyph.height, glyph.bottomRight.x, glyph.bottomRight.y, 0,
+                            pos.x + accumulatedX + glyph.width, lineY,                glyph.bottomRight.x, glyph.topLeft.y,     0
                     });
                     accumulatedX += glyph.width;
                 }

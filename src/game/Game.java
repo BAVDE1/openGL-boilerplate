@@ -101,7 +101,7 @@ public class Game {
         va.addBuffer(vb, layout);
 
         tr.setupBufferObjects();
-        TextRenderer.TextObject to = new TextRenderer.TextObject(0, "stringg!", new Vec2f(50, 50));
+        TextRenderer.TextObject to = new TextRenderer.TextObject(2, "stringg!\na STRING@!!!!\n\nit's alive!", new Vec2f(10, 100));
         tr.pushTextObject(to);
     }
 
