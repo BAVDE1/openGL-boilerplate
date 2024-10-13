@@ -9,6 +9,7 @@ import src.rendering.VertexBuffer;
 import src.utility.Logging;
 import src.utility.Vec2f;
 
+import javax.annotation.processing.SupportedSourceVersion;
 import java.util.ArrayList;
 
 public class TextRenderer {
@@ -57,11 +58,14 @@ public class TextRenderer {
                     }
 
                     FontManager.Glyph glyph = font.glyphMap.get(c);
+
+                    // 2 4
+                    // 1 3
                     sb.pushSeparatedVertices(new float[] {
-                            pos.x,                              lineY + glyph.height, 0, 0, 0,
-                            pos.x + accumulatedX,               lineY,                0, 0, 0,
-                            pos.x + accumulatedX + glyph.width, lineY + glyph.height, 0, 0, 0,
-                            pos.x + accumulatedX,               lineY,                0, 0, 0
+                            pos.x + accumulatedX,               lineY + glyph.height, 0, 0, -1,
+                            pos.x + accumulatedX,               lineY,                0, 0, -1,
+                            pos.x + accumulatedX + glyph.width, lineY + glyph.height, 0, 0, -1,
+                            pos.x + accumulatedX + glyph.width, lineY,                0, 0, -1
                     });
                     accumulatedX += glyph.width;
                 }
@@ -111,15 +115,16 @@ public class TextRenderer {
         }
 
         Renderer.bindBuffer(vb);
-        vb.bufferSubData(sb.getSetVertices());
+        vb.bufferData(sb.getSetVertices());
         hasBeenModified = false;
+        System.out.println("build");
     }
 
     public void draw() {
         if (hasBeenModified) buildBuffer();
 
         if (sb.count > 0) {
-            Renderer.draw(GL_LINE_STRIP, va, sb.count / va.layout.getTotalItems());
+            Renderer.draw(GL_TRIANGLE_STRIP, va, sb.count / va.layout.getTotalItems());
         }
     }
 

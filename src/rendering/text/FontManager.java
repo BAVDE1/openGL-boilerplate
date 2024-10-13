@@ -3,23 +3,33 @@ package src.rendering.text;
 import src.rendering.ShaderHelper;
 import src.rendering.Texture;
 import src.utility.Logging;
+import src.utility.Vec2f;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 /** State Machine */
 public class FontManager {
     public static class Glyph {
         public final int width, height;
         public final int x, y;
+        public final Vec2f topLeft;
+        public final Vec2f bottomRight;
 
         public Glyph(int x, int y, int width, int height) {
-            this.width = width;     this.height = height;
-            this.x = x;             this.y = y;
+            this.width = width; this.height = height;
+            this.x = x; this.y = y;
+
+            this.topLeft = new Vec2f(
+                    (float) x / fullWidth,
+                    (float) y / fullHeight
+            );
+            this.bottomRight = new Vec2f(
+                    topLeft.x + (float) width / fullWidth,
+                    topLeft.y + (float) height / fullHeight
+            );
         }
 
         @Override

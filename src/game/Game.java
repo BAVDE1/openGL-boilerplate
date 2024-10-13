@@ -101,7 +101,7 @@ public class Game {
         va.addBuffer(vb, layout);
 
         tr.setupBufferObjects();
-        TextRenderer.TextObject to = new TextRenderer.TextObject(0, "a\nstring", new Vec2f(50, 50));
+        TextRenderer.TextObject to = new TextRenderer.TextObject(0, "stringg!", new Vec2f(50, 50));
         tr.pushTextObject(to);
     }
 
@@ -132,8 +132,8 @@ public class Game {
         Renderer.clearScreen();
         sh.uniform1f("time", (float) glfwGetTime());
 
-//        tr.draw();
         Renderer.draw(GL_TRIANGLE_STRIP, va, 10);
+        tr.draw();
 
         Renderer.finish(window);
     }
