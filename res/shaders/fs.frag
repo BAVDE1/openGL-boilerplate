@@ -3,7 +3,7 @@
 uniform vec2 resolution;
 uniform highp float time;
 
-uniform sampler2D textures[2];
+uniform sampler2D textures[3];
 
 in vec2 v_texCoord;
 in float v_texSlot;

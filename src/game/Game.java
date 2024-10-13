@@ -84,16 +84,16 @@ public class Game {
         StripBuilder2f s = new StripBuilder2f();
         s.setAdditionalVerts(3);
         s.pushSeparatedVertices(new float[] {
-                50,  400, 0, 1, 1,
-                50,  0,   0, 0, 1,
-                300, 340, 1, 1, 1,
-                300, 50,  1, 0, 1
+                50,  400, 0, 1, 2,
+                50,  0,   0, 0, 2,
+                300, 340, 1, 1, 2,
+                300, 50,  1, 0, 2
         });
         s.pushSeparatedVertices(new float[] {
-                200, 300, 0, 1, 0,
-                200, 100, 0, 0, 0,
-                7000, 300, 1, 1, 0,
-                7000, 100, 1, 0, 0
+                200, 300, 0, 1, 1,
+                200, 100, 0, 0, 1,
+                700, 300, 1, 1, 1,
+                700, 100, 1, 0, 1
         });
         vb.bufferData(s.getSetVertices());
 
@@ -118,8 +118,8 @@ public class Game {
 
         sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
 
-//        new Texture("res/textures/explosion.png").bind(0, sh);
-        new Texture("res/textures/closed.png").bind(1, sh);
+        new Texture("res/textures/explosion.png").bind(1, sh);
+        new Texture("res/textures/closed.png").bind(2, sh);
     }
 
     public void updateFps() {
