@@ -7,6 +7,8 @@ import src.utility.Vec2f;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -42,24 +44,48 @@ public class FontManager {
 
     public static class LoadedFont {
         private final boolean aa;  // anti-aliasing
-        public int atlasOffset;
         public final HashMap<Character, Glyph> glyphMap = new HashMap<>();
 
-        public final String name;
-        public final Font font;
+        private final String name;
+        private Font font;
 
         public int imgWidth = 0, imgHeight = 0;
 
         public LoadedFont(String fontName, int fontStyle, int fontSize) {
-            this.aa = FontManager.antiAlias;
-            this.name = String.format("%s_%s_%s_%s", fontName, fontStyle, fontSize, aa);
-            this.font = new Font(fontName, fontStyle, fontSize);
+            aa = FontManager.antiAlias;
+            name = String.format("%s_%s_%s_%s", fontName, fontStyle, fontSize, aa);
 
+            font = new Font(fontName, fontStyle, fontSize);
             findImageDimensions();
 
             if (!font.getFamily().equalsIgnoreCase(fontName)) {
                 Logging.warn("Font '%s' could not be found, using '%s' instead", fontName, font.getFamily());
             }
+        }
+
+        public LoadedFont(int fontEnum, int fontStyle, int fontSize) {
+            aa = FontManager.antiAlias;
+            name = String.format("%s_%s_%s_%s", fontEnum, fontStyle, fontSize, aa);
+
+            File fontFile = null;
+            switch (fontEnum) {
+                case FONT_NOVA -> fontFile = new File("res/fonts/Bona_Nova_SC/BonaNovaSC-Regular.ttf");
+            }
+
+            if (fontFile == null) {
+                Logging.danger("Font with enum value '%s' does not exist or has not been registered.", fontEnum);
+                return;
+            }
+
+            try {
+                font = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+                font = font.deriveFont(fontStyle, fontSize);
+            } catch (IOException | FontFormatException e) {
+                Logging.danger("Failed to load the font file '%s'\nError message: %s", fontFile.getPath(), e);
+                return;
+            }
+
+            findImageDimensions();
         }
 
         /** Find the dimensions of the image */
@@ -73,9 +99,7 @@ public class FontManager {
 
         /** Draw the fonts glyphs at the y offset onto the given image */
         public void drawOntoFinalImage(Graphics2D graphics, int yOffset) {
-            this.atlasOffset = yOffset;
             int x = 0;
-
             for (int i = AsciiFrom; i < AsciiTo; i++) {
                 BufferedImage charImage = CharFondler.createCharImage(font, (char) i, aa);
                 if (charImage == null) continue;
@@ -91,6 +115,7 @@ public class FontManager {
     }
 
     public static final int DEFAULT_TEXTURE_SLOT = 0;
+    public static final int FONT_NOVA = 0;
 
     private static final int AsciiFrom = 32;
     private static final int AsciiTo = 256;
@@ -106,11 +131,11 @@ public class FontManager {
     /** Loads the default font first */
     public static void init() {
         initialized = true;
-        loadFont(Font.DIALOG, Font.PLAIN, 32);
+        loadBuiltInFont(Font.DIALOG, Font.PLAIN, 32);
     }
 
-    /** Load given font. Returns the loaded font id / index */
-    public static int loadFont(String font, int style, int size) {
+    /** Returns -1 if there was an error */
+    private static int runLoadFontChecks() {
         if (!initialized) {
             Logging.danger("FontManager has not been initialized! Aborting");
             return -1;
@@ -120,8 +145,22 @@ public class FontManager {
             Logging.danger("The font image atlas has already been generated, and so can't be appended to. Aborting.");
             return -1;
         }
+        return 1;
+    }
 
-        LoadedFont newFont = new LoadedFont(font, style, size);
+    public static int loadCustomFont(int font, int style, int size) {
+        return loadFont("", font, style, size, false);
+    }
+
+    public static int loadBuiltInFont(String font, int style, int size) {
+        return loadFont(font, -1, style, size, true);
+    }
+
+    /** Load given font. Returns the loaded font id / index */
+    private static int loadFont(String fontStr, int fontInt, int style, int size, boolean useString) {
+        if (runLoadFontChecks() == -1) return -1;
+
+        LoadedFont newFont = useString ? new LoadedFont(fontStr, style, size) : new LoadedFont(fontInt, style, size);
         String fn = newFont.name;
         if (loadedFontUids.containsKey(fn)) {
             Logging.warn("The font '%s' has already been loaded with uid '%s'. Aborting loading duplicate font", fn, loadedFontUids.get(fn));
@@ -151,6 +190,7 @@ public class FontManager {
         graphics.dispose();
         finalTexture = new Texture(fullImage);
         finalTexture.bind(DEFAULT_TEXTURE_SLOT, sh);
+        Texture.writeToFile(fullImage);
         Logging.debug("%s fonts generated, bound to slot %s", allLoadedFonts.size(), DEFAULT_TEXTURE_SLOT);
     }
 

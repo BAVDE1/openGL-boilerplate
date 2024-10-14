@@ -50,7 +50,7 @@ public class Game {
         setupBuffers();
 
         FontManager.init();
-        FontManager.loadFont(Font.DIALOG, Font.BOLD, 32);
+        FontManager.loadCustomFont(FontManager.FONT_NOVA, Font.PLAIN, 32);
         FontManager.generateAndBindAllFonts(sh);
     }
 
@@ -102,7 +102,7 @@ public class Game {
         va.addBuffer(vb, layout);
 
         tr.setupBufferObjects();
-        to1 = new TextRenderer.TextObject(0, "stringg!\na STRING@!!!!\n\nit's alive!", new Vec2f(10, 100));
+        to1 = new TextRenderer.TextObject(1, "stringg!\na STRING@!!!!\n\nit's alive!", new Vec2f(10, 100));
         tr.pushTextObject(to1);
     }
 
