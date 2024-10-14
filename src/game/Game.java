@@ -50,7 +50,7 @@ public class Game {
         setupBuffers();
 
         FontManager.init();
-        FontManager.loadCustomFont(FontManager.FONT_NOVA, Font.PLAIN, 32);
+        FontManager.loadFont(FontManager.FONT_JACQUARD, Font.PLAIN, 42, false);
         FontManager.generateAndBindAllFonts(sh);
     }
 

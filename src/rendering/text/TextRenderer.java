@@ -100,35 +100,35 @@ public class TextRenderer {
         public void setString(String newString) {
             if (!Objects.equals(newString, string)) {
                 string = newString;
-                parent.hasBeenModified = true;
+                if (parent != null) parent.hasBeenModified = true;
             }
         }
 
         public void setPos(Vec2f newPos) {
             if (newPos != pos) {
                 pos = newPos;
-                parent.hasBeenModified = true;
+                if (parent != null) parent.hasBeenModified = true;
             }
         }
 
         public void setFontId(int newFontId) {
             if (newFontId != loadedFontId) {
                 loadedFontId = newFontId;
-                parent.hasBeenModified = true;
+                if (parent != null) parent.hasBeenModified = true;
             }
         }
 
         public void setScale(float newScale) {
             if (newScale != scale) {
                 scale = newScale;
-                parent.hasBeenModified = true;
+                if (parent != null) parent.hasBeenModified = true;
             }
         }
 
         public void setYSpacing(int newYSpacing) {
             if (newYSpacing != ySpacing) {
                 ySpacing = newYSpacing;
-                parent.hasBeenModified = true;
+                if (parent != null) parent.hasBeenModified = true;
             }
         }
     }

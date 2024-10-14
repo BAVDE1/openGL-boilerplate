@@ -51,8 +51,8 @@ public class FontManager {
 
         public int imgWidth = 0, imgHeight = 0;
 
-        public LoadedFont(String fontName, int fontStyle, int fontSize) {
-            aa = FontManager.antiAlias;
+        public LoadedFont(String fontName, int fontStyle, int fontSize, boolean antiAlias) {
+            aa = antiAlias;
             name = String.format("%s_%s_%s_%s", fontName, fontStyle, fontSize, aa);
 
             font = new Font(fontName, fontStyle, fontSize);
@@ -63,15 +63,11 @@ public class FontManager {
             }
         }
 
-        public LoadedFont(int fontEnum, int fontStyle, int fontSize) {
-            aa = FontManager.antiAlias;
+        public LoadedFont(int fontEnum, int fontStyle, int fontSize, boolean antiAlias) {
+            aa = antiAlias;
             name = String.format("%s_%s_%s_%s", fontEnum, fontStyle, fontSize, aa);
 
-            File fontFile = null;
-            switch (fontEnum) {
-                case FONT_NOVA -> fontFile = new File("res/fonts/Bona_Nova_SC/BonaNovaSC-Regular.ttf");
-            }
-
+            File fontFile = getCustomFontFile(fontEnum);
             if (fontFile == null) {
                 Logging.danger("Font with enum value '%s' does not exist or has not been registered.", fontEnum);
                 return;
@@ -86,6 +82,18 @@ public class FontManager {
             }
 
             findImageDimensions();
+        }
+
+        private File getCustomFontFile(int fontEnum) {
+            File fontFile = null;
+            switch (fontEnum) {
+                case FONT_NOVA -> fontFile = new File("res/fonts/Bona_Nova_SC/BonaNovaSC-Regular.ttf");
+                case FONT_JACQUARD -> fontFile = new File("res/fonts/Jacquard_24/Jacquard24-Regular.ttf");
+                case FONT_TINY -> fontFile = new File("res/fonts/Tiny5/Tiny5-Regular.ttf");
+                case FONT_CASTORO -> fontFile = new File("res/fonts/Castoro_Titling/CastoroTitling-Regular.ttf");
+                case FONT_LUGRASIMO -> fontFile = new File("res/fonts/Lugrasimo/Lugrasimo-Regular.ttf");
+            }
+            return fontFile;
         }
 
         /** Find the dimensions of the image */
@@ -115,11 +123,15 @@ public class FontManager {
     }
 
     public static final int DEFAULT_TEXTURE_SLOT = 0;
+
     public static final int FONT_NOVA = 0;
+    public static final int FONT_JACQUARD = 1;  // recommended size: 42
+    public static final int FONT_TINY = 2;      // recommended size: 24
+    public static final int FONT_CASTORO = 3;
+    public static final int FONT_LUGRASIMO = 4;
 
     private static final int AsciiFrom = 32;
     private static final int AsciiTo = 256;
-    public static boolean antiAlias = true;
 
     private final static ArrayList<LoadedFont> allLoadedFonts = new ArrayList<>();
     private final static HashMap<String, Integer> loadedFontUids = new HashMap<>();
@@ -131,7 +143,7 @@ public class FontManager {
     /** Loads the default font first */
     public static void init() {
         initialized = true;
-        loadBuiltInFont(Font.DIALOG, Font.PLAIN, 32);
+        loadFont(Font.DIALOG, Font.PLAIN, 32, true);
     }
 
     /** Returns -1 if there was an error */
@@ -148,19 +160,19 @@ public class FontManager {
         return 1;
     }
 
-    public static int loadCustomFont(int font, int style, int size) {
-        return loadFont("", font, style, size, false);
+    public static int loadFont(int font, int style, int size, boolean antiAlias) {
+        return loadFont("", font, style, size, antiAlias, false);
     }
 
-    public static int loadBuiltInFont(String font, int style, int size) {
-        return loadFont(font, -1, style, size, true);
+    public static int loadFont(String font, int style, int size, boolean antiAlias) {
+        return loadFont(font, -1, style, size, antiAlias, true);
     }
 
     /** Load given font. Returns the loaded font id / index */
-    private static int loadFont(String fontStr, int fontInt, int style, int size, boolean useString) {
+    private static int loadFont(String fontStr, int fontInt, int style, int size, boolean antiAlias, boolean useString) {
         if (runLoadFontChecks() == -1) return -1;
 
-        LoadedFont newFont = useString ? new LoadedFont(fontStr, style, size) : new LoadedFont(fontInt, style, size);
+        LoadedFont newFont = useString ? new LoadedFont(fontStr, style, size, antiAlias) : new LoadedFont(fontInt, style, size, antiAlias);
         String fn = newFont.name;
         if (loadedFontUids.containsKey(fn)) {
             Logging.warn("The font '%s' has already been loaded with uid '%s'. Aborting loading duplicate font", fn, loadedFontUids.get(fn));
