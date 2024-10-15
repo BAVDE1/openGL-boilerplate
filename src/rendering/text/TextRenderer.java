@@ -25,6 +25,7 @@ public class TextRenderer {
 
         private final StripBuilder2f sb = new StripBuilder2f();
         private boolean hasChanged = true;
+        private int lastEstimate = 0;
 
         public TextObject(int loadedFontId, String string, Vec2f pos, float scale, int ySpacing) {
             this(loadedFontId, string, pos);
@@ -49,11 +50,13 @@ public class TextRenderer {
         }
 
         private float[] buildStrip() {
-            if (!hasChanged) {
-                return sb.getSetVertices();  // don't even bother re-building
-            }
+            if (!hasChanged) return sb.getSetVertices();  // don't even bother re-building
 
-            sb.clear();
+            int estimate = estimateSizeRequired();
+            if (estimate > sb.getBufferSize()) {
+                sb.resizeBufferAndWipe(Constants.findNextLargestBuffSize(estimate));
+            } else sb.clear();
+
             sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
@@ -96,6 +99,16 @@ public class TextRenderer {
 
             hasChanged = false;
             return sb.getSetVertices();
+        }
+
+        private int estimateSizeRequired() {
+            if (!hasChanged) return lastEstimate;
+
+            String stripped = string.replaceAll("\n", "");
+            int estimate = stripped.length() * VertexArray.Layout.defaultLayoutTotalFloatCount() * 4;  // ascii chars
+            estimate += ((string.length() - stripped.length()) * VertexArray.Layout.defaultLayoutTotalFloatCount()) * 2;  // new line chars
+            lastEstimate = estimate;
+            return estimate;
         }
 
         public String getString() {return string;}
@@ -154,7 +167,7 @@ public class TextRenderer {
     private VertexBuffer vb;
     private StripBuilder2f sb;
 
-    private int bufferSize = Constants.BUFF_SIZE_DEFAULT;
+    private int bufferSize = Constants.BUFF_SIZE_SMALL;
     private boolean hasBeenModified = false;
 
     public TextRenderer() {}
@@ -174,6 +187,12 @@ public class TextRenderer {
 
     private void buildBuffer() {
         sb.clear();
+
+        int estimate = estimateFullSizeRequired();
+        if (estimate > sb.getBufferSize()) {
+            sb.resizeBufferAndWipe(Constants.findNextLargestBuffSize(estimate));
+        }
+
         for (TextObject to : textObjects) {
             sb.pushSeparatedVertices(to.buildStrip());
         }
@@ -189,6 +208,14 @@ public class TextRenderer {
         if (sb.floatCount > 0) {
             Renderer.draw(GL_TRIANGLE_STRIP, va, sb.floatCount / va.layout.getTotalItems());
         }
+    }
+
+    public int estimateFullSizeRequired() {
+        int estimate = 0;
+        for (TextObject to : textObjects) {
+            estimate += to.estimateSizeRequired();
+        }
+        return estimate;
     }
 
     public ArrayList<TextObject> getTextObjects() {

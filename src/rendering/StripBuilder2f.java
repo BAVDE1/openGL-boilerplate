@@ -5,7 +5,7 @@ import src.utility.Logging;
 
 public class StripBuilder2f {
     private float[] vertices;
-    private final int size;
+    private int size;
 
     public int floatCount = 0;
     public int vertexCount = 0;
@@ -13,7 +13,7 @@ public class StripBuilder2f {
 
     private int additionalVerts = 0;
 
-    public StripBuilder2f(){this(Constants.BUFF_SIZE_DEFAULT);}
+    public StripBuilder2f(){this(Constants.BUFF_SIZE_SMALL);}
     public StripBuilder2f(int size){
         vertices = new float[size];
         this.size = size;
@@ -37,8 +37,7 @@ public class StripBuilder2f {
     }
 
     public void pushSeparatedVertices(float[] verts, int vertsFloatCount) {
-        assert verts.length > 1;
-        if (floatCount > 0) addSeparation(verts[0], verts[1]);
+        if (floatCount > 0 && vertsFloatCount > 2) addSeparation(verts[0], verts[1]);
         pushVertices(verts, vertsFloatCount);
     }
 
@@ -88,5 +87,24 @@ public class StripBuilder2f {
 
     public float getCurrentFullnessPercent() {
         return (float) getSetVertices().length / size;
+    }
+
+    /** Resize buffer and copy already set elements across (if there are any) */
+    public void resizeBufferAndKeepElements(int newSize) {
+        // store temporarily
+        float[] temp = getSetVertices();
+        resizeBufferAndWipe(newSize);
+
+        // place back verts
+        pushVertices(temp);
+    }
+
+    public void resizeBufferAndWipe(int newSize) {
+        size = newSize;
+        clear();
+    }
+
+    public int getBufferSize() {
+        return size;
     }
 }
