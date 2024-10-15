@@ -1,6 +1,6 @@
 package src.game;
 
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL45;
 import src.Main;
 import src.rendering.*;
 import src.rendering.text.FontManager;
@@ -14,7 +14,7 @@ import java.awt.*;
 import java.io.File;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 public class Game {
     public Window window = new Window();
@@ -70,8 +70,14 @@ public class Game {
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true);
-            if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-                to1.setString("fps: %s", fps);
+
+            if (action == GLFW_PRESS) {
+                if (key == GLFW_KEY_W) {
+                    to1.setScale(to1.getScale() + .5f);
+                }
+                if (key == GLFW_KEY_S) {
+                    to1.setScale(to1.getScale() - .5f);
+                }
             }
         });
 

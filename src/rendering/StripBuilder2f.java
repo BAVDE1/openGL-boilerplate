@@ -3,8 +3,6 @@ package src.rendering;
 import src.game.Constants;
 import src.utility.Logging;
 
-import java.util.Arrays;
-
 public class StripBuilder2f {
     private float[] vertices;
     private final int size;

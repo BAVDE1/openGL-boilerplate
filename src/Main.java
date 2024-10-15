@@ -2,8 +2,8 @@ package src;
 
 import src.game.Constants;
 import src.game.Game;
-import src.utility.MathUtils;
 import src.utility.Logging;
+import src.utility.MathUtils;
 
 public class Main {
     public static void main(String[] args) {

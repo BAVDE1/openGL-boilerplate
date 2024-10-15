@@ -1,6 +1,5 @@
 package src.rendering;
 
-import org.lwjgl.opengl.GL45;
 import src.utility.Logging;
 
 import java.util.ArrayList;

@@ -1,6 +1,5 @@
 package src.rendering.text;
 
-import static org.lwjgl.opengl.GL11.*;
 import src.game.Constants;
 import src.rendering.Renderer;
 import src.rendering.StripBuilder2f;
@@ -9,11 +8,10 @@ import src.rendering.VertexBuffer;
 import src.utility.Logging;
 import src.utility.Vec2f;
 
-import javax.annotation.processing.SupportedSourceVersion;
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
+
+import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 public class TextRenderer {
     public static class TextObject {
@@ -104,12 +102,16 @@ public class TextRenderer {
             }
         }
 
+        public String getString() {return string;}
+
         public void setPos(Vec2f newPos) {
             if (newPos != pos) {
                 pos = newPos;
                 if (parent != null) parent.hasBeenModified = true;
             }
         }
+
+        public Vec2f getPos() {return pos;}
 
         public void setFontId(int newFontId) {
             if (newFontId != loadedFontId) {
@@ -118,6 +120,8 @@ public class TextRenderer {
             }
         }
 
+        public int getLoadedFontId() {return loadedFontId;}
+
         public void setScale(float newScale) {
             if (newScale != scale) {
                 scale = newScale;
@@ -125,12 +129,16 @@ public class TextRenderer {
             }
         }
 
+        public float getScale() {return scale;}
+
         public void setYSpacing(int newYSpacing) {
             if (newYSpacing != ySpacing) {
                 ySpacing = newYSpacing;
                 if (parent != null) parent.hasBeenModified = true;
             }
         }
+
+        public int getYSpacing() {return ySpacing;}
     }
 
     private final ArrayList<TextObject> textObjects = new ArrayList<>();
