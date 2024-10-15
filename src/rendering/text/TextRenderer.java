@@ -24,12 +24,14 @@ public class TextRenderer {
         private Vec2f pos;
 
         private final StripBuilder2f sb = new StripBuilder2f();
+        private boolean hasChanged = true;
 
         public TextObject(int loadedFontId, String string, Vec2f pos, float scale, int ySpacing) {
             this(loadedFontId, string, pos);
             this.scale = scale;
             this.ySpacing = ySpacing;
         }
+
         public TextObject(int loadedFontId, String string, Vec2f pos) {
             this.loadedFontId = loadedFontId;
             this.string = string;
@@ -47,8 +49,12 @@ public class TextRenderer {
         }
 
         private float[] buildStrip() {
+            if (!hasChanged) {
+                return sb.getSetVertices();  // don't even bother re-building
+            }
+
             sb.clear();
-            sb.setAdditionalVerts(3);
+            sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
             int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
@@ -88,9 +94,11 @@ public class TextRenderer {
                 accumulatedY += genericHeight + ySpacing;
             }
 
+            hasChanged = false;
             return sb.getSetVertices();
         }
 
+        public String getString() {return string;}
         public void setString(String newString, Object... args) {
             setString(String.format(newString, args));
         }
@@ -98,47 +106,46 @@ public class TextRenderer {
         public void setString(String newString) {
             if (!Objects.equals(newString, string)) {
                 string = newString;
+                hasChanged = true;
                 if (parent != null) parent.hasBeenModified = true;
             }
         }
 
-        public String getString() {return string;}
-
+        public Vec2f getPos() {return pos.getClone();}
         public void setPos(Vec2f newPos) {
             if (newPos != pos) {
                 pos = newPos;
-                if (parent != null) parent.hasBeenModified = true;
-            }
-        }
-
-        public Vec2f getPos() {return pos;}
-
-        public void setFontId(int newFontId) {
-            if (newFontId != loadedFontId) {
-                loadedFontId = newFontId;
+                hasChanged = true;
                 if (parent != null) parent.hasBeenModified = true;
             }
         }
 
         public int getLoadedFontId() {return loadedFontId;}
-
-        public void setScale(float newScale) {
-            if (newScale != scale) {
-                scale = newScale;
+        public void setFontId(int newFontId) {
+            if (newFontId != loadedFontId) {
+                loadedFontId = newFontId;
+                hasChanged = true;
                 if (parent != null) parent.hasBeenModified = true;
             }
         }
 
         public float getScale() {return scale;}
-
-        public void setYSpacing(int newYSpacing) {
-            if (newYSpacing != ySpacing) {
-                ySpacing = newYSpacing;
+        public void setScale(float newScale) {
+            if (newScale != scale) {
+                scale = newScale;
+                hasChanged = true;
                 if (parent != null) parent.hasBeenModified = true;
             }
         }
 
         public int getYSpacing() {return ySpacing;}
+        public void setYSpacing(int newYSpacing) {
+            if (newYSpacing != ySpacing) {
+                ySpacing = newYSpacing;
+                hasChanged = true;
+                if (parent != null) parent.hasBeenModified = true;
+            }
+        }
     }
 
     private final ArrayList<TextObject> textObjects = new ArrayList<>();
@@ -159,12 +166,10 @@ public class TextRenderer {
         vb = new VertexBuffer();  vb.genId();
         sb = new StripBuilder2f(bufferSize);
 
-        sb.setAdditionalVerts(3);
+        sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
         vb.bufferSize(bufferSize);
 
-        VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
-        layout.setupDefaultLayout();
-        va.addBuffer(vb, layout);
+        va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
     }
 
     private void buildBuffer() {
@@ -181,8 +186,8 @@ public class TextRenderer {
     public void draw() {
         if (hasBeenModified) buildBuffer();
 
-        if (sb.count > 0) {
-            Renderer.draw(GL_TRIANGLE_STRIP, va, sb.count / va.layout.getTotalItems());
+        if (sb.floatCount > 0) {
+            Renderer.draw(GL_TRIANGLE_STRIP, va, sb.floatCount / va.layout.getTotalItems());
         }
     }
 

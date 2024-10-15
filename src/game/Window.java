@@ -69,6 +69,7 @@ public class Window {
     }
 
     public void close() {
+        Logging.info("Closing safely");
         glfwFreeCallbacks(handle);
         glfwDestroyWindow(handle);
         glfwTerminate();

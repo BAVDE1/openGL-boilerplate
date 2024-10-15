@@ -22,6 +22,7 @@ public class Game {
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
     VertexBuffer vb = new VertexBuffer();
+    StripBuilder2f sb = new StripBuilder2f();
 
     TextRenderer.TextObject to1;
     TextRenderer tr = new TextRenderer();
@@ -55,7 +56,6 @@ public class Game {
     }
 
     public void close() {
-        Logging.info("Closing safely");
         window.close();
     }
 
@@ -81,13 +81,12 @@ public class Game {
             }
         });
 
-        glfwSetCursorPosCallback(window.handle, (window, xpos, ypos) -> mousePos.set(xpos, ypos));
+        glfwSetCursorPosCallback(window.handle, (window, xPos, yPos) -> mousePos.set(xPos, yPos));
     }
 
     public void setupBuffers() {
         vb.genId();
-        StripBuilder2f sb = new StripBuilder2f();
-        sb.setAdditionalVerts(3);
+        sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
         sb.pushSeparatedVertices(new float[] {
                 200, 300, 0, 1, 1,
                 200, 100, 0, 0, 1,
@@ -100,12 +99,16 @@ public class Game {
                 300, 340, 1, 1, 2,
                 300, 50,  1, 0, 2
         });
+        sb.pushSeparatedVertices(new float[] {
+                750, 350, 0, 1, 1,
+                750, 200, 0, 0, 1,
+                850, 350, 1, 1, 1,
+                850, 200, 1, 0, 1
+        });
         vb.bufferData(sb.getSetVertices());
 
         va.genId();
-        VertexArray.VertexArrayLayout layout = new VertexArray.VertexArrayLayout();
-        layout.setupDefaultLayout();
-        va.addBuffer(vb, layout);
+        va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
 
         tr.setupBufferObjects();
         to1 = new TextRenderer.TextObject(1, "stringg!\na STRING@!!!!\n\nit's alive!", new Vec2f(10, 100));
@@ -139,7 +142,7 @@ public class Game {
         Renderer.clearScreen();
         sh.uniform1f("time", (float) glfwGetTime());
 
-        Renderer.draw(GL_TRIANGLE_STRIP, va, 10);
+        Renderer.draw(GL_TRIANGLE_STRIP, va, sb.vertexCount);
         tr.draw();
 
         Renderer.finish(window);
