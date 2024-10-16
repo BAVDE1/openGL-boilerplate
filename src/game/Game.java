@@ -111,7 +111,7 @@ public class Game {
         va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
 
         tr.setupBufferObjects();
-        to1 = new TextRenderer.TextObject(1, "String!\nWOW! it worketh", new Vec2f(10, 100));
+        to1 = new TextRenderer.TextObject(1, "N/A", new Vec2f(10, 200));
         tr.pushTextObject(to1);
     }
 
@@ -135,6 +135,7 @@ public class Game {
             fps = frameCounter;
             frameCounter = 0;
             secondsElapsed = newSeconds;
+            to1.setString("Secs Elapsed: %s\nFPS: %s", secondsElapsed, fps);
         }
     }
 

@@ -49,7 +49,7 @@ public class VertexArray {
             totalItems += count;
         }
 
-        public void pushInt(int count) {
+        public void pushFloat(int count) {
             if (count == 0) return;
             push(GL_FLOAT, count, false);
         }
@@ -65,7 +65,7 @@ public class VertexArray {
         /** Push the default vertex layout: 2 pos, 2 texCoords, 1 slot */
         public void setupDefaultLayout() {
             for (int f : defaultLayout) {
-                pushInt(f);
+                pushFloat(f);
             }
         }
 
