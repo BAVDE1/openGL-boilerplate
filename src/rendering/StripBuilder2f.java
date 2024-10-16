@@ -2,6 +2,7 @@ package src.rendering;
 
 import src.game.Constants;
 import src.utility.Logging;
+import src.utility.Vec2f;
 
 public class StripBuilder2f {
     private float[] vertices;
@@ -58,8 +59,34 @@ public class StripBuilder2f {
             vertices[floatCount] = v;
             floatCount++;
         }
+
         // todo: allow for non-default layouts
         vertexCount += vertsFloatCount / VertexArray.Layout.defaultLayoutTotalFloatCount();
+    }
+
+    public void pushSeparatedTri(Vec2f a, Vec2f b, Vec2f c) {
+        if (floatCount > 0) addSeparation(a.x, a.y);
+        pushTri(a, b, c);
+    }
+
+    public void pushTri(Vec2f a, Vec2f b, Vec2f c) {
+        pushVertices(new float[] {
+                a.x, a.y, 2, 0, 0, 0,
+                b.x, b.y, 2, 0, 0, 0,
+                c.x, c.y, 2, 0, 0, 0
+        }, 3);
+    }
+
+    public void pushSeparatedRect(Vec2f topLeft, Vec2f size) {
+
+    }
+
+    public void pushRect(Vec2f topLeft, Vec2f size) {
+
+    }
+
+    public void pushQuad(Vec2f a, Vec2f b, Vec2f c, Vec2f d) {
+
     }
 
     public void clear() {
@@ -67,10 +94,6 @@ public class StripBuilder2f {
         floatCount = 0;
         vertexCount = 0;
         separationsCount = 0;
-    }
-
-    public float[] getAllVertices() {
-        return vertices;
     }
 
     public float[] getSetVertices() {

@@ -37,7 +37,7 @@ public class VertexArray {
     }
 
     public static class Layout {
-        private final static int[] defaultLayout = new int[] {2, 2, 1};  // 2x pos, 2x texCoord, 1x slot
+        private final static int[] defaultLayout = new int[] {2, 1, 3};  // 2x pos, 1x mode, 3x mode vars
 
         private final ArrayList<Element> elements = new ArrayList<>();
         private int totalItems = 0;
