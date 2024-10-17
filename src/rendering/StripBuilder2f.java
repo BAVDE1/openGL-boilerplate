@@ -7,7 +7,6 @@ import src.utility.Vec3;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class StripBuilder2f {
