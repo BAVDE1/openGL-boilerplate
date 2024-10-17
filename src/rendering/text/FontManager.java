@@ -92,6 +92,7 @@ public class FontManager {
                 case FONT_TINY -> fontFile = new File("res/fonts/Tiny5/Tiny5-Regular.ttf");
                 case FONT_CASTORO -> fontFile = new File("res/fonts/Castoro_Titling/CastoroTitling-Regular.ttf");
                 case FONT_LUGRASIMO -> fontFile = new File("res/fonts/Lugrasimo/Lugrasimo-Regular.ttf");
+                case FONT_KINGS -> fontFile = new File("res/fonts/Kings/Kings-Regular.ttf");
             }
             return fontFile;
         }
@@ -129,6 +130,7 @@ public class FontManager {
     public static final int FONT_TINY = 2;      // recommended size: 24
     public static final int FONT_CASTORO = 3;
     public static final int FONT_LUGRASIMO = 4;
+    public static final int FONT_KINGS = 5;
 
     private static final int AsciiFrom = 32;
     private static final int AsciiTo = 256;

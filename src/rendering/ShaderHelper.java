@@ -26,11 +26,6 @@ public class ShaderHelper {
 
     /** Search entire directory (including folders within folders) until a file is found, and pass it to applyShader() */
     public void attachShadersInDir(File dir) {
-        if (program < 0) {
-            Logging.danger("No program set!");
-            return;
-        }
-
         for (final File fileEntry : Objects.requireNonNull(dir.listFiles())) {
             if (fileEntry.isDirectory()) {
                 if (fileEntry.getName().equals("ignore")) continue;
@@ -42,11 +37,24 @@ public class ShaderHelper {
         }
     }
 
+    /** Attach the 2 necessary shaders */
+    public void attachShaders(String vertexFilePath, String fragmentFilePath) {
+        File vertexFile = new File(vertexFilePath);
+        File fragmentFile = new File(fragmentFilePath);
+        attachShader(vertexFile);
+        attachShader(fragmentFile);
+    }
+
     /**
      * adds new GL shader from given file (if applicable)
      * <a href="https://docs.gl/gl2/glAttachShader">Shader setup example</a>
      */
     public static void attachShader(int program, File file) {
+        if (program < 0) {
+            Logging.danger("No program set!");
+            return;
+        }
+
         int shaderType = getShaderType(file);
         if (shaderType < 0) return;  // not a shader file
 
@@ -84,6 +92,7 @@ public class ShaderHelper {
         attachShader(program, file);
     }
 
+    /**  */
     public void linkProgram() {
         glLinkProgram(program);
         int[] programLinked = new int[1];

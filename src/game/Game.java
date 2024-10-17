@@ -105,7 +105,7 @@ public class Game {
     /** Must be called after window is visible */
     public void setupShaders() {
         sh.genProgram();
-        sh.attachShadersInDir(new File(Constants.SHADERS_FOLDER));
+        sh.attachShaders(Constants.SHADER_VERTEX, Constants.SHADER_FRAGMENT);
         sh.linkProgram();
         sh.bind();
 

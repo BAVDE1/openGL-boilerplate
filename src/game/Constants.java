@@ -21,6 +21,8 @@ public class Constants {
     public static final int FPS = 60;
     public static final double DT = 1 / (double) FPS;
 
+    public static final String SHADER_VERTEX = "res/shaders/vs.vert";
+    public static final String SHADER_FRAGMENT = "res/shaders/fs.frag";
     public static final String SHADERS_FOLDER = "res/shaders";
 
     public static final Dimension SCREEN_SIZE = new Dimension(900, 400);

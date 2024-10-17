@@ -115,15 +115,18 @@ public class StripBuilder2f {
     }
 
     public void pushSeparatedRect(Vec2 topLeft, Vec2 size) {
-        addSeparation(topLeft); pushRect(topLeft, size);
+        addSeparation(topLeft);
+        pushRect(topLeft, size);
     }
 
     public void pushSeparatedRect(Vec2 topLeft, Vec2 size, int texSlot, Vec2 texTopLeft, Vec2 texSize) {
-        addSeparation(topLeft); pushRect(topLeft, size, texSlot, texTopLeft, texSize);
+        addSeparation(topLeft);
+        pushRect(topLeft, size, texSlot, texTopLeft, texSize);
     }
 
     public void pushSeparatedRect(Vec2 topLeft, Vec2 size, Color col) {
-        addSeparation(topLeft); pushRect(topLeft, size, col);
+        addSeparation(topLeft);
+        pushRect(topLeft, size, col);
     }
 
     public void pushRect(Vec2 topLeft, Vec2 size) {
