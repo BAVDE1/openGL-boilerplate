@@ -2,7 +2,12 @@ package src.rendering;
 
 import src.game.Constants;
 import src.utility.Logging;
-import src.utility.Vec2f;
+import src.utility.Vec2;
+import src.utility.Vec3;
+
+import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class StripBuilder2f {
     private float[] vertices;
@@ -21,72 +26,17 @@ public class StripBuilder2f {
     }
 
     /** Adds 2 "invisible" vertices */
+    private void addSeparation(Vec2 v) {addSeparation(v.x, v.y);}
     private void addSeparation(float toX, float toY) {
-        assert floatCount > 1;
+        if (floatCount < 2) return;
         separationsCount++;
 
         float[] f = new float[4 + (additionalVerts * 2)];
-        f[0] = vertices[floatCount -2-additionalVerts];  // just trust me here bro
-        f[1] = vertices[floatCount -1-additionalVerts];
+        f[0] = vertices[floatCount-2-additionalVerts];  // just trust me here bro
+        f[1] = vertices[floatCount-1-additionalVerts];
         f[2+additionalVerts] = toX;
         f[2+additionalVerts+1] = toY;
         pushVertices(f);
-    }
-
-    public void pushSeparatedVertices(float[] verts) {
-        pushSeparatedVertices(verts, verts.length);
-    }
-
-    public void pushSeparatedVertices(float[] verts, int vertsFloatCount) {
-        if (floatCount > 0 && vertsFloatCount > 2) addSeparation(verts[0], verts[1]);
-        pushVertices(verts, vertsFloatCount);
-    }
-
-    public void pushVertices(float[] verts) {
-        pushVertices(verts, verts.length);
-    }
-
-    public void pushVertices(float[] verts, int vertsFloatCount) {
-        assert verts.length > 0;
-        if (floatCount + vertsFloatCount > size) {
-            Logging.danger("Cannot add an additional '%s' items to an array at '%s' fullness, with '%s / %s' items already set. Aborting.",
-                    vertsFloatCount, getCurrentFullnessPercent(), floatCount, size);
-            Logging.expensive("Consider allowing more space at the initialization of this StripBuilder!");
-            return;
-        }
-
-        for (float v : verts) {
-            vertices[floatCount] = v;
-            floatCount++;
-        }
-
-        // todo: allow for non-default layouts
-        vertexCount += vertsFloatCount / VertexArray.Layout.defaultLayoutTotalFloatCount();
-    }
-
-    public void pushSeparatedTri(Vec2f a, Vec2f b, Vec2f c) {
-        if (floatCount > 0) addSeparation(a.x, a.y);
-        pushTri(a, b, c);
-    }
-
-    public void pushTri(Vec2f a, Vec2f b, Vec2f c) {
-        pushVertices(new float[] {
-                a.x, a.y, 2, 0, 0, 0,
-                b.x, b.y, 2, 0, 0, 0,
-                c.x, c.y, 2, 0, 0, 0
-        }, 3);
-    }
-
-    public void pushSeparatedRect(Vec2f topLeft, Vec2f size) {
-
-    }
-
-    public void pushRect(Vec2f topLeft, Vec2f size) {
-
-    }
-
-    public void pushQuad(Vec2f a, Vec2f b, Vec2f c, Vec2f d) {
-
     }
 
     public void clear() {
@@ -129,5 +79,80 @@ public class StripBuilder2f {
 
     public int getBufferSize() {
         return size;
+    }
+
+    /** Get vec3 at inx, or last, or empty */
+    private static Vec3 getVar(List<Vec3> vars, int inx) {
+        if (vars.isEmpty()) return new Vec3();
+        if (inx >= vars.size()) return vars.getLast();
+        return vars.get(inx);
+    }
+
+    /**
+     * PUSHING VERTICES & SHAPES
+     */
+
+    public void pushSeparatedVertices(float[] verts) {
+        addSeparation(verts[0], verts[1]);
+        pushVertices(verts);
+    }
+
+    public void pushVertices(float[] verts) {
+        int fCount = verts.length;
+        assert fCount > 0;
+        if (floatCount + fCount > size) {
+            Logging.danger("Cannot add an additional '%s' items to an array at '%s' fullness, with '%s / %s' items already set. Aborting.",
+                    fCount, getCurrentFullnessPercent(), floatCount, size);
+            Logging.expensive("Consider allowing more space at the initialization of this StripBuilder!");
+            return;
+        }
+
+        for (float v : verts) {
+            vertices[floatCount] = v;
+            floatCount++;
+        }
+        vertexCount += fCount / (2 + additionalVerts);
+    }
+
+    public void pushSeparatedRect(Vec2 topLeft, Vec2 size) {
+        addSeparation(topLeft); pushRect(topLeft, size);
+    }
+
+    public void pushSeparatedRect(Vec2 topLeft, Vec2 size, int texSlot, Vec2 texTopLeft, Vec2 texSize) {
+        addSeparation(topLeft); pushRect(topLeft, size, texSlot, texTopLeft, texSize);
+    }
+
+    public void pushSeparatedRect(Vec2 topLeft, Vec2 size, Color col) {
+        addSeparation(topLeft); pushRect(topLeft, size, col);
+    }
+
+    public void pushRect(Vec2 topLeft, Vec2 size) {
+        pushRect(topLeft, size, Constants.MODE_NIL);
+    }
+
+    public void pushRect(Vec2 topLeft, Vec2 size, int texSlot, Vec2 texTopLeft, Vec2 texSize) {
+        pushRect(topLeft, size, Constants.MODE_TEX,
+                new Vec3(texTopLeft, texSlot),
+                new Vec3(texTopLeft.add(0, texSize.y), texSlot),
+                new Vec3(texTopLeft.add(texSize.x, 0), texSlot),
+                new Vec3(texTopLeft.add(texSize), texSlot)
+        );
+    }
+
+    public void pushRect(Vec2 topLeft, Vec2 size, Color col) {
+        pushRect(topLeft, size, Constants.MODE_COL, new Vec3(col));
+    }
+
+    public void pushRect(Vec2 topLeft, Vec2 size, int mode, Vec3... modeVars) {
+        Vec2 btmR = topLeft.add(size);
+        List<Vec3> v = Arrays.stream(modeVars).toList();
+        // 2 4
+        // 1 3
+        pushVertices(new float[] {
+                topLeft.x, topLeft.y, mode, getVar(v, 0).x, getVar(v, 0).y, getVar(v, 0).z,
+                topLeft.x, btmR.y,    mode, getVar(v, 1).x, getVar(v, 1).y, getVar(v, 1).z,
+                btmR.x, topLeft.y,    mode, getVar(v, 2).x, getVar(v, 2).y, getVar(v, 2).z,
+                btmR.x, btmR.y,       mode, getVar(v, 3).x, getVar(v, 3).y, getVar(v, 3).z
+        });
     }
 }

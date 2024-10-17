@@ -6,7 +6,7 @@ import src.rendering.StripBuilder2f;
 import src.rendering.VertexArray;
 import src.rendering.VertexBuffer;
 import src.utility.Logging;
-import src.utility.Vec2f;
+import src.utility.Vec2;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -21,19 +21,19 @@ public class TextRenderer {
 
         private int loadedFontId;
         private String string;
-        private Vec2f pos;
+        private Vec2 pos;
 
         private final StripBuilder2f sb = new StripBuilder2f();
         private boolean hasChanged = true;
         private int lastEstimate = 0;
 
-        public TextObject(int loadedFontId, String string, Vec2f pos, float scale, int ySpacing) {
+        public TextObject(int loadedFontId, String string, Vec2 pos, float scale, int ySpacing) {
             this(loadedFontId, string, pos);
             this.scale = scale;
             this.ySpacing = ySpacing;
         }
 
-        public TextObject(int loadedFontId, String string, Vec2f pos) {
+        public TextObject(int loadedFontId, String string, Vec2 pos) {
             this.loadedFontId = loadedFontId;
             this.string = string;
             this.pos = pos;
@@ -79,19 +79,12 @@ public class TextRenderer {
                     }
 
                     FontManager.Glyph glyph = font.glyphMap.get(c);
-                    Vec2f size = new Vec2f(glyph.width, glyph.height).mul(scale);
+                    Vec2 size = new Vec2(glyph.width, glyph.height).mul(scale);
+                    Vec2 topLeft = new Vec2(pos.x + accumulatedX, lineY);
 
-                    // 2 4
-                    // 1 3
-                    float charX = pos.x + accumulatedX;
-                    float[] charVertices = new float[] {
-                            charX,          lineY + size.y, glyph.topLeft.x,     glyph.bottomRight.y, 0,
-                            charX,          lineY,          glyph.topLeft.x,     glyph.topLeft.y,     0,
-                            charX + size.x, lineY + size.y, glyph.bottomRight.x, glyph.bottomRight.y, 0,
-                            charX + size.x, lineY,          glyph.bottomRight.x, glyph.topLeft.y,     0
-                    };
-                    if (accumulatedX == 0) sb.pushSeparatedVertices(charVertices);
-                    else sb.pushVertices(charVertices);
+                    if (accumulatedX == 0) sb.pushSeparatedRect(topLeft, size, FontManager.FONT_TEXTURE_SLOT, glyph.topLeft, glyph.size);
+                    else sb.pushRect(topLeft, size, FontManager.FONT_TEXTURE_SLOT, glyph.topLeft, glyph.size);
+
                     accumulatedX += (int) size.x;
                 }
                 accumulatedY += genericHeight + ySpacing;
@@ -124,8 +117,8 @@ public class TextRenderer {
             }
         }
 
-        public Vec2f getPos() {return pos.getClone();}
-        public void setPos(Vec2f newPos) {
+        public Vec2 getPos() {return pos.getClone();}
+        public void setPos(Vec2 newPos) {
             if (newPos != pos) {
                 pos = newPos;
                 hasChanged = true;
@@ -194,6 +187,7 @@ public class TextRenderer {
         }
 
         for (TextObject to : textObjects) {
+            if (to.string.isEmpty()) continue;
             sb.pushSeparatedVertices(to.buildStrip());
         }
 

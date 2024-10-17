@@ -12,6 +12,10 @@ public class Constants {
     public static final int BUFF_SIZE_LARGEST  = BUFF_SIZE_LARGER  * 2;
     public static final int BUFF_SIZE_ENORMOUS = BUFF_SIZE_LARGEST * 2;
 
+    public static final int MODE_NIL = 0;
+    public static final int MODE_TEX = 1;
+    public static final int MODE_COL = 2;
+
     public static final double EPSILON = 0.0001;
     public static final double EPSILON_SQ = EPSILON * EPSILON;
     public static final int FPS = 60;

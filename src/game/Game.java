@@ -8,12 +8,13 @@ import src.rendering.text.TextRenderer;
 import src.utility.Logging;
 import src.utility.MathUtils;
 import src.utility.Vec2;
-import src.utility.Vec2f;
 
 import java.awt.*;
 import java.io.File;
+import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 public class Game {
@@ -81,37 +82,23 @@ public class Game {
             }
         });
 
-        glfwSetCursorPosCallback(window.handle, (window, xPos, yPos) -> mousePos.set(xPos, yPos));
+        glfwSetCursorPosCallback(window.handle, (window, xPos, yPos) -> mousePos.set((float) xPos, (float) yPos));
     }
 
     public void setupBuffers() {
         vb.genId();
+        va.genId();
+
         sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
-        sb.pushSeparatedVertices(new float[] {
-                200, 300, 0, 1, 1,
-                200, 100, 0, 0, 1,
-                700, 300, 1, 1, 1,
-                700, 100, 1, 0, 1
-        });
-        sb.pushSeparatedVertices(new float[] {
-                50,  400, 0, 1, 2,
-                50,  0,   0, 0, 2,
-                300, 340, 1, 1, 2,
-                300, 50,  1, 0, 2
-        });
-        sb.pushSeparatedVertices(new float[] {
-                750, 350, 0, 1, 1,
-                750, 200, 0, 0, 1,
-                850, 350, 1, 1, 1,
-                850, 200, 1, 0, 1
-        });
+        sb.pushSeparatedRect(new Vec2(50, 50), new Vec2(500, 100), 1, new Vec2(), new Vec2(1));
+        sb.pushSeparatedRect(new Vec2(200, 200), new Vec2(700, 150), 2, new Vec2(), new Vec2(1));
+        System.out.println(sb.getCurrentFullnessPercent());
         vb.bufferData(sb.getSetVertices());
 
-        va.genId();
         va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
 
         tr.setupBufferObjects();
-        to1 = new TextRenderer.TextObject(1, "N/A", new Vec2f(10, 200));
+        to1 = new TextRenderer.TextObject(1, "", new Vec2(10, 200));
         tr.pushTextObject(to1);
     }
 

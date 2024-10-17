@@ -5,20 +5,31 @@ uniform highp float time;
 
 uniform sampler2D textures[3];
 
-in vec2 v_texCoord;
-in float v_texSlot;
+in float v_mode;
+in vec3 v_modeVars;
 
 out vec4 colour;
 
 vec2 invResolution = 1 / resolution;
 
 void main() {
-    int slot = int(v_texSlot);
+    int m = int(v_mode);
 
-    if (slot < 0) {
+    if (m == 0) {
+        colour = vec4(1, 1, 1, 1);
+    }
+
+    if (m == 1) {
+        int slot = int(v_modeVars.z);
+        colour = texture(textures[slot], v_modeVars.xy);
+    }
+
+    if (m == 2) {
+        colour = vec4(v_modeVars, 1);
+    }
+
+    if (m == 3) {
         vec2 uv = gl_FragCoord.xy * invResolution;
         colour = vec4(uv.xy, abs(sin(time - length(uv))), 1);
-    } else {
-        colour = texture(textures[slot], v_texCoord);
     }
 }

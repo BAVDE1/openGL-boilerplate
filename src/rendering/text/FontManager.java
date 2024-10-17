@@ -3,7 +3,7 @@ package src.rendering.text;
 import src.rendering.ShaderHelper;
 import src.rendering.Texture;
 import src.utility.Logging;
-import src.utility.Vec2f;
+import src.utility.Vec2;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -19,20 +19,20 @@ public class FontManager {
         public final int x, y;
 
         // texture coordinates
-        public final Vec2f topLeft;
-        public final Vec2f bottomRight;
+        public final Vec2 topLeft;
+        public final Vec2 size;
 
         public Glyph(int x, int y, int width, int height) {
             this.width = width; this.height = height;
             this.x = x; this.y = y;
 
-            this.topLeft = new Vec2f(
+            this.topLeft = new Vec2(
                     (float) x / fullWidth,
                     (float) y / fullHeight
             );
-            this.bottomRight = new Vec2f(
-                    topLeft.x + (float) width / fullWidth,
-                    topLeft.y + (float) height / fullHeight
+            this.size = new Vec2(
+                    (float) width / fullWidth,
+                    (float) height / fullHeight
             );
         }
 
@@ -122,7 +122,7 @@ public class FontManager {
         }
     }
 
-    public static final int DEFAULT_TEXTURE_SLOT = 0;
+    public static final int FONT_TEXTURE_SLOT = 0;
 
     public static final int FONT_NOVA = 0;
     public static final int FONT_JACQUARD = 1;  // recommended size: 42
@@ -201,9 +201,9 @@ public class FontManager {
 
         graphics.dispose();
         finalTexture = new Texture(fullImage);
-        finalTexture.bind(DEFAULT_TEXTURE_SLOT, sh);
+        finalTexture.bind(FONT_TEXTURE_SLOT, sh);
         Texture.writeToFile(fullImage);
-        Logging.debug("%s fonts generated, bound to slot %s", allLoadedFonts.size(), DEFAULT_TEXTURE_SLOT);
+        Logging.debug("%s fonts generated, bound to slot %s", allLoadedFonts.size(), FONT_TEXTURE_SLOT);
     }
 
     public static LoadedFont getLoadedFont(int loadedFontId) {
