@@ -10,14 +10,13 @@ import src.utility.MathUtils;
 import src.utility.Vec2;
 
 import java.awt.*;
-import java.io.File;
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 public class Game {
+    public static boolean debugMode = false;
     public Window window = new Window();
 
     ShaderHelper sh = new ShaderHelper();
@@ -73,11 +72,10 @@ public class Game {
                 glfwSetWindowShouldClose(window, true);
 
             if (action == GLFW_PRESS) {
-                if (key == GLFW_KEY_W) {
-                    to1.setScale(to1.getScale() + .5f);
-                }
-                if (key == GLFW_KEY_S) {
-                    to1.setScale(to1.getScale() - .5f);
+                switch (key) {
+                    case GLFW_KEY_W -> to1.setScale(to1.getScale() + .5f);
+                    case GLFW_KEY_S -> to1.setScale(to1.getScale() - .5f);
+                    case GLFW_KEY_TAB -> toggleDebug();
                 }
             }
         });
@@ -92,13 +90,12 @@ public class Game {
         sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
         sb.pushSeparatedRect(new Vec2(50, 50), new Vec2(500, 100), 1, new Vec2(), new Vec2(1));
         sb.pushSeparatedRect(new Vec2(200, 200), new Vec2(700, 150), 2, new Vec2(), new Vec2(1));
-        System.out.println(sb.getCurrentFullnessPercent());
         vb.bufferData(sb.getSetVertices());
 
         va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
 
         tr.setupBufferObjects();
-        to1 = new TextRenderer.TextObject(1, "", new Vec2(10, 200));
+        to1 = new TextRenderer.TextObject(1, "", new Vec2(10, 150));
         tr.pushTextObject(to1);
     }
 
@@ -122,15 +119,19 @@ public class Game {
             fps = frameCounter;
             frameCounter = 0;
             secondsElapsed = newSeconds;
-            to1.setString("Secs Elapsed: %s\nFPS: %s", secondsElapsed, fps);
         }
+    }
+
+    public void toggleDebug() {
+        debugMode = !debugMode;
+        sh.uniform1i("debugMode", debugMode ? 1:0);
     }
 
     public void render() {
         Renderer.clearScreen();
         sh.uniform1f("time", (float) glfwGetTime());
 
-        Renderer.draw(GL_TRIANGLE_STRIP, va, sb.vertexCount);
+        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va, sb.vertexCount);
         tr.draw();
 
         Renderer.finish(window);
@@ -142,6 +143,7 @@ public class Game {
 
         glfwPollEvents();
         updateFps();
+        to1.setString("Secs Elapsed: %s\nFPS: %s\nDebug (tab): %s", secondsElapsed, fps, debugMode);
         render();
 
         return MathUtils.nanoToSecond(System.nanoTime() - tStart);

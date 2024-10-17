@@ -1,6 +1,7 @@
 package src.rendering.text;
 
 import src.game.Constants;
+import src.game.Game;
 import src.rendering.Renderer;
 import src.rendering.StripBuilder2f;
 import src.rendering.VertexArray;
@@ -11,6 +12,7 @@ import src.utility.Vec2;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 public class TextRenderer {
@@ -187,7 +189,7 @@ public class TextRenderer {
         }
 
         for (TextObject to : textObjects) {
-            if (to.string.isEmpty()) continue;
+            if (to.string.isEmpty() || to.scale < Constants.EPSILON) continue;
             sb.pushSeparatedVertices(to.buildStrip());
         }
 
@@ -200,7 +202,7 @@ public class TextRenderer {
         if (hasBeenModified) buildBuffer();
 
         if (sb.floatCount > 0) {
-            Renderer.draw(GL_TRIANGLE_STRIP, va, sb.floatCount / va.layout.getTotalItems());
+            Renderer.draw(GL_TRIANGLE_STRIP, va, sb.vertexCount);
         }
     }
 

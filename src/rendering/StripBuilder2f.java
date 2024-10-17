@@ -119,6 +119,11 @@ public class StripBuilder2f {
         pushRect(topLeft, size);
     }
 
+    public void pushSeparatedRect(Vec2 topLeft, Vec2 size, int mode) {
+        addSeparation(topLeft);
+        pushRect(topLeft, size, mode);
+    }
+
     public void pushSeparatedRect(Vec2 topLeft, Vec2 size, int texSlot, Vec2 texTopLeft, Vec2 texSize) {
         addSeparation(topLeft);
         pushRect(topLeft, size, texSlot, texTopLeft, texSize);
@@ -149,8 +154,8 @@ public class StripBuilder2f {
     public void pushRect(Vec2 topLeft, Vec2 size, int mode, Vec3... modeVars) {
         Vec2 btmR = topLeft.add(size);
         List<Vec3> v = Arrays.stream(modeVars).toList();
-        // 2 4
         // 1 3
+        // 2 4
         pushVertices(new float[] {
                 topLeft.x, topLeft.y, mode, getVar(v, 0).x, getVar(v, 0).y, getVar(v, 0).z,
                 topLeft.x, btmR.y,    mode, getVar(v, 1).x, getVar(v, 1).y, getVar(v, 1).z,
