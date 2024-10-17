@@ -1,5 +1,7 @@
 package src.game;
 
+import src.utility.Logging;
+
 import java.awt.*;
 
 public class Constants {
@@ -16,6 +18,7 @@ public class Constants {
     public static final int MODE_TEX = 1;
     public static final int MODE_COL = 2;
 
+    public static final int ERROR = -1;
     public static final double EPSILON = 0.0001;
     public static final double EPSILON_SQ = EPSILON * EPSILON;
     public static final int FPS = 60;
@@ -30,6 +33,11 @@ public class Constants {
     public static final boolean V_SYNC = false;
 
     public static int findNextLargestBuffSize(int givenSize) {
+        if (givenSize >= BUFF_SIZE_ENORMOUS) {
+            Logging.danger("Maximum buffer size reached! Attempting to find a size greater than the given '%s', which doesn't currently exist.", givenSize);
+            return ERROR;
+        }
+
         int[] allSizes = new int[] {BUFF_SIZE_SMALL, BUFF_SIZE_MEDIUM, BUFF_SIZE_LARGE, BUFF_SIZE_LARGER, BUFF_SIZE_LARGEST};
         for (int size : allSizes) {
             if (size > givenSize) return size;

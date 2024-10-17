@@ -7,11 +7,14 @@ import src.utility.Vec3;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class StripBuilder2f {
+    private static final int DEFAULT_SIZE = Constants.BUFF_SIZE_SMALL;
     private float[] vertices;
     private int size;
+    private boolean autoResize;
 
     private int floatCount = 0;
     private int vertexCount = 0;
@@ -19,10 +22,13 @@ public class StripBuilder2f {
 
     private int additionalVerts = 0;
 
-    public StripBuilder2f(){this(Constants.BUFF_SIZE_SMALL);}
-    public StripBuilder2f(int size){
+    public StripBuilder2f() {this(DEFAULT_SIZE, false);}
+    public StripBuilder2f(int size) {this(size, false);}
+    public StripBuilder2f(boolean autoResize) {this(DEFAULT_SIZE, true);}
+    public StripBuilder2f(int size, boolean autoResize){
         vertices = new float[size];
         this.size = size;
+        this.autoResize = autoResize;
     }
 
     /** Adds 2 "invisible" vertices */
@@ -53,6 +59,7 @@ public class StripBuilder2f {
         resizeBufferAndWipe(newSize);
 
         // place back verts
+        if (temp.length > newSize) System.arraycopy(temp, 0, temp, 0, newSize-1);
         pushRawVertices(temp);
     }
 
@@ -81,6 +88,15 @@ public class StripBuilder2f {
     public int getFloatCount() {return floatCount;}
     public int getVertexCount() {return vertexCount;}
     public int getSeparationsCount() {return separationsCount;}
+    public boolean isAutoResizing() {return autoResize;}
+    public void setAutoResize(boolean val) {autoResize = val;}
+
+    private int autoResizeBuffer(int minSize) {
+        int newSize = Constants.findNextLargestBuffSize(minSize);
+        if (newSize == Constants.ERROR) return Constants.ERROR;
+        resizeBufferAndKeepElements(newSize);
+        return size;
+    }
 
     /** Get vec3 at inx, or last (or empty vec3 if no vars exist) */
     private static Vec3 getVar(List<Vec3> vars, int inx) {
@@ -102,10 +118,17 @@ public class StripBuilder2f {
         int fCount = verts.length;
         assert fCount > 0;
         if (floatCount + fCount > size) {
-            Logging.danger("Cannot add an additional '%s' items to an array at '%s' fullness, with '%s / %s' items already set. Aborting.",
-                    fCount, getCurrentFullnessPercent(), floatCount, size);
-            Logging.expensive("Consider allowing more space at the initialization of this StripBuilder!");
-            return;
+            if (!autoResize) {
+                Logging.danger("Cannot add an additional '%s' items to an array at '%s' fullness, with '%s / %s' items already set. Aborting.",
+                        fCount, getCurrentFullnessPercent(), floatCount, size);
+                Logging.expensive("Consider setting autoResize to true! (or manually allow more space at the initialization of this StripBuilder)");
+                return;
+            }
+
+            if (autoResizeBuffer(floatCount + fCount) == Constants.ERROR) {
+                Logging.danger("An error occurred attempting to resize this buffer! Aborting.");
+                return;
+            }
         }
 
         for (float v : verts) {
