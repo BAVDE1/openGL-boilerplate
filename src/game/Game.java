@@ -131,7 +131,7 @@ public class Game {
         Renderer.clearScreen();
         sh.uniform1f("time", (float) glfwGetTime());
 
-        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va, sb.vertexCount);
+        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va, sb.getVertexCount());
         tr.draw();
 
         Renderer.finish(window);

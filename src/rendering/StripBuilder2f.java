@@ -13,9 +13,9 @@ public class StripBuilder2f {
     private float[] vertices;
     private int size;
 
-    public int floatCount = 0;
-    public int vertexCount = 0;
-    public int separationsCount = 0;
+    private int floatCount = 0;
+    private int vertexCount = 0;
+    private int separationsCount = 0;
 
     private int additionalVerts = 0;
 
@@ -36,7 +36,7 @@ public class StripBuilder2f {
         f[1] = vertices[floatCount-1-additionalVerts];
         f[2+additionalVerts] = toX;
         f[2+additionalVerts+1] = toY;
-        pushVertices(f);
+        pushRawVertices(f);
     }
 
     public void clear() {
@@ -46,10 +46,19 @@ public class StripBuilder2f {
         separationsCount = 0;
     }
 
-    public float[] getSetVertices() {
-        float[] v = new float[floatCount];
-        System.arraycopy(vertices, 0, v, 0, floatCount);
-        return v;
+    /** Resize buffer and copy already set elements across (if there are any) */
+    public void resizeBufferAndKeepElements(int newSize) {
+        // store temporarily
+        float[] temp = getSetVertices();
+        resizeBufferAndWipe(newSize);
+
+        // place back verts
+        pushRawVertices(temp);
+    }
+
+    public void resizeBufferAndWipe(int newSize) {
+        size = newSize;
+        clear();
     }
 
     public void setAdditionalVerts(int num) {
@@ -58,30 +67,22 @@ public class StripBuilder2f {
         additionalVerts = num;
     }
 
+    public float[] getSetVertices() {
+        float[] v = new float[floatCount];
+        System.arraycopy(vertices, 0, v, 0, floatCount);
+        return v;
+    }
+
     public float getCurrentFullnessPercent() {
         return (float) getSetVertices().length / size;
     }
 
-    /** Resize buffer and copy already set elements across (if there are any) */
-    public void resizeBufferAndKeepElements(int newSize) {
-        // store temporarily
-        float[] temp = getSetVertices();
-        resizeBufferAndWipe(newSize);
+    public int getBufferSize() {return size;}
+    public int getFloatCount() {return floatCount;}
+    public int getVertexCount() {return vertexCount;}
+    public int getSeparationsCount() {return separationsCount;}
 
-        // place back verts
-        pushVertices(temp);
-    }
-
-    public void resizeBufferAndWipe(int newSize) {
-        size = newSize;
-        clear();
-    }
-
-    public int getBufferSize() {
-        return size;
-    }
-
-    /** Get vec3 at inx, or last, or empty */
+    /** Get vec3 at inx, or last (or empty vec3 if no vars exist) */
     private static Vec3 getVar(List<Vec3> vars, int inx) {
         if (vars.isEmpty()) return new Vec3();
         if (inx >= vars.size()) return vars.getLast();
@@ -92,12 +93,12 @@ public class StripBuilder2f {
      * PUSHING VERTICES & SHAPES
      */
 
-    public void pushSeparatedVertices(float[] verts) {
+    public void pushRawSeparatedVertices(float[] verts) {
         addSeparation(verts[0], verts[1]);
-        pushVertices(verts);
+        pushRawVertices(verts);
     }
 
-    public void pushVertices(float[] verts) {
+    public void pushRawVertices(float[] verts) {
         int fCount = verts.length;
         assert fCount > 0;
         if (floatCount + fCount > size) {
@@ -156,7 +157,7 @@ public class StripBuilder2f {
         List<Vec3> v = Arrays.stream(modeVars).toList();
         // 1 3
         // 2 4
-        pushVertices(new float[] {
+        pushRawVertices(new float[] {
                 topLeft.x, topLeft.y, mode, getVar(v, 0).x, getVar(v, 0).y, getVar(v, 0).z,
                 topLeft.x, btmR.y,    mode, getVar(v, 1).x, getVar(v, 1).y, getVar(v, 1).z,
                 btmR.x, topLeft.y,    mode, getVar(v, 2).x, getVar(v, 2).y, getVar(v, 2).z,

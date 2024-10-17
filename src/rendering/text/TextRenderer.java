@@ -1,7 +1,6 @@
 package src.rendering.text;
 
 import src.game.Constants;
-import src.game.Game;
 import src.rendering.Renderer;
 import src.rendering.StripBuilder2f;
 import src.rendering.VertexArray;
@@ -12,7 +11,6 @@ import src.utility.Vec2;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 public class TextRenderer {
@@ -51,12 +49,13 @@ public class TextRenderer {
             this.parent = null;
         }
 
-        private float[] buildStrip() {
+        private float[] buildStrop() {return buildStrip(true);}
+        private float[] buildStrip(boolean useLastEstimate) {
             if (!hasChanged) return sb.getSetVertices();  // don't even bother re-building
 
-            int estimate = estimateSizeRequired();
-            if (estimate > sb.getBufferSize()) {
-                sb.resizeBufferAndWipe(Constants.findNextLargestBuffSize(estimate));
+            if (useLastEstimate) estimateSizeRequired();
+            if (lastEstimate > sb.getBufferSize()) {
+                sb.resizeBufferAndWipe(Constants.findNextLargestBuffSize(lastEstimate));
             } else sb.clear();
 
             sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
@@ -100,10 +99,10 @@ public class TextRenderer {
             if (!hasChanged) return lastEstimate;
 
             String stripped = string.replaceAll("\n", "");
-            int estimate = stripped.length() * VertexArray.Layout.defaultLayoutTotalFloatCount() * 4;  // ascii chars
-            estimate += ((string.length() - stripped.length()) * VertexArray.Layout.defaultLayoutTotalFloatCount()) * 2;  // new line chars
-            lastEstimate = estimate;
-            return estimate;
+            int newLineCount = string.length() - stripped.length();
+            lastEstimate = stripped.length() * VertexArray.Layout.defaultLayoutTotalFloatCount() * 4;  // ascii chars
+            lastEstimate += newLineCount * VertexArray.Layout.defaultLayoutTotalFloatCount() * 2;  // new line chars
+            return lastEstimate;
         }
 
         public String getString() {return string;}
@@ -190,7 +189,7 @@ public class TextRenderer {
 
         for (TextObject to : textObjects) {
             if (to.string.isEmpty() || to.scale < Constants.EPSILON) continue;
-            sb.pushSeparatedVertices(to.buildStrip());
+            sb.pushRawSeparatedVertices(to.buildStrip(false));
         }
 
         Renderer.bindBuffer(vb);
@@ -201,8 +200,8 @@ public class TextRenderer {
     public void draw() {
         if (hasBeenModified) buildBuffer();
 
-        if (sb.floatCount > 0) {
-            Renderer.draw(GL_TRIANGLE_STRIP, va, sb.vertexCount);
+        if (sb.getFloatCount() > 0) {
+            Renderer.draw(GL_TRIANGLE_STRIP, va, sb.getVertexCount());
         }
     }
 
