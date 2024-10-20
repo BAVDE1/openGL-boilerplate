@@ -3,6 +3,7 @@ package src.rendering;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL45;
 import src.game.Window;
+import src.rendering.text.TextRenderer;
 import src.utility.Logging;
 
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
@@ -34,6 +35,10 @@ public class Renderer {
     public static void draw(int mode, VertexArray va, int count) {
         Renderer.bindArray(va);
         glDrawArrays(mode, 0, count);
+    }
+
+    public static void draw(TextRenderer tr) {
+        tr.draw();
     }
 
     public static void finish(Window window) {

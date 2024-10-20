@@ -1,10 +1,7 @@
 package src.rendering.text;
 
 import src.game.Constants;
-import src.rendering.Renderer;
-import src.rendering.StripBuilder2f;
-import src.rendering.VertexArray;
-import src.rendering.VertexBuffer;
+import src.rendering.*;
 import src.utility.Logging;
 import src.utility.Vec2;
 
@@ -77,8 +74,10 @@ public class TextRenderer {
                     Vec2 size = new Vec2(glyph.width, glyph.height).mul(scale);
                     Vec2 topLeft = new Vec2(pos.x + accumulatedX, lineY);
 
-                    if (accumulatedX == 0) sb.pushSeparatedRect(topLeft, size, FontManager.FONT_TEXTURE_SLOT, glyph.topLeft, glyph.size);
-                    else sb.pushRect(topLeft, size, FontManager.FONT_TEXTURE_SLOT, glyph.topLeft, glyph.size);
+                    Shape.Mode mode = new Shape.Mode(FontManager.FONT_TEXTURE_SLOT, glyph.texTopLeft, glyph.texSize);
+                    Shape.Quad quad = new Shape.Quad(topLeft, size, mode);
+                    if (accumulatedX == 0) sb.pushSeparatedQuad(quad);
+                    else sb.pushQuad(quad);
 
                     accumulatedX += (int) size.x;
                 }

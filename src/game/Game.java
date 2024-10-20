@@ -3,6 +3,7 @@ package src.game;
 import org.lwjgl.opengl.GL45;
 import src.Main;
 import src.rendering.*;
+import src.rendering.Shape;
 import src.rendering.text.FontManager;
 import src.rendering.text.TextRenderer;
 import src.utility.Logging;
@@ -88,8 +89,8 @@ public class Game {
         va.genId();
 
         sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
-        sb.pushSeparatedRect(new Vec2(50, 50), new Vec2(500, 100), 1, new Vec2(), new Vec2(1));
-        sb.pushSeparatedRect(new Vec2(200, 200), new Vec2(700, 150), 2, new Vec2(), new Vec2(1));
+        sb.pushSeparatedQuad(new Shape.Quad(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
+        sb.pushSeparatedQuad(new Shape.Quad(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
         vb.bufferData(sb.getSetVertices());
 
         va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
@@ -132,7 +133,7 @@ public class Game {
         sh.uniform1f("time", (float) glfwGetTime());
 
         Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va, sb.getVertexCount());
-        tr.draw();
+        Renderer.draw(tr);
 
         Renderer.finish(window);
     }

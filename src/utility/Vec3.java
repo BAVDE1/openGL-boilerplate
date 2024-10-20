@@ -46,4 +46,8 @@ public class Vec3 {
     public Vec3 getClone() {
         return new Vec3(x, y, z);
     }
+
+    public Vec2 xy() {
+        return new Vec2(x, y);
+    }
 }

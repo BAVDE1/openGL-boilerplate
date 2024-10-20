@@ -5,10 +5,6 @@ import src.utility.Logging;
 import src.utility.Vec2;
 import src.utility.Vec3;
 
-import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
-
 public class StripBuilder2f {
     private static final int DEFAULT_SIZE = Constants.BUFF_SIZE_SMALL;
     private float[] vertices;
@@ -28,20 +24,6 @@ public class StripBuilder2f {
         vertices = new float[size];
         this.size = size;
         this.autoResize = autoResize;
-    }
-
-    /** Adds 2 "invisible" vertices */
-    private void addSeparation(Vec2 v) {addSeparation(v.x, v.y);}
-    private void addSeparation(float toX, float toY) {
-        if (floatCount < 2) return;
-        separationsCount++;
-
-        float[] f = new float[4 + (additionalVerts * 2)];
-        f[0] = vertices[floatCount-2-additionalVerts];  // just trust me here bro
-        f[1] = vertices[floatCount-1-additionalVerts];
-        f[2+additionalVerts] = toX;
-        f[2+additionalVerts+1] = toY;
-        pushRawVertices(f);
     }
 
     public void clear() {
@@ -97,19 +79,26 @@ public class StripBuilder2f {
         return size;
     }
 
-    /** Get vec3 at inx, or last (or empty vec3 if no vars exist) */
-    private static Vec3 getVar(List<Vec3> vars, int inx) {
-        if (vars.isEmpty()) return new Vec3();
-        if (inx >= vars.size()) return vars.getLast();
-        return vars.get(inx);
-    }
-
     /**
      * PUSHING VERTICES & SHAPES
      */
 
+    // Adds 2 "invisible" vertices
+    private void pushSeparation(Vec2 v) {pushSeparation(v.x, v.y);}
+    private void pushSeparation(float toX, float toY) {
+        if (floatCount < 2) return;
+        separationsCount++;
+
+        float[] f = new float[4 + (additionalVerts * 2)];
+        f[0] = vertices[floatCount-2-additionalVerts];  // just trust me here bro
+        f[1] = vertices[floatCount-1-additionalVerts];
+        f[2+additionalVerts] = toX;
+        f[2+additionalVerts+1] = toY;
+        pushRawVertices(f);
+    }
+
     public void pushRawSeparatedVertices(float[] verts) {
-        addSeparation(verts[0], verts[1]);
+        pushSeparation(verts[0], verts[1]);
         pushRawVertices(verts);
     }
 
@@ -137,53 +126,19 @@ public class StripBuilder2f {
         vertexCount += fCount / (2 + additionalVerts);
     }
 
-    public void pushSeparatedRect(Vec2 topLeft, Vec2 size) {
-        addSeparation(topLeft);
-        pushRect(topLeft, size);
+    public void pushSeparatedQuad(Shape.Quad quad) {
+        pushSeparation(quad.a);
+        pushQuad(quad);
     }
 
-    public void pushSeparatedRect(Vec2 topLeft, Vec2 size, int mode) {
-        addSeparation(topLeft);
-        pushRect(topLeft, size, mode);
-    }
-
-    public void pushSeparatedRect(Vec2 topLeft, Vec2 size, int texSlot, Vec2 texTopLeft, Vec2 texSize) {
-        addSeparation(topLeft);
-        pushRect(topLeft, size, texSlot, texTopLeft, texSize);
-    }
-
-    public void pushSeparatedRect(Vec2 topLeft, Vec2 size, Color col) {
-        addSeparation(topLeft);
-        pushRect(topLeft, size, col);
-    }
-
-    public void pushRect(Vec2 topLeft, Vec2 size) {
-        pushRect(topLeft, size, Constants.MODE_NIL);
-    }
-
-    public void pushRect(Vec2 topLeft, Vec2 size, int texSlot, Vec2 texTopLeft, Vec2 texSize) {
-        pushRect(topLeft, size, Constants.MODE_TEX,
-                new Vec3(texTopLeft, texSlot),
-                new Vec3(texTopLeft.add(0, texSize.y), texSlot),
-                new Vec3(texTopLeft.add(texSize.x, 0), texSlot),
-                new Vec3(texTopLeft.add(texSize), texSlot)
-        );
-    }
-
-    public void pushRect(Vec2 topLeft, Vec2 size, Color col) {
-        pushRect(topLeft, size, Constants.MODE_COL, new Vec3(col));
-    }
-
-    public void pushRect(Vec2 topLeft, Vec2 size, int mode, Vec3... modeVars) {
-        Vec2 btmR = topLeft.add(size);
-        List<Vec3> v = Arrays.stream(modeVars).toList();
-        // 1 3
-        // 2 4
+    public void pushQuad(Shape.Quad quad) {
+        Vec3 v1 = quad.mode.getVar(0); Vec3 v2 = quad.mode.getVar(1);
+        Vec3 v3 = quad.mode.getVar(2); Vec3 v4 = quad.mode.getVar(3);
         pushRawVertices(new float[] {
-                topLeft.x, topLeft.y, mode, getVar(v, 0).x, getVar(v, 0).y, getVar(v, 0).z,
-                topLeft.x, btmR.y,    mode, getVar(v, 1).x, getVar(v, 1).y, getVar(v, 1).z,
-                btmR.x, topLeft.y,    mode, getVar(v, 2).x, getVar(v, 2).y, getVar(v, 2).z,
-                btmR.x, btmR.y,       mode, getVar(v, 3).x, getVar(v, 3).y, getVar(v, 3).z
+                quad.a.x, quad.a.y, quad.mode.type, v1.x, v1.y, v1.z,
+                quad.b.x, quad.b.y, quad.mode.type, v2.x, v2.y, v2.z,
+                quad.c.x, quad.c.y, quad.mode.type, v3.x, v3.y, v3.z,
+                quad.d.x, quad.d.y, quad.mode.type, v4.x, v4.y, v4.z
         });
     }
 }

@@ -19,18 +19,18 @@ public class FontManager {
         public final int x, y;
 
         // texture coordinates
-        public final Vec2 topLeft;
-        public final Vec2 size;
+        public final Vec2 texTopLeft;
+        public final Vec2 texSize;
 
         public Glyph(int x, int y, int width, int height) {
             this.width = width; this.height = height;
             this.x = x; this.y = y;
 
-            this.topLeft = new Vec2(
+            this.texTopLeft = new Vec2(
                     (float) x / fullWidth,
                     (float) y / fullHeight
             );
-            this.size = new Vec2(
+            this.texSize = new Vec2(
                     (float) width / fullWidth,
                     (float) height / fullHeight
             );
