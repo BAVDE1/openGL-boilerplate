@@ -89,8 +89,9 @@ public class Game {
         va.genId();
 
         sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
-        sb.pushSeparatedQuad(new Shape.Quad(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
-        sb.pushSeparatedQuad(new Shape.Quad(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
+        sb.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
+        sb.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
+        sb.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(300, 200), 50, new Shape.Mode(3)));
         vb.bufferData(sb.getSetVertices());
 
         va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());

@@ -24,7 +24,7 @@ void main() {
     int m = int(v_mode);
 
     if (m == 0) {
-        colour = vec4(1, 1, 1, .1);
+        colour = vec4(1, 1, 1, .5);
         return;
     }
 

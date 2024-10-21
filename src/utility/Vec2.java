@@ -235,6 +235,14 @@ public class Vec2 {
         return new Vec2(vec1.x * vec2.x, vec1.y * vec2.y);
     }
 
+    public Vec2 perpendicular() {
+        return perpendicular(this);
+    }
+
+    public static Vec2 perpendicular(Vec2 vec) {
+        return new Vec2(-vec.y, vec.x);
+    }
+
     @Override
     public String toString() {
         return String.format("Vec2(x=%.2f, y=%.2f)", x, y);

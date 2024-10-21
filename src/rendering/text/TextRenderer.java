@@ -75,7 +75,7 @@ public class TextRenderer {
                     Vec2 topLeft = new Vec2(pos.x + accumulatedX, lineY);
 
                     Shape.Mode mode = new Shape.Mode(FontManager.FONT_TEXTURE_SLOT, glyph.texTopLeft, glyph.texSize);
-                    Shape.Quad quad = new Shape.Quad(topLeft, size, mode);
+                    Shape.Quad quad = Shape.createRect(topLeft, size, mode);
                     if (accumulatedX == 0) sb.pushSeparatedQuad(quad);
                     else sb.pushQuad(quad);
 

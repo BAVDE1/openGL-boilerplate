@@ -89,7 +89,7 @@ public class StripBuilder2f {
         if (floatCount < 2) return;
         separationsCount++;
 
-        float[] f = new float[4 + (additionalVerts * 2)];
+        float[] f = new float[(2 + additionalVerts) * 2];  // pushing 2 vertices
         f[0] = vertices[floatCount-2-additionalVerts];  // just trust me here bro
         f[1] = vertices[floatCount-1-additionalVerts];
         f[2+additionalVerts] = toX;
@@ -119,26 +119,33 @@ public class StripBuilder2f {
             }
         }
 
-        for (float v : verts) {
-            vertices[floatCount] = v;
-            floatCount++;
-        }
+        System.arraycopy(verts, 0, vertices, floatCount, fCount);
+        floatCount += fCount;
         vertexCount += fCount / (2 + additionalVerts);
     }
 
-    public void pushSeparatedQuad(Shape.Quad quad) {
-        pushSeparation(quad.a);
-        pushQuad(quad);
+    public void pushSeparatedQuad(Shape.Quad q) {
+        pushSeparation(q.a);
+        pushQuad(q);
     }
 
-    public void pushQuad(Shape.Quad quad) {
-        Vec3 v1 = quad.mode.getVar(0); Vec3 v2 = quad.mode.getVar(1);
-        Vec3 v3 = quad.mode.getVar(2); Vec3 v4 = quad.mode.getVar(3);
+    public void pushQuad(Shape.Quad q) {
+        Vec3 v1 = q.mode.getVar(0); Vec3 v2 = q.mode.getVar(1);
+        Vec3 v3 = q.mode.getVar(2); Vec3 v4 = q.mode.getVar(3);
         pushRawVertices(new float[] {
-                quad.a.x, quad.a.y, quad.mode.type, v1.x, v1.y, v1.z,
-                quad.b.x, quad.b.y, quad.mode.type, v2.x, v2.y, v2.z,
-                quad.c.x, quad.c.y, quad.mode.type, v3.x, v3.y, v3.z,
-                quad.d.x, quad.d.y, quad.mode.type, v4.x, v4.y, v4.z
+                q.a.x, q.a.y, q.mode.type, v1.x, v1.y, v1.z,
+                q.b.x, q.b.y, q.mode.type, v2.x, v2.y, v2.z,
+                q.c.x, q.c.y, q.mode.type, v3.x, v3.y, v3.z,
+                q.d.x, q.d.y, q.mode.type, v4.x, v4.y, v4.z
         });
+    }
+
+    public void pushSeparatedPolygon(Shape.Polygon p) {
+        pushSeparation(p.points.getFirst());
+        pushPolygon(p);
+    }
+
+    public void pushPolygon(Shape.Polygon p) {
+        // loop each point to build float[]
     }
 }
