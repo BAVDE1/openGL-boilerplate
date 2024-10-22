@@ -5,9 +5,7 @@ import src.utility.Vec2;
 import src.utility.Vec3;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 
 public class Shape {
@@ -75,12 +73,21 @@ public class Shape {
         }
 
         public void sortPoints() {
-            final Vec2 center = Vec2.fromDim(Constants.SCREEN_SIZE).mul(.5f);
+            ListIterator<Vec2> iterator = points.listIterator();
+            Vec2 avg = iterator.next();
+            while (iterator.hasNext()) {
+                avg.addSelf(iterator.next());
+            }
+            sortPoints(avg.div(points.size()));
+        }
+
+        public void sortPoints(Vec2 center) {
+            Vec2 ce = Vec2.fromDim(Constants.SCREEN_SIZE).mul(.5f);
             interface Func {float call(Vec2 point);}
 
             Func findOrderPoint = point -> {
-                float dot = point.sub(center).normalized().dot(center.normalized());
-                float onSide = (point.x * center.y) - (point.y * center.x);
+                float dot = point.sub(ce).normalized().dot(ce.normalized());
+                float onSide = (point.x * ce.y) - (point.y * ce.x);
                 return onSide > 0 ? dot+3 : (-dot)+1;
             };
 
