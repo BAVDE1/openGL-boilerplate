@@ -5,7 +5,9 @@ import src.utility.Vec2;
 import src.utility.Vec3;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Shape {
@@ -60,16 +62,34 @@ public class Shape {
         public String toString() {return String.format("Quad(%s, %s, %s, %s)", a, b, c, d);}
     }
 
-    public static class Polygon {
+    public static class Poly {
         public Mode mode = new Mode();
         public List<Vec2> points;
 
-        public Polygon(Vec2... points) {
+        public Poly(Vec2... points) {
             this.points = List.of(points);
         }
-        public Polygon(Mode mode, Vec2... points) {
+        public Poly(Mode mode, Vec2... points) {
             this(points);
             this.mode = mode;
+        }
+
+        public void sortPoints() {
+            final Vec2 center = Vec2.fromDim(Constants.SCREEN_SIZE).mul(.5f);
+            interface Func {float call(Vec2 point);}
+
+            Func findOrderPoint = point -> {
+                float dot = point.sub(center).normalized().dot(center.normalized());
+                float onSide = (point.x * center.y) - (point.y * center.x);
+                return onSide > 0 ? dot+3 : (-dot)+1;
+            };
+
+            int i = 0;
+            while (i < points.size()) {
+                float num = findOrderPoint.call(points.get(i));
+                System.out.println(num);
+                i++;
+            }
         }
     }
 
@@ -89,17 +109,8 @@ public class Shape {
         return q;
     }
 
-    public static Polygon createRectOutline(Vec2 topLeft, Vec2 size, int thickness) {
-        return new Polygon();
-    }
-    public static Polygon createRectOutline(Vec2 topLeft, Vec2 size, int thickness, Mode mode) {
-        Polygon p = createRectOutline(topLeft, size, thickness);
-        p.mode = mode;
-        return p;
-    }
-
     public static Quad createLine(Vec2 point1, Vec2 point2, int thickness) {
-        Vec2 normalised = point2.sub(point1).normaliseSelf();
+        Vec2 normalised = point2.sub(point1).normalized();
         Vec2 perp = normalised.perpendicular().mul(thickness * .5f);
         return new Quad(
             point1.add(perp), point1.sub(perp),
@@ -110,5 +121,14 @@ public class Shape {
         Quad q = createLine(point1, point2, thickness);
         q.mode = mode;
         return q;
+    }
+
+    public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness) {
+        return new Poly();
+    }
+    public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness, Mode mode) {
+        Poly p = createRectOutline(topLeft, size, thickness);
+        p.mode = mode;
+        return p;
     }
 }

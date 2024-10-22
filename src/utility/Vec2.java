@@ -71,8 +71,12 @@ public class Vec2 {
         return Math.sqrt(lengthSq());
     }
 
-    public Vec2 normaliseSelf() {
-        return normalise(this);
+    public void normaliseSelf() {
+        normalise(this);
+    }
+
+    public Vec2 normalized() {
+        return normalise(getClone());
     }
 
     public static Vec2 normalise(Vec2 out) {
@@ -119,6 +123,10 @@ public class Vec2 {
 
     public boolean equals(Vec2 other) {
         return x == other.x && y == other.y;
+    }
+
+    public boolean equals(float f) {
+        return x == f && y == f;
     }
 
     /**

@@ -140,12 +140,12 @@ public class StripBuilder2f {
         });
     }
 
-    public void pushSeparatedPolygon(Shape.Polygon p) {
+    public void pushSeparatedPolygon(Shape.Poly p) {
         pushSeparation(p.points.getFirst());
         pushPolygon(p);
     }
 
-    public void pushPolygon(Shape.Polygon p) {
+    public void pushPolygon(Shape.Poly p) {
         // loop each point to build float[]
     }
 }
