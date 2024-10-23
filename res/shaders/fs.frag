@@ -35,7 +35,7 @@ void main() {
         // debug bg colour
         if (debugMode == 1 && colour.a < EPSILON) {
             doColourfull();
-            colour.a = .2;
+            colour.a = .3;
         }
         return;
     }

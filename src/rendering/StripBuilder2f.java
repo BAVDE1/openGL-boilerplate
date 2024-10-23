@@ -5,9 +5,6 @@ import src.utility.Logging;
 import src.utility.Vec2;
 import src.utility.Vec3;
 
-import javax.swing.*;
-import java.util.Arrays;
-
 public class StripBuilder2f {
     private static final int DEFAULT_SIZE = Constants.BUFF_SIZE_SMALL;
     private float[] vertices;
@@ -19,6 +16,7 @@ public class StripBuilder2f {
     private int separationsCount = 0;
 
     private int additionalVerts = 0;
+    private int floatCountPerVert = 2;
 
     public StripBuilder2f() {this(DEFAULT_SIZE, false);}
     public StripBuilder2f(int size) {this(size, false);}
@@ -56,6 +54,7 @@ public class StripBuilder2f {
         if (additionalVerts != 0 && additionalVerts != num)
             Logging.warn("Changing already set 'additional vertices'. This could warp the buffer");
         additionalVerts = num;
+        floatCountPerVert = 2 + num;
     }
 
     public float[] getSetVertices() {
@@ -92,7 +91,7 @@ public class StripBuilder2f {
         if (floatCount < 2) return;
         separationsCount++;
 
-        float[] f = new float[(2 + additionalVerts) * 2];  // pushing 2 vertices
+        float[] f = new float[floatCountPerVert * 2];  // pushing 2 vertices
         f[0] = vertices[floatCount-2-additionalVerts];  // just trust me here bro
         f[1] = vertices[floatCount-1-additionalVerts];
         f[2+additionalVerts] = toX;
@@ -124,7 +123,7 @@ public class StripBuilder2f {
 
         System.arraycopy(verts, 0, vertices, floatCount, fCount);
         floatCount += fCount;
-        vertexCount += fCount / (2 + additionalVerts);
+        vertexCount += fCount / floatCountPerVert;
     }
 
     public void pushSeparatedQuad(Shape.Quad q) {
@@ -148,12 +147,13 @@ public class StripBuilder2f {
         pushPolygon(p);
     }
 
+    /** first, second, third, ... */
     public void pushPolygon(Shape.Poly p) {
-        float[] verts = new float[p.points.size() * (2+additionalVerts)];
+        float[] verts = new float[p.points.size() * floatCountPerVert];
         int i = 0;
         for (Vec2 point : p.points) {
             Vec3 mv = p.mode.getVar(i);
-            int inx = i * (2+additionalVerts);
+            int inx = i * floatCountPerVert;
 
             verts[inx] = point.x + p.pos.x; verts[inx+1] = point.y + p.pos.y;
             verts[inx+2] = p.mode.type;

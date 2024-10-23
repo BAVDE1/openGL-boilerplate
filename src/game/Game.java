@@ -90,7 +90,6 @@ public class Game {
         va.genId();
 
         sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
-
         sb.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
         sb.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
         sb.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
@@ -150,7 +149,7 @@ public class Game {
 
         glfwPollEvents();
         updateFps();
-        to1.setString("Secs Elapsed: %s\nFPS: %s\nDebug (tab): %s", secondsElapsed, fps, debugMode);
+        to1.setString("Secs Elapsed: %s, FPS: %s\nDebug (tab): %s\nv: %s, f: %s, s: %s (%s)", secondsElapsed, fps, debugMode, sb.getVertexCount(), sb.getFloatCount(), sb.getSeparationsCount(), sb.getCurrentFullnessPercent());
         render();
 
         return MathUtils.nanoToSecond(System.nanoTime() - tStart);
