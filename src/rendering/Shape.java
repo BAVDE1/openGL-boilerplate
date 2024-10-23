@@ -11,7 +11,7 @@ import java.util.List;
 public class Shape {
     public static class Mode {
         int type;
-        List<Vec3> vars = List.of(new Vec3[0]);
+        List<Vec3> vars;
 
         public Mode() {this(Constants.MODE_NIL);}
         public Mode(int texSlot, Vec2 texTopLeft, Vec2 texSize) {
@@ -36,7 +36,7 @@ public class Shape {
 
         /** Get vec3 at inx, or last (or empty vec3 if no vars exist) */
         public Vec3 getVar(int inx) {
-            if (vars.isEmpty()) return new Vec3();
+            if (vars == null || vars.isEmpty()) return new Vec3();
             if (inx >= vars.size()) return vars.getLast();
             return vars.get(inx);
         }
@@ -71,37 +71,8 @@ public class Shape {
             this(points);
             this.mode = mode;
         }
-
-        public void sortPoints() {
-            ListIterator<Vec2> iterator = points.listIterator();
-            Vec2 avg = iterator.next();
-            while (iterator.hasNext()) {
-                avg.addSelf(iterator.next());
-            }
-            sortPoints(avg.div(points.size()));
-        }
-
-        public void sortPoints(Vec2 center) {
-            Vec2 ce = Vec2.fromDim(Constants.SCREEN_SIZE).mul(.5f);
-            interface Func {float call(Vec2 point);}
-
-            Func findOrderPoint = point -> {
-                float dot = point.sub(ce).normalized().dot(ce.normalized());
-                float onSide = (point.x * ce.y) - (point.y * ce.x);
-                return onSide > 0 ? dot+3 : (-dot)+1;
-            };
-
-            int i = 0;
-            while (i < points.size()) {
-                float num = findOrderPoint.call(points.get(i));
-                System.out.println(num);
-                i++;
-            }
-        }
     }
 
-    // 1 3
-    // 2 4
     public static Quad createRect(Vec2 topLeft, Vec2 size) {
         return new Quad(
                 topLeft,
@@ -137,5 +108,79 @@ public class Shape {
         Poly p = createRectOutline(topLeft, size, thickness);
         p.mode = mode;
         return p;
+    }
+
+    public static void sortPoints(Poly p) {sortPoints(p, findCenter(p.points));}
+    public static void sortPoints(Poly p, Vec2 center) {
+        final int fidelity = 2;
+
+        // functions
+        interface Func {void call(ArrayList<ArrayList<Integer>> radixGroups);}
+        Func buildRadixGroups = radixGroups -> {
+            radixGroups.clear();
+            for (int i = 0; i < 10; i++) {radixGroups.add(new ArrayList<>());}
+        };
+
+        interface Func2 {void call(int[] arr, ArrayList<ArrayList<Integer>> radixGroups);}
+        Func2 reOrderIndexes = (arr, radixGroups) -> {
+            int i = 0;
+            for (ArrayList<Integer> group : radixGroups) {
+                for (int index : group) arr[i++] = index;
+            }
+        };
+
+        // pre calculate comparisons
+        int[] indexOrder = new int[p.points.size()];
+        int[] comparableItems = new int[p.points.size()];
+        for(int i = 0; i < p.points.size(); i++) {
+            Vec2 point = p.points.get(i);
+            float onSide = (point.x * center.y) - (point.y * center.x);
+            float dot = point.sub(center).normalized().dot(center.normalized());
+            dot = onSide > 0 ? dot+3 : (-dot)+1;
+
+            indexOrder[i] = i;
+            comparableItems[i] = (int) Math.floor(dot * Math.pow(10, fidelity));
+        }
+
+        // radix sort all the points
+        ArrayList<ArrayList<Integer>> radixGroups = new ArrayList<>();
+        buildRadixGroups.call(radixGroups);
+
+        int on_digit = 0;
+        int i = 0;
+        while(i < p.points.size()) {
+            int index = indexOrder[i];
+            int comparison = comparableItems[index];
+
+            int groupInto = String.valueOf(comparison).charAt(fidelity - on_digit) - '0';
+            radixGroups.get(groupInto).add(index);
+
+            // next digit
+            if (++i == p.points.size()) {
+                i = 0;
+                on_digit++;
+                reOrderIndexes.call(indexOrder, radixGroups);
+                buildRadixGroups.call(radixGroups);
+            }
+
+            // finish
+            if (fidelity - on_digit < 0) {
+                Vec2[] newPoints = new Vec2[p.points.size()];
+                for (int j = 0; j < p.points.size(); j++) {
+                    newPoints[j] = p.points.get(indexOrder[j]);
+                }
+                p.points = List.of(newPoints);
+                break;
+            }
+        }
+    }
+
+    public static Vec2 findCenter(List<Vec2> points) {
+        ListIterator<Vec2> iterator = points.listIterator();
+        Vec2 avg = iterator.next().getClone();
+        while (iterator.hasNext()) {
+            avg.addSelf(iterator.next());
+        }
+        return avg.div(points.size());
     }
 }
