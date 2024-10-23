@@ -11,6 +11,7 @@ import src.utility.MathUtils;
 import src.utility.Vec2;
 
 import java.awt.*;
+import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
@@ -89,13 +90,15 @@ public class Game {
         va.genId();
 
         sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
+
         sb.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
         sb.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
-        sb.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(300, 200), 50, new Shape.Mode(3)));
-        sb.pushSeparatedQuad(new Shape.Quad(new Vec2(410, 100), new Vec2(440, 110), new Vec2(460, 180), new Vec2(400, 150), new Shape.Mode(3)));
+        sb.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
+        sb.pushSeparatedQuad(new Shape.Quad(new Vec2(410, 100), new Vec2(440, 110), new Vec2(460, 180), new Vec2(480, 150), new Shape.Mode(3)));
+        Shape.Poly p = Shape.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new Shape.Mode(3));
+        sb.pushSeparatedPolygon(p);
+
         vb.bufferData(sb.getSetVertices());
-//        Shape.Poly p = new Shape.Poly(mousePos);
-//        Shape.sortPoints(p);
         va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
 
         tr.setupBufferObjects();

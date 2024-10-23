@@ -179,6 +179,10 @@ public class Vec2 {
         return sub(this, f);
     }
 
+    public Vec2 sub(float x, float y) {
+        return new Vec2(this.x - x, this.y - y);
+    }
+
     public Vec2 sub(Vec2 vec) {
         return sub(this, vec);
     }

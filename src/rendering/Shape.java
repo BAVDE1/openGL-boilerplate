@@ -63,12 +63,14 @@ public class Shape {
     public static class Poly {
         public Mode mode = new Mode();
         public List<Vec2> points;
+        public Vec2 pos;
 
-        public Poly(Vec2... points) {
+        public Poly(Vec2 pos, Vec2... points) {
             this.points = List.of(points);
+            this.pos = pos;
         }
-        public Poly(Mode mode, Vec2... points) {
-            this(points);
+        public Poly(Vec2 pos, Mode mode, Vec2... points) {
+            this(pos, points);
             this.mode = mode;
         }
     }
@@ -102,7 +104,20 @@ public class Shape {
     }
 
     public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness) {
-        return new Poly();
+        Vec2 pos = topLeft.add(size.div(2));
+
+        topLeft = topLeft.sub(pos);
+        Vec2 topRight = topLeft.add(size.x, 0);
+        Vec2 btmRight = topLeft.add(size);
+        Vec2 btmLeft = topLeft.add(0, size.y);
+
+        return new Poly(pos,
+                topLeft,  topLeft.add(thickness),
+                topRight, topRight.add(-thickness, thickness),
+                btmRight, btmRight.sub(thickness),
+                btmLeft,  btmLeft.sub(-thickness, thickness),
+                topLeft,  topLeft.add(thickness)
+        );
     }
     public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness, Mode mode) {
         Poly p = createRectOutline(topLeft, size, thickness);
@@ -110,8 +125,8 @@ public class Shape {
         return p;
     }
 
-    public static void sortPoints(Poly p) {sortPoints(p, findCenter(p.points));}
-    public static void sortPoints(Poly p, Vec2 center) {
+    /** Sort points of a polygon so they are all listed in a clockwise direction */
+    public static void sortPoints(Poly p) {
         final int fidelity = 2;
 
         // functions
@@ -134,8 +149,8 @@ public class Shape {
         int[] comparableItems = new int[p.points.size()];
         for(int i = 0; i < p.points.size(); i++) {
             Vec2 point = p.points.get(i);
-            float onSide = (point.x * center.y) - (point.y * center.x);
-            float dot = point.sub(center).normalized().dot(center.normalized());
+            float onSide = (point.x * p.pos.y) - (point.y * p.pos.x);
+            float dot = point.sub(p.pos).normalized().dot(p.pos.normalized());
             dot = onSide > 0 ? dot+3 : (-dot)+1;
 
             indexOrder[i] = i;
@@ -175,10 +190,11 @@ public class Shape {
         }
     }
 
+    /** Finds average of all points */
     public static Vec2 findCenter(List<Vec2> points) {
         ListIterator<Vec2> iterator = points.listIterator();
         Vec2 avg = iterator.next().getClone();
-        while (iterator.hasNext()) {
+        while(iterator.hasNext()) {
             avg.addSelf(iterator.next());
         }
         return avg.div(points.size());

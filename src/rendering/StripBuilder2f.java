@@ -5,6 +5,9 @@ import src.utility.Logging;
 import src.utility.Vec2;
 import src.utility.Vec3;
 
+import javax.swing.*;
+import java.util.Arrays;
+
 public class StripBuilder2f {
     private static final int DEFAULT_SIZE = Constants.BUFF_SIZE_SMALL;
     private float[] vertices;
@@ -141,11 +144,27 @@ public class StripBuilder2f {
     }
 
     public void pushSeparatedPolygon(Shape.Poly p) {
-        pushSeparation(p.points.getFirst());
+        pushSeparation(p.points.getFirst().add(p.pos));
         pushPolygon(p);
     }
 
     public void pushPolygon(Shape.Poly p) {
-        // loop each point to build float[]
+        float[] verts = new float[p.points.size() * (2+additionalVerts)];
+        int i = 0;
+        for (Vec2 point : p.points) {
+            Vec3 mv = p.mode.getVar(i);
+            int inx = i * (2+additionalVerts);
+
+            verts[inx] = point.x + p.pos.x; verts[inx+1] = point.y + p.pos.y;
+            verts[inx+2] = p.mode.type;
+            verts[inx+3] = mv.x; verts[inx+4] = mv.y; verts[inx+5] = mv.z;
+            i++;
+        }
+        pushRawVertices(verts);
+    }
+
+    /** first, last, first+1, last-1, ... */
+    public void pushPolygonSorted(Shape.Poly p) {
+
     }
 }
