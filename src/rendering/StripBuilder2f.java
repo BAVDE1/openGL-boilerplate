@@ -5,6 +5,8 @@ import src.utility.Logging;
 import src.utility.Vec2;
 import src.utility.Vec3;
 
+import java.util.Arrays;
+
 public class StripBuilder2f {
     private static final int DEFAULT_SIZE = Constants.BUFF_SIZE_SMALL;
     private float[] vertices;
@@ -154,7 +156,6 @@ public class StripBuilder2f {
         for (Vec2 point : p.points) {
             Vec3 mv = p.mode.getVar(i);
             int inx = i * floatCountPerVert;
-
             verts[inx] = point.x + p.pos.x; verts[inx+1] = point.y + p.pos.y;
             verts[inx+2] = p.mode.type;
             verts[inx+3] = mv.x; verts[inx+4] = mv.y; verts[inx+5] = mv.z;
@@ -163,8 +164,27 @@ public class StripBuilder2f {
         pushRawVertices(verts);
     }
 
+    public void pushSeparatedPolygonSorted(Shape.Poly p) {
+        pushSeparation(p.points.getFirst().add(p.pos));
+        pushPolygonSorted(p);
+    }
+
     /** first, last, first+1, last-1, ... */
     public void pushPolygonSorted(Shape.Poly p) {
+        float[] verts = new float[p.points.size() * floatCountPerVert];
+        for (int i = 0; i < p.points.size(); i++) {
+            int offset = (int) (i / 2f);  // floor
 
+            Vec2 point;
+            if (i % 2 == 0) point = p.points.get(offset);  // front
+            else point = p.points.get(p.points.size()-1 - offset);  // back
+
+            Vec3 mv = p.mode.getVar(i);
+            int inx = i * floatCountPerVert;
+            verts[inx] = point.x + p.pos.x; verts[inx+1] = point.y + p.pos.y;
+            verts[inx+2] = p.mode.type;
+            verts[inx+3] = mv.x; verts[inx+4] = mv.y; verts[inx+5] = mv.z;
+        }
+        pushRawVertices(verts);
     }
 }

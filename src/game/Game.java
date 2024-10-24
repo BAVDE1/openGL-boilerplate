@@ -14,8 +14,7 @@ import java.awt.*;
 import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
     public static boolean debugMode = false;
@@ -96,6 +95,10 @@ public class Game {
         sb.pushSeparatedQuad(new Shape.Quad(new Vec2(410, 100), new Vec2(440, 110), new Vec2(460, 180), new Vec2(480, 150), new Shape.Mode(3)));
         Shape.Poly p = Shape.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new Shape.Mode(3));
         sb.pushSeparatedPolygon(p);
+
+        Shape.Poly p2 = new Shape.Poly(new Vec2(600, 250), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0), new Vec2(-50, 50), new Vec2(0, -50));
+        Shape.sortPoints(p2);
+        sb.pushSeparatedPolygonSorted(p2);
 
         vb.bufferData(sb.getSetVertices());
         va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());

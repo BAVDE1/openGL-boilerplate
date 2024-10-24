@@ -125,8 +125,12 @@ public class Shape {
         return p;
     }
 
-    /** Sort points of a polygon so they are all listed in a clockwise direction */
     public static void sortPoints(Poly p) {
+        sortPoints(p, new Vec2(1));
+    }
+
+    /** Sort points of a polygon so they are all listed in a clockwise direction */
+    public static void sortPoints(Poly p, Vec2 center) {
         final int fidelity = 2;
 
         // functions
@@ -146,15 +150,15 @@ public class Shape {
 
         // pre calculate comparisons
         int[] indexOrder = new int[p.points.size()];
-        int[] comparableItems = new int[p.points.size()];
+        String[] comparableItems = new String[p.points.size()];
         for(int i = 0; i < p.points.size(); i++) {
             Vec2 point = p.points.get(i);
-            float onSide = (point.x * p.pos.y) - (point.y * p.pos.x);
-            float dot = point.sub(p.pos).normalized().dot(p.pos.normalized());
+            float onSide = (point.x * center.y) - (point.y * center.x);
+            float dot = point.sub(center).normalized().dot(center.normalized());
             dot = onSide > 0 ? dot+3 : (-dot)+1;
 
             indexOrder[i] = i;
-            comparableItems[i] = (int) Math.floor(dot * Math.pow(10, fidelity));
+            comparableItems[i] = String.valueOf((int) Math.floor(dot * Math.pow(10, fidelity)));
         }
 
         // radix sort all the points
@@ -165,9 +169,11 @@ public class Shape {
         int i = 0;
         while(i < p.points.size()) {
             int index = indexOrder[i];
-            int comparison = comparableItems[index];
+            String comparison = comparableItems[index];
 
-            int groupInto = String.valueOf(comparison).charAt(fidelity - on_digit) - '0';
+            int groupInto = 0;
+            try {groupInto = comparison.charAt(fidelity - on_digit) - '0';}
+            catch (IndexOutOfBoundsException _){}
             radixGroups.get(groupInto).add(index);
 
             // next digit
