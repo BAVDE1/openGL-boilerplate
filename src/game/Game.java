@@ -93,11 +93,11 @@ public class Game {
         sb.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
         sb.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
         sb.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
-        sb.pushSeparatedQuad(new Shape.Quad(new Vec2(410, 100), new Vec2(440, 110), new Vec2(460, 180), new Vec2(480, 150), new Shape.Mode(3)));
+        sb.pushSeparatedQuad(new Shape.Quad(new Vec2(510, 100), new Vec2(540, 110), new Vec2(560, 180), new Vec2(580, 150), new Shape.Mode(3)));
         Shape.Poly p = Shape.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new Shape.Mode(3));
         sb.pushSeparatedPolygon(p);
 
-        Shape.Poly p2 = new Shape.Poly(new Vec2(600, 250), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0), new Vec2(-50, 50), new Vec2(0, -50));
+        Shape.Poly p2 = new Shape.Poly(new Vec2(100, 250), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0), new Vec2(-50, 50), new Vec2(0, -50));
         Shape.sortPoints(p2);
         sb.pushSeparatedPolygonSorted(p2);
 
