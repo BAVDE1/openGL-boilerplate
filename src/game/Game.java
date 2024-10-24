@@ -26,6 +26,7 @@ public class Game {
     StripBuilder2f sb = new StripBuilder2f();
 
     TextRenderer.TextObject to1;
+    TextRenderer.TextObject to2;
     TextRenderer tr = new TextRenderer();
 
     Vec2 mousePos = new Vec2();
@@ -52,7 +53,7 @@ public class Game {
         setupBuffers();
 
         FontManager.init();
-        FontManager.loadFont(FontManager.FONT_JACQUARD, Font.PLAIN, 42, false);
+        FontManager.loadFont(Font.MONOSPACED, Font.PLAIN, 18, true);
         FontManager.generateAndBindAllFonts(sh);
     }
 
@@ -104,7 +105,8 @@ public class Game {
         va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
 
         tr.setupBufferObjects();
-        to1 = new TextRenderer.TextObject(1, "", new Vec2(10, 150));
+        to1 = new TextRenderer.TextObject(1, "", new Vec2());
+        to1.setBgColour(Color.BLACK);
         tr.pushTextObject(to1);
     }
 

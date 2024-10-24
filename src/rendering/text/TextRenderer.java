@@ -2,9 +2,11 @@ package src.rendering.text;
 
 import src.game.Constants;
 import src.rendering.*;
+import src.rendering.Shape;
 import src.utility.Logging;
 import src.utility.Vec2;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -22,6 +24,9 @@ public class TextRenderer {
 
         private final StripBuilder2f sb = new StripBuilder2f(true);
         private boolean hasChanged = true;
+
+        private Color bgColour = new Color(0, 0, 0, 0);
+        private boolean seamlessBg = false;
 
         public TextObject(int loadedFontId, String string, Vec2 pos, float scale, int ySpacing) {
             this(loadedFontId, string, pos);
@@ -53,6 +58,7 @@ public class TextRenderer {
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
             int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
+            int yAddition = genericHeight + ySpacing;
 
             int accumulatedY = 0;
             for (String line : string.split("\n")) {
@@ -61,9 +67,19 @@ public class TextRenderer {
                     continue;
                 }
 
-                // all chars in line
                 float lineY = pos.y + accumulatedY;
                 int accumulatedX = 0;
+
+                // line background
+                if (bgColour.getAlpha() > Constants.EPSILON) {
+                    Vec2 topLeft = new Vec2(pos.x, lineY);
+                    Vec2 size = new Vec2(font.findLineWidth(line) * scale, yAddition);
+                    if (!seamlessBg) size.y -= ySpacing;
+
+                    sb.pushSeparatedQuad(Shape.createRect(topLeft, size, new Shape.Mode(bgColour)));
+                }
+
+                // all chars in line
                 for (char c : line.toCharArray()) {
                     if (!font.glyphMap.containsKey(c)) {
                         Logging.warn("Character '%s' does not exist in the currently loaded font. Using '0' instead.", c);
@@ -81,7 +97,7 @@ public class TextRenderer {
 
                     accumulatedX += (int) size.x;
                 }
-                accumulatedY += genericHeight + ySpacing;
+                accumulatedY += yAddition;
             }
 
             hasChanged = false;
@@ -96,8 +112,7 @@ public class TextRenderer {
         public void setString(String newString) {
             if (!Objects.equals(newString, string)) {
                 string = newString;
-                hasChanged = true;
-                if (parent != null) parent.hasBeenModified = true;
+                setHasChanged();
             }
         }
 
@@ -105,8 +120,7 @@ public class TextRenderer {
         public void setPos(Vec2 newPos) {
             if (newPos != pos) {
                 pos = newPos;
-                hasChanged = true;
-                if (parent != null) parent.hasBeenModified = true;
+                setHasChanged();
             }
         }
 
@@ -114,8 +128,7 @@ public class TextRenderer {
         public void setFontId(int newFontId) {
             if (newFontId != loadedFontId) {
                 loadedFontId = newFontId;
-                hasChanged = true;
-                if (parent != null) parent.hasBeenModified = true;
+                setHasChanged();
             }
         }
 
@@ -123,8 +136,7 @@ public class TextRenderer {
         public void setScale(float newScale) {
             if (newScale != scale) {
                 scale = newScale;
-                hasChanged = true;
-                if (parent != null) parent.hasBeenModified = true;
+                setHasChanged();
             }
         }
 
@@ -132,9 +144,29 @@ public class TextRenderer {
         public void setYSpacing(int newYSpacing) {
             if (newYSpacing != ySpacing) {
                 ySpacing = newYSpacing;
-                hasChanged = true;
-                if (parent != null) parent.hasBeenModified = true;
+                setHasChanged();
             }
+        }
+
+        public Color getBgColour() {return bgColour;}
+        public void setBgColour(Color newBgColour) {
+            if (newBgColour != bgColour) {
+                bgColour = newBgColour;
+                setHasChanged();
+            }
+        }
+
+        public boolean getSeamlessBg() {return seamlessBg;}
+        public void setSeamlessBg(boolean isSeamlessBg) {
+            if (isSeamlessBg != seamlessBg) {
+                seamlessBg = isSeamlessBg;
+                setHasChanged();
+            }
+        }
+
+        private void setHasChanged() {
+            hasChanged = true;
+            if (parent != null) parent.hasBeenModified = true;
         }
     }
 

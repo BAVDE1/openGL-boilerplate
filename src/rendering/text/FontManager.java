@@ -121,6 +121,12 @@ public class FontManager {
                 x += charWidth;
             }
         }
+
+        public int findLineWidth(String line) {
+            int accumulatedWidth = 0;
+            for (char c : line.toCharArray()) accumulatedWidth += glyphMap.get(c).width;
+            return accumulatedWidth;
+        }
     }
 
     public static final int FONT_TEXTURE_SLOT = 0;

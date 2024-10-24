@@ -16,7 +16,7 @@ public class Shape {
         public Mode() {this(Constants.MODE_NIL);}
         public Mode(int texSlot, Vec2 texTopLeft, Vec2 texSize) {
             this(Constants.MODE_TEX);
-            this.vars = List.of(new Vec3[]{
+            this.vars = List.of(new Vec3[] {
                     new Vec3(texTopLeft, texSlot),
                     new Vec3(texTopLeft.add(0, texSize.y), texSlot),
                     new Vec3(texTopLeft.add(texSize.x, 0), texSlot),
