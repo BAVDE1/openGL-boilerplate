@@ -152,7 +152,7 @@ public class Game {
 
         glfwPollEvents();
         updateFps();
-        to1.setString("Secs Elapsed: %s, FPS: %s\nDebug (tab): %s\nv: %s, f: %s, s: %s (%s)", secondsElapsed, fps, debugMode, sb.getVertexCount(), sb.getFloatCount(), sb.getSeparationsCount(), sb.getCurrentFullnessPercent());
+        to1.setString("Secs Elapsed: %s, FPS: %s\nDebug (tab): %s\ns: %s, v: %s, f: %s/%s (%.5f)", secondsElapsed, fps, debugMode, sb.getSeparationsCount(), sb.getVertexCount(), sb.getFloatCount(), sb.getBufferSize(), sb.getCurrentFullnessPercent());
         render();
 
         return MathUtils.nanoToSecond(System.nanoTime() - tStart);
