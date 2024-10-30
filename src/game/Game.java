@@ -33,7 +33,7 @@ public class Game {
 
     // other
     TextRenderer.TextObject to1;
-    TextRenderer tr = new TextRenderer();
+    TextRenderer textRenderer = new TextRenderer();
 
     Vec2 mousePos = new Vec2();
 
@@ -59,7 +59,7 @@ public class Game {
         setupBuffers();
 
         FontManager.init();
-        FontManager.loadFont(Font.MONOSPACED, Font.PLAIN, 18, true);
+        FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 18, true);
         FontManager.generateAndBindAllFonts(sh_main);
     }
 
@@ -109,25 +109,29 @@ public class Game {
         sb_main.pushSeparatedPolygonSorted(p2);
 
         vb_main.bufferData(sb_main.getSetVertices());
-        va_main.addBuffer(vb_main, VertexArray.Layout.getDefaultLayout());
+        va_main.pushBuffer(vb_main, VertexArray.Layout.getDefaultLayout());
 
-        tr.setupBufferObjects();
+        textRenderer.setupBufferObjects();
         to1 = new TextRenderer.TextObject(1, "", new Vec2());
         to1.setBgColour(Color.BLACK);
-        tr.pushTextObject(to1);
+        textRenderer.pushTextObject(to1);
 
         // CIRCLE BUFFERS
         vb_cir.genId();
         va_cir.genId();
 
+        // todo: https://learnopengl.com/Advanced-OpenGL/Instancing
         // push circles
+        sb_cir.setAdditionalVerts(5);
+        sb_cir.pushCircle(new Vec2(300), 20, Color.MAGENTA);
 
         vb_cir.bufferData(sb_cir.getSetVertices());
         VertexArray.Layout circleLayout = new VertexArray.Layout();
         circleLayout.pushFloat(2);  // pos
         circleLayout.pushFloat(1);  // radius
+        circleLayout.pushFloat(1);  // inner radius
         circleLayout.pushFloat(3);  // colour
-        va_cir.addBuffer(vb_cir, circleLayout);
+        va_cir.pushBuffer(vb_cir, circleLayout);
     }
 
     /** Must be called after window is visible */
@@ -135,7 +139,8 @@ public class Game {
         sh_main.genProgram();
         sh_main.attachShaders(Constants.SHADER_VERTEX, Constants.SHADER_FRAGMENT);
         sh_main.linkProgram();
-        sh_main.bind();
+
+        ShaderHelper.uniform2f(sh_main, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
 
         new Texture("res/textures/explosion.png").bind(1, sh_main);
         new Texture("res/textures/closed.png").bind(2, sh_main);
@@ -144,7 +149,7 @@ public class Game {
         sh_cir.attachShaders("res/shaders/vs_cir.vert", "res/shaders/fs_cir.frag");
         sh_cir.linkProgram();
 
-        ShaderHelper.uniform2f(sh_main, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        ShaderHelper.uniform2f(sh_cir, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
     }
 
     public void updateFpsCounter() {
@@ -167,7 +172,9 @@ public class Game {
         ShaderHelper.uniform1f(sh_main, "time", (float) glfwGetTime());
 
         Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va_main, sb_main.getVertexCount());
-        Renderer.draw(tr);
+        Renderer.draw(textRenderer);
+        sh_cir.bind();
+        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLES, va_cir, sb_cir.getVertexCount());
 
         Renderer.finish(window);
     }

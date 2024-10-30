@@ -7,7 +7,7 @@ import src.rendering.text.TextRenderer;
 import src.utility.Logging;
 
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL45.*;
 
 public class Renderer {
     private static int boundArray = 0;
@@ -17,7 +17,7 @@ public class Renderer {
     public static void setupGLContext() {
         GL.createCapabilities();
 
-        glEnable(GL45.GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_TEXTURE_2D);
 
         // transparency
@@ -51,11 +51,11 @@ public class Renderer {
     public static void bindArray(int id) {
         if (id == boundArray) return;
         boundArray = id;
-        GL45.glBindVertexArray(id);
+        glBindVertexArray(id);
     }
     public static void unBindArray() {
         boundArray = 0;
-        GL45.glBindVertexArray(0);
+        glBindVertexArray(0);
     }
 
     public static void bindBuffer(VertexBuffer vb) {
@@ -64,10 +64,10 @@ public class Renderer {
     public static void bindBuffer(int bufferType, int id) {
         if (id == boundBuffer) return;
         boundBuffer = id;
-        GL45.glBindBuffer(bufferType, id);
+        glBindBuffer(bufferType, id);
     }
     public static void unBindBuffer() {
         boundArray = 0;
-        GL45.glBindBuffer(GL45.GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 }

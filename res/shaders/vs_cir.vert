@@ -2,12 +2,14 @@
 
 layout(location = 0) in vec2 position;
 layout(location = 1) in float radius;
-layout(location = 2) in vec3 colour;
+layout(location = 2) in float innerRadius;
+layout(location = 3) in vec3 colour;
 
 uniform vec2 resolution;
 uniform highp float time;
 
 out float v_radius;
+out float v_innerRadius;
 out vec3 v_colour;
 
 /**
@@ -30,5 +32,6 @@ void main() {
     gl_Position = pos * projectionMatrix;
 
     v_radius = radius;
+    v_innerRadius = innerRadius;
     v_colour = colour;
 }

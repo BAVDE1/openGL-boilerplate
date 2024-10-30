@@ -5,6 +5,7 @@ import src.utility.Logging;
 import src.utility.Vec2;
 import src.utility.Vec3;
 
+import java.awt.*;
 import java.util.Arrays;
 
 public class StripBuilder2f {
@@ -186,5 +187,22 @@ public class StripBuilder2f {
             verts[inx+3] = mv.x; verts[inx+4] = mv.y; verts[inx+5] = mv.z;
         }
         pushRawVertices(verts);
+    }
+
+    /** Circles should be rendered as GL_TRIANGLES */
+    public void pushCircle(Vec2 pos, float radius, Color col) {
+        pushCircleOutline(pos, radius, 0, col);
+    }
+
+    /** Circles should be rendered as GL_TRIANGLES */
+    public void pushCircleOutline(Vec2 pos, float radius, float thickness, Color col) {
+        thickness /= radius;  // to percent
+        Vec3 color = new Vec3(col);
+        float x_add = radius * Constants.THREE_SQRT;
+        pushRawVertices(new float[] {
+                pos.x,         pos.y - (radius * 2), radius, thickness, color.x, color.y, color.z,
+                pos.x + x_add, pos.y + radius,       radius, thickness, color.x, color.y, color.z,
+                pos.x - x_add, pos.y + radius,       radius, thickness, color.x, color.y, color.z
+        });
     }
 }

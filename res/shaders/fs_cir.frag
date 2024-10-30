@@ -6,6 +6,7 @@ uniform int debugMode;
 const float EPSILON = 0.0001;
 
 in float v_radius;
+out float v_innerRadius;
 in vec3 v_colour;
 
 out vec4 colour;
@@ -13,5 +14,7 @@ out vec4 colour;
 vec2 invResolution = 1 / resolution;
 
 void main() {
-    colour = vec4(v_colour, 0);
+    vec2 dist = gl_FragCoord.xy * invResolution;
+
+    colour = vec4(v_colour, 1);
 }

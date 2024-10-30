@@ -20,6 +20,7 @@ public class Constants {
 
     public static final int ERROR = -1;
     public static final double EPSILON = 0.0001;
+    public static final float THREE_SQRT = 1.7321f;
     public static final double EPSILON_SQ = EPSILON * EPSILON;
     public static final int FPS = 60;
     public static final double DT = 1 / (double) FPS;

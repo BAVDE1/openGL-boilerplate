@@ -185,7 +185,7 @@ public class TextRenderer {
         sb = new StripBuilder2f(true);
 
         sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
-        va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
+        va.pushBuffer(vb, VertexArray.Layout.getDefaultLayout());
     }
 
     private void buildBuffer() {

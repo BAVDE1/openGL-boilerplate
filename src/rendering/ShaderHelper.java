@@ -11,10 +11,10 @@ import java.util.Scanner;
 import static org.lwjgl.opengl.GL45.*;
 
 public class ShaderHelper {
-    private Integer program;
     public static final HashMap<String, Integer> uniformCache = new HashMap<>();
+    public static int boundShader = 0;
 
-    public ShaderHelper() {}
+    private Integer program;
 
     public void genProgram() {
         if (program != null) {
@@ -118,13 +118,20 @@ public class ShaderHelper {
         return shaderType;
     }
 
-    public void bind() {glUseProgram(program);}
-    public void unbind() {glUseProgram(0);}
+    public void bind() {
+        if (program == boundShader) return;
+        boundShader = program;
+        glUseProgram(program);
+    }
+    public void unbind() {
+        boundShader = 0;
+        glUseProgram(0);
+    }
     public int getProgram() {return program;}
 
     public static int getUniformLocation(ShaderHelper sh, String uniform) {
+        sh.bind();
         if (!uniformCache.containsKey(uniform)) {
-            sh.bind();  // can't use the program without binding
             uniformCache.put(uniform, glGetUniformLocation(sh.program, uniform));
         }
         return uniformCache.get(uniform);
@@ -144,5 +151,4 @@ public class ShaderHelper {
         glUniform2f(getUniformLocation(sh, uniform), f1, f2);
     }
     // todo: matrix4 uniform for projection matrix
-    // todo: optimize bind here as static int boundProgram
 }
