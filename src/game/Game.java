@@ -61,11 +61,6 @@ public class Game {
         FontManager.init();
         FontManager.loadFont(Font.MONOSPACED, Font.PLAIN, 18, true);
         FontManager.generateAndBindAllFonts(sh_main);
-
-//        glViewport(0, 0, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
-//        glMatrixMode(GL_PROJECTION);
-//        glLoadIdentity();
-//        glOrtho(0, Constants.SCREEN_SIZE.width, 0, Constants.SCREEN_SIZE.height, -1, 1);
     }
 
     public void close() {
@@ -132,7 +127,7 @@ public class Game {
         circleLayout.pushFloat(2);  // pos
         circleLayout.pushFloat(1);  // radius
         circleLayout.pushFloat(3);  // colour
-        va_main.addBuffer(vb_cir, circleLayout);
+        va_cir.addBuffer(vb_cir, circleLayout);
     }
 
     /** Must be called after window is visible */

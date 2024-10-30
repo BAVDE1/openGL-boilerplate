@@ -53,6 +53,10 @@ public class Renderer {
         boundArray = id;
         GL45.glBindVertexArray(id);
     }
+    public static void unBindArray() {
+        boundArray = 0;
+        GL45.glBindVertexArray(0);
+    }
 
     public static void bindBuffer(VertexBuffer vb) {
         bindBuffer(vb.getBufferType(), vb.getId());
@@ -61,5 +65,9 @@ public class Renderer {
         if (id == boundBuffer) return;
         boundBuffer = id;
         GL45.glBindBuffer(bufferType, id);
+    }
+    public static void unBindBuffer() {
+        boundArray = 0;
+        GL45.glBindBuffer(GL45.GL_ARRAY_BUFFER, 0);
     }
 }
