@@ -209,6 +209,7 @@ public class FontManager {
 
         graphics.dispose();
         finalTexture = new Texture(fullImage);
+        sh.bind();
         finalTexture.bind(FONT_TEXTURE_SLOT, sh);
         Texture.writeToFile(fullImage);
         Logging.debug("%s fonts generated, bound to slot %s", allLoadedFonts.size(), FONT_TEXTURE_SLOT);

@@ -137,10 +137,14 @@ public class Game {
         sh_main.linkProgram();
         sh_main.bind();
 
-        sh_main.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
-
         new Texture("res/textures/explosion.png").bind(1, sh_main);
         new Texture("res/textures/closed.png").bind(2, sh_main);
+
+        sh_cir.genProgram();
+        sh_cir.attachShaders("res/shaders/vs_cir.vert", "res/shaders/fs_cir.frag");
+        sh_cir.linkProgram();
+
+        ShaderHelper.uniform2f(sh_main, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
     }
 
     public void updateFpsCounter() {
@@ -155,12 +159,12 @@ public class Game {
 
     public void toggleDebug() {
         debugMode = !debugMode;
-        sh_main.uniform1i("debugMode", debugMode ? 1:0);
+        ShaderHelper.uniform1i(sh_main, "debugMode", debugMode ? 1:0);
     }
 
     public void render() {
         Renderer.clearScreen();
-        sh_main.uniform1f("time", (float) glfwGetTime());
+        ShaderHelper.uniform1f(sh_main, "time", (float) glfwGetTime());
 
         Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va_main, sb_main.getVertexCount());
         Renderer.draw(tr);

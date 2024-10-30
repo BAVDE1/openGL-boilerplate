@@ -118,7 +118,8 @@ public class Texture {
         boundSlots.add(slot);
         boundSlots.sort(Comparator.naturalOrder());
 
-        sh.uniform1iv("textures", boundSlots.stream().mapToInt(i -> ++i).toArray());
+        sh.bind();
+        ShaderHelper.uniform1iv(sh, "textures", boundSlots.stream().mapToInt(i -> ++i).toArray());
     }
 
     public void unbind() {
