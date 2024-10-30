@@ -27,7 +27,7 @@ void main() {
     vec4 pos = vec4(position, 1, 1);
 //    float t = time + length(position.xy) * .01;
 //    pos += vec4(20 * sin(t), 20 * cos(t), 0, 0);
-    gl_Position = pos * projectionMatrix;
+    gl_Position = pos;
 
     v_mode = mode;
     v_modeVars = modeVars;

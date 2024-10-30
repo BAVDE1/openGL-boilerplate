@@ -11,7 +11,6 @@ import src.utility.MathUtils;
 import src.utility.Vec2;
 
 import java.awt.*;
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -20,13 +19,20 @@ public class Game {
     public static boolean debugMode = false;
     public Window window = new Window();
 
-    ShaderHelper sh = new ShaderHelper();
-    VertexArray va = new VertexArray();
-    VertexBuffer vb = new VertexBuffer();
-    StripBuilder2f sb = new StripBuilder2f();
+    // main buffers
+    ShaderHelper sh_main = new ShaderHelper();
+    VertexArray va_main = new VertexArray();
+    VertexBuffer vb_main = new VertexBuffer();
+    StripBuilder2f sb_main = new StripBuilder2f();
 
+    // circle buffers
+    ShaderHelper sh_cir = new ShaderHelper();
+    VertexArray va_cir = new VertexArray();
+    VertexBuffer vb_cir = new VertexBuffer();
+    StripBuilder2f sb_cir = new StripBuilder2f();
+
+    // other
     TextRenderer.TextObject to1;
-    TextRenderer.TextObject to2;
     TextRenderer tr = new TextRenderer();
 
     Vec2 mousePos = new Vec2();
@@ -54,7 +60,12 @@ public class Game {
 
         FontManager.init();
         FontManager.loadFont(Font.MONOSPACED, Font.PLAIN, 18, true);
-        FontManager.generateAndBindAllFonts(sh);
+        FontManager.generateAndBindAllFonts(sh_main);
+
+//        glViewport(0, 0, Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+//        glMatrixMode(GL_PROJECTION);
+//        glLoadIdentity();
+//        glOrtho(0, Constants.SCREEN_SIZE.width, 0, Constants.SCREEN_SIZE.height, -1, 1);
     }
 
     public void close() {
@@ -75,8 +86,8 @@ public class Game {
 
             if (action == GLFW_PRESS) {
                 switch (key) {
-                    case GLFW_KEY_W -> to1.setScale(to1.getScale() + .5f);
-                    case GLFW_KEY_S -> to1.setScale(to1.getScale() - .5f);
+                    case GLFW_KEY_E -> to1.setScale(to1.getScale() + .5f);
+                    case GLFW_KEY_Q -> to1.setScale(to1.getScale() - .5f);
                     case GLFW_KEY_TAB -> toggleDebug();
                 }
             }
@@ -86,44 +97,58 @@ public class Game {
     }
 
     public void setupBuffers() {
-        vb.genId();
-        va.genId();
+        // MAIN BUFFERS
+        vb_main.genId();
+        va_main.genId();
 
-        sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
-        sb.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
-        sb.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
-        sb.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
-        sb.pushSeparatedQuad(new Shape.Quad(new Vec2(510, 100), new Vec2(540, 110), new Vec2(560, 180), new Vec2(580, 150), new Shape.Mode(3)));
+        sb_main.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
+        sb_main.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
+        sb_main.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
+        sb_main.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
+        sb_main.pushSeparatedQuad(new Shape.Quad(new Vec2(510, 100), new Vec2(540, 110), new Vec2(560, 180), new Vec2(580, 150), new Shape.Mode(3)));
         Shape.Poly p = Shape.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new Shape.Mode(3));
-        sb.pushSeparatedPolygon(p);
+        sb_main.pushSeparatedPolygon(p);
 
-        Shape.Poly p2 = new Shape.Poly(new Vec2(100, 250), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0), new Vec2(-50, 50), new Vec2(0, -50));
+        Shape.Poly p2 = new Shape.Poly(new Vec2(100, 250), new Shape.Mode(Color.RED), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0), new Vec2(-50, 50), new Vec2(0, -50));
         Shape.sortPoints(p2);
-        sb.pushSeparatedPolygonSorted(p2);
+        sb_main.pushSeparatedPolygonSorted(p2);
 
-        vb.bufferData(sb.getSetVertices());
-        va.addBuffer(vb, VertexArray.Layout.getDefaultLayout());
+        vb_main.bufferData(sb_main.getSetVertices());
+        va_main.addBuffer(vb_main, VertexArray.Layout.getDefaultLayout());
 
         tr.setupBufferObjects();
         to1 = new TextRenderer.TextObject(1, "", new Vec2());
         to1.setBgColour(Color.BLACK);
         tr.pushTextObject(to1);
+
+        // CIRCLE BUFFERS
+        vb_cir.genId();
+        va_cir.genId();
+
+        // push circles
+
+        vb_cir.bufferData(sb_cir.getSetVertices());
+        VertexArray.Layout circleLayout = new VertexArray.Layout();
+        circleLayout.pushFloat(2);  // pos
+        circleLayout.pushFloat(1);  // radius
+        circleLayout.pushFloat(3);  // colour
+        va_main.addBuffer(vb_cir, circleLayout);
     }
 
     /** Must be called after window is visible */
     public void setupShaders() {
-        sh.genProgram();
-        sh.attachShaders(Constants.SHADER_VERTEX, Constants.SHADER_FRAGMENT);
-        sh.linkProgram();
-        sh.bind();
+        sh_main.genProgram();
+        sh_main.attachShaders(Constants.SHADER_VERTEX, Constants.SHADER_FRAGMENT);
+        sh_main.linkProgram();
+        sh_main.bind();
 
-        sh.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        sh_main.uniform2f("resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
 
-        new Texture("res/textures/explosion.png").bind(1, sh);
-        new Texture("res/textures/closed.png").bind(2, sh);
+        new Texture("res/textures/explosion.png").bind(1, sh_main);
+        new Texture("res/textures/closed.png").bind(2, sh_main);
     }
 
-    public void updateFps() {
+    public void updateFpsCounter() {
         // updates every second
         int newSeconds = (int) Math.floor(MathUtils.millisToSecond(System.currentTimeMillis()) - MathUtils.millisToSecond(timeStarted));
         if (newSeconds != secondsElapsed) {
@@ -135,14 +160,14 @@ public class Game {
 
     public void toggleDebug() {
         debugMode = !debugMode;
-        sh.uniform1i("debugMode", debugMode ? 1:0);
+        sh_main.uniform1i("debugMode", debugMode ? 1:0);
     }
 
     public void render() {
         Renderer.clearScreen();
-        sh.uniform1f("time", (float) glfwGetTime());
+        sh_main.uniform1f("time", (float) glfwGetTime());
 
-        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va, sb.getVertexCount());
+        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va_main, sb_main.getVertexCount());
         Renderer.draw(tr);
 
         Renderer.finish(window);
@@ -153,8 +178,8 @@ public class Game {
         frameCounter++;
 
         glfwPollEvents();
-        updateFps();
-        to1.setString("Secs Elapsed: %s, FPS: %s\nDebug (tab): %s\ns: %s, v: %s, f: %s/%s (%.5f)", secondsElapsed, fps, debugMode, sb.getSeparationsCount(), sb.getVertexCount(), sb.getFloatCount(), sb.getBufferSize(), sb.getCurrentFullnessPercent());
+        updateFpsCounter();
+        to1.setString("Secs Elapsed: %s, FPS: %s\nDebug (tab): %s\ns: %s, v: %s, f: %s/%s (%.5f)", secondsElapsed, fps, debugMode, sb_main.getSeparationsCount(), sb_main.getVertexCount(), sb_main.getFloatCount(), sb_main.getBufferSize(), sb_main.getCurrentFullnessPercent());
         render();
 
         return MathUtils.nanoToSecond(System.nanoTime() - tStart);
