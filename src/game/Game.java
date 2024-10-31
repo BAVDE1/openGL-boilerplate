@@ -31,7 +31,7 @@ public class Game {
     VertexBuffer vb_circles = new VertexBuffer();
     StripBuilder2f sb_circles = new StripBuilder2f();
 
-    // other
+    // text
     TextRenderer.TextObject to1;
     TextRenderer textRenderer = new TextRenderer();
 
@@ -146,7 +146,7 @@ public class Game {
         new Texture("res/textures/closed.png").bind(2, sh_main);
 
         sh_circles.genProgram();
-        sh_circles.attachShaders("res/shaders/vs_cir.vert", "res/shaders/fs_cir.frag");
+        sh_circles.attachShaders("res/shaders/vs_circle.vert", "res/shaders/fs_circle.frag");
         sh_circles.linkProgram();
 
         ShaderHelper.uniform2f(sh_circles, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
