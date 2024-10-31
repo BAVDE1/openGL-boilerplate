@@ -26,10 +26,10 @@ public class Game {
     StripBuilder2f sb_main = new StripBuilder2f();
 
     // circle buffers
-    ShaderHelper sh_cir = new ShaderHelper();
-    VertexArray va_cir = new VertexArray();
-    VertexBuffer vb_cir = new VertexBuffer();
-    StripBuilder2f sb_cir = new StripBuilder2f();
+    ShaderHelper sh_circles = new ShaderHelper();
+    VertexArray va_circles = new VertexArray();
+    VertexBuffer vb_circles = new VertexBuffer();
+    StripBuilder2f sb_circles = new StripBuilder2f();
 
     // other
     TextRenderer.TextObject to1;
@@ -117,21 +117,22 @@ public class Game {
         textRenderer.pushTextObject(to1);
 
         // CIRCLE BUFFERS
-        vb_cir.genId();
-        va_cir.genId();
+        vb_circles.genId();
+        va_circles.genId();
 
         // todo: https://learnopengl.com/Advanced-OpenGL/Instancing
-        // push circles
-        sb_cir.setAdditionalVerts(5);
-        sb_cir.pushCircle(new Vec2(300), 20, Color.MAGENTA);
+        sb_circles.setAdditionalVerts(5);
+        sb_circles.pushCircle(new Vec2(300), 20, Color.GREEN);
+        sb_circles.pushCircle(new Vec2(220), 30, Color.BLUE);
 
-        vb_cir.bufferData(sb_cir.getSetVertices());
-        VertexArray.Layout circleLayout = new VertexArray.Layout();
-        circleLayout.pushFloat(2);  // pos
-        circleLayout.pushFloat(1);  // radius
-        circleLayout.pushFloat(1);  // inner radius
-        circleLayout.pushFloat(3);  // colour
-        va_cir.pushBuffer(vb_cir, circleLayout);
+        VertexArray.Layout instanceLayout = new VertexArray.Layout();
+        instanceLayout.pushFloat(2);  // circle pos
+        instanceLayout.pushFloat(1);  // radius
+        instanceLayout.pushFloat(1);  // inner radius
+        instanceLayout.pushFloat(3);  // colour
+        vb_circles.bufferData(sb_circles.getSetVertices());
+        va_circles.pushBuffer(vb_circles, instanceLayout, 1);
+
     }
 
     /** Must be called after window is visible */
@@ -145,11 +146,11 @@ public class Game {
         new Texture("res/textures/explosion.png").bind(1, sh_main);
         new Texture("res/textures/closed.png").bind(2, sh_main);
 
-        sh_cir.genProgram();
-        sh_cir.attachShaders("res/shaders/vs_cir.vert", "res/shaders/fs_cir.frag");
-        sh_cir.linkProgram();
+        sh_circles.genProgram();
+        sh_circles.attachShaders("res/shaders/vs_cir.vert", "res/shaders/fs_cir.frag");
+        sh_circles.linkProgram();
 
-        ShaderHelper.uniform2f(sh_cir, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        ShaderHelper.uniform2f(sh_circles, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
     }
 
     public void updateFpsCounter() {
@@ -171,10 +172,13 @@ public class Game {
         Renderer.clearScreen();
         ShaderHelper.uniform1f(sh_main, "time", (float) glfwGetTime());
 
-        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va_main, sb_main.getVertexCount());
+        int mode = debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
+        Renderer.draw(mode, va_main, sb_main.getVertexCount());
         Renderer.draw(textRenderer);
-        sh_cir.bind();
-        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLES, va_cir, sb_cir.getVertexCount());
+
+        sh_circles.bind();
+        mode = debugMode ? GL_LINE_STRIP : GL_TRIANGLES;
+        Renderer.drawInstanced(mode, va_circles, 3, sb_circles.getVertexCount());
 
         Renderer.finish(window);
     }

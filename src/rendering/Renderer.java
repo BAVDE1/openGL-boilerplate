@@ -41,6 +41,11 @@ public class Renderer {
         tr.draw();
     }
 
+    public static void drawInstanced(int mode, VertexArray va, int vertsPerInstance, int instanceCount) {
+        Renderer.bindArray(va);
+        glDrawArraysInstanced(mode, 0, vertsPerInstance, instanceCount);
+    }
+
     public static void finish(Window window) {
         glfwSwapBuffers(window.handle);
     }

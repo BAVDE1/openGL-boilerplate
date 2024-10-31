@@ -5,8 +5,9 @@ uniform int debugMode;
 
 const float EPSILON = 0.0001;
 
+in vec2 v_circlePos;
 in float v_radius;
-out float v_innerRadius;
+in float v_innerRadius;
 in vec3 v_colour;
 
 out vec4 colour;

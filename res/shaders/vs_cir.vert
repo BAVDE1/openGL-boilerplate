@@ -1,6 +1,7 @@
 #version 450 core
 
-layout(location = 0) in vec2 position;
+// instanced
+layout(location = 0) in vec2 circlePosition;
 layout(location = 1) in float radius;
 layout(location = 2) in float innerRadius;
 layout(location = 3) in vec3 colour;
@@ -8,6 +9,7 @@ layout(location = 3) in vec3 colour;
 uniform vec2 resolution;
 uniform highp float time;
 
+out vec2 v_circlePos;
 out float v_radius;
 out float v_innerRadius;
 out vec3 v_colour;
@@ -25,12 +27,21 @@ mat4 projectionMatrix = mat4(
     0,              0,               0,  1
 );
 
-void main() {
-    vec4 pos = vec4(position, 1, 1);
-//    float t = time + length(position.xy) * .01;
-//    pos += vec4(20 * sin(t), 20 * cos(t), 0, 0);
-    gl_Position = pos * projectionMatrix;
+vec2 TRI_POSITIONS[3] = vec2[3] (
+        vec2(0,       -2),
+        vec2(1.7321,   1),
+        vec2(-1.7321,  1)
+);
 
+void main() {
+    vec2 radiusMultiplier = TRI_POSITIONS[gl_VertexID % 3];
+    vec2 pos = vec2(
+        circlePosition.x + (radius * radiusMultiplier.x),
+        circlePosition.y + (radius * radiusMultiplier.y)
+    );
+    gl_Position = vec4(pos, 1, 1) * projectionMatrix;
+
+    v_circlePos = circlePosition;
     v_radius = radius;
     v_innerRadius = innerRadius;
     v_colour = colour;

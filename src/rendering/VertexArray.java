@@ -98,8 +98,12 @@ public class VertexArray {
         arrayId = glGenVertexArrays();
     }
 
-    /** Pushing multiple layouts adds onto last layout that was pushed */
     public void pushBuffer(VertexBuffer vb, Layout layout) {
+        pushBuffer(vb, layout, 0);
+    }
+
+    /** Pushing multiple layouts adds onto last layout that was pushed */
+    public void pushBuffer(VertexBuffer vb, Layout layout, int divisor) {
         this.layout = layout;
 
         Renderer.bindArray(this);
@@ -113,6 +117,7 @@ public class VertexArray {
             int attribInx = i + attribCount;  // adding onto the last
             glEnableVertexAttribArray(attribInx);
             glVertexAttribPointer(attribInx, element.count, element.type, element.normalized, layout.stride, offset);
+            if (divisor > 0) glVertexAttribDivisor(attribInx, divisor);
 
             offset += element.count * element.getByteSizeForType();
         }

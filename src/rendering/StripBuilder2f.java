@@ -10,6 +10,8 @@ import java.util.Arrays;
 
 public class StripBuilder2f {
     private static final int DEFAULT_SIZE = Constants.BUFF_SIZE_SMALL;
+    private static final int POS_FLOAT_COUNT = 2;
+
     private float[] vertices;
     private int size;
     private boolean autoResize;
@@ -19,7 +21,7 @@ public class StripBuilder2f {
     private int separationsCount = 0;
 
     private int additionalVerts = 0;
-    private int floatCountPerVert = 2;
+    private int floatCountPerVert = POS_FLOAT_COUNT;
 
     public StripBuilder2f() {this(DEFAULT_SIZE, false);}
     public StripBuilder2f(int size) {this(size, false);}
@@ -57,7 +59,7 @@ public class StripBuilder2f {
         if (additionalVerts != 0 && additionalVerts != num)
             Logging.warn("Changing already set 'additional vertices'. This could warp the buffer");
         additionalVerts = num;
-        floatCountPerVert = 2 + num;
+        floatCountPerVert = POS_FLOAT_COUNT + num;
     }
 
     public float[] getSetVertices() {
@@ -196,13 +198,8 @@ public class StripBuilder2f {
 
     /** Circles should be rendered as GL_TRIANGLES */
     public void pushCircleOutline(Vec2 pos, float radius, float thickness, Color col) {
-        thickness /= radius;  // to percent
-        Vec3 color = new Vec3(col);
-        float x_add = radius * Constants.THREE_SQRT;
         pushRawVertices(new float[] {
-                pos.x,         pos.y - (radius * 2), radius, thickness, color.x, color.y, color.z,
-                pos.x + x_add, pos.y + radius,       radius, thickness, color.x, color.y, color.z,
-                pos.x - x_add, pos.y + radius,       radius, thickness, color.x, color.y, color.z
+                pos.x, pos.y, radius, thickness / radius, col.getRed(), col.getGreen(), col.getBlue()
         });
     }
 }
