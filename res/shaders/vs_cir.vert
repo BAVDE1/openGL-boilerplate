@@ -41,7 +41,7 @@ void main() {
     );
     gl_Position = vec4(pos, 1, 1) * projectionMatrix;
 
-    v_circlePos = circlePosition;
+    v_circlePos = vec2(circlePosition.x, resolution.y - circlePosition.y);
     v_radius = radius;
     v_innerRadius = innerRadius;
     v_colour = colour;

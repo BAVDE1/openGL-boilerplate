@@ -199,7 +199,7 @@ public class StripBuilder2f {
     /** Circles should be rendered as GL_TRIANGLES */
     public void pushCircleOutline(Vec2 pos, float radius, float thickness, Color col) {
         pushRawVertices(new float[] {
-                pos.x, pos.y, radius, thickness / radius, col.getRed(), col.getGreen(), col.getBlue()
+                pos.x, pos.y, radius, thickness, col.getRed(), col.getGreen(), col.getBlue()
         });
     }
 }

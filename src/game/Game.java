@@ -120,10 +120,9 @@ public class Game {
         vb_circles.genId();
         va_circles.genId();
 
-        // todo: https://learnopengl.com/Advanced-OpenGL/Instancing
         sb_circles.setAdditionalVerts(5);
-        sb_circles.pushCircle(new Vec2(300), 20, Color.GREEN);
-        sb_circles.pushCircle(new Vec2(220), 30, Color.BLUE);
+        sb_circles.pushCircle(new Vec2(200), 50, Color.BLUE);
+        sb_circles.pushCircleOutline(new Vec2(300), 34, 10, Color.GREEN);
 
         VertexArray.Layout instanceLayout = new VertexArray.Layout();
         instanceLayout.pushFloat(2);  // circle pos
@@ -165,20 +164,18 @@ public class Game {
 
     public void toggleDebug() {
         debugMode = !debugMode;
-        ShaderHelper.uniform1i(sh_main, "debugMode", debugMode ? 1:0);
+        ShaderHelper.uniform1i(sh_circles, "debugMode", debugMode ? 1:0);
     }
 
     public void render() {
         Renderer.clearScreen();
         ShaderHelper.uniform1f(sh_main, "time", (float) glfwGetTime());
 
-        int mode = debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
-        Renderer.draw(mode, va_main, sb_main.getVertexCount());
+        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va_main, sb_main.getVertexCount());
         Renderer.draw(textRenderer);
 
         sh_circles.bind();
-        mode = debugMode ? GL_LINE_STRIP : GL_TRIANGLES;
-        Renderer.drawInstanced(mode, va_circles, 3, sb_circles.getVertexCount());
+        Renderer.drawInstanced(GL_TRIANGLES, va_circles, 3, sb_circles.getVertexCount());
 
         Renderer.finish(window);
     }
