@@ -15,7 +15,10 @@ out vec4 colour;
 vec2 invResolution = 1 / resolution;
 
 void main() {
-    vec2 dist = gl_FragCoord.xy * invResolution;
+    float dist = length((gl_FragCoord.xy * invResolution) - v_circlePos);
 
+    if (dist < v_radius) {
+        discard;
+    }
     colour = vec4(v_colour, 1);
 }
