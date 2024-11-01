@@ -3,6 +3,9 @@ package src.rendering.text;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * Various functions for finding char rendering information
+ */
 public class CharFondler {
     public static class CharMetrics {
         int width, height, ascent;
@@ -29,7 +32,7 @@ public class CharFondler {
         return new ImgContainer(graphics, image);
     }
 
-    /** todo: the width doesn't take into account the lean of italicised characters */
+    /** todo: the width doesn't take into account the lean of italicised characters :( */
     public static CharMetrics getCharSize(Font font, char ch, boolean antiAlias) {
         Graphics2D graphics = generateImg(font, 1, 1, antiAlias).graphics;
         FontMetrics metrics = graphics.getFontMetrics();

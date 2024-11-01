@@ -15,6 +15,9 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+/**
+ * Some simple stuff for window management
+ */
 public class Window {
     public long handle;
 

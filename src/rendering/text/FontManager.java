@@ -12,7 +12,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/** State Machine */
+/**
+ * State Machine
+ * Loads (default and then given) fonts once to be used by TextRenderers
+ */
 public class FontManager {
     public static class Glyph {
         public final int width, height;

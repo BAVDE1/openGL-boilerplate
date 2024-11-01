@@ -10,10 +10,11 @@ import java.util.Scanner;
 
 import static org.lwjgl.opengl.GL45.*;
 
+/**
+ * Loads, compiles and links shaders from file / file paths to its own shader program.
+ */
 public class ShaderHelper {
-    public static final HashMap<String, Integer> uniformCache = new HashMap<>();
-    public static int boundShader = 0;
-
+    public final HashMap<String, Integer> uniformCache = new HashMap<>();
     private Integer program;
 
     public void genProgram() {
@@ -118,37 +119,29 @@ public class ShaderHelper {
         return shaderType;
     }
 
-    public void bind() {
-        if (program == boundShader) return;
-        boundShader = program;
-        glUseProgram(program);
-    }
-    public void unbind() {
-        boundShader = 0;
-        glUseProgram(0);
-    }
+    public void bind() {Renderer.bindShader(this);}
+    public void unbind() {Renderer.unBindShader();}
     public int getProgram() {return program;}
 
-    public static int getUniformLocation(ShaderHelper sh, String uniform) {
-        sh.bind();
+    public int getUniformLocation(String uniform) {
+        bind();
         if (!uniformCache.containsKey(uniform)) {
-            uniformCache.put(uniform, glGetUniformLocation(sh.program, uniform));
+            uniformCache.put(uniform, glGetUniformLocation(program, uniform));
         }
         return uniformCache.get(uniform);
     }
 
     public static void uniform1i(ShaderHelper sh, String uniform, int i) {
-        glUniform1i(getUniformLocation(sh, uniform), i);
+        glUniform1i(sh.getUniformLocation(uniform), i);
     }
     public static void uniform1iv(ShaderHelper sh, String uniform, int[] intArray) {
-        glUniform1iv(getUniformLocation(sh, uniform), intArray);
+        glUniform1iv(sh.getUniformLocation(uniform), intArray);
     }
     public static void uniform1f(ShaderHelper sh, String uniform, float f) {
-        glUniform1f(getUniformLocation(sh, uniform), f);
+        glUniform1f(sh.getUniformLocation(uniform), f);
     }
-
     public static void uniform2f(ShaderHelper sh, String uniform, float f1, float f2) {
-        glUniform2f(getUniformLocation(sh, uniform), f1, f2);
+        glUniform2f(sh.getUniformLocation(uniform), f1, f2);
     }
     // todo: matrix4 uniform for projection matrix
 }

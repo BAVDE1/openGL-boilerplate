@@ -17,6 +17,9 @@ import static org.lwjgl.opengl.GL45.*;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
+/**
+ * Loads a texture from a file path or buffered image & binds to a slot
+ */
 public class Texture {
     public static class Image {
         public ByteBuffer buffer;
@@ -118,7 +121,6 @@ public class Texture {
         boundSlots.add(slot);
         boundSlots.sort(Comparator.naturalOrder());
 
-        sh.bind();
         ShaderHelper.uniform1iv(sh, "textures", boundSlots.stream().mapToInt(i -> ++i).toArray());
     }
 

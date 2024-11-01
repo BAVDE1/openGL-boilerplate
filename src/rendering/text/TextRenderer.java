@@ -1,8 +1,8 @@
 package src.rendering.text;
 
 import src.game.Constants;
-import src.rendering.*;
 import src.rendering.Shape;
+import src.rendering.*;
 import src.utility.Logging;
 import src.utility.Vec2;
 
@@ -12,6 +12,10 @@ import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
+/**
+ * Renders (multiple) TentRenderer.TextObjects in its own auto-resizing buffer.
+ * TextRenderer buffer is only rebuilt when one of its TextObjects has been modified
+ */
 public class TextRenderer {
     public static class TextObject {
         private TextRenderer parent;
@@ -22,7 +26,7 @@ public class TextRenderer {
         private String string;
         private Vec2 pos;
 
-        private final StripBuilder2f sb = new StripBuilder2f(true);
+        private final BufferBuilder2f sb = new BufferBuilder2f(true);
         private boolean hasChanged = true;
 
         private Color bgColour = new Color(0, 0, 0, 0);
@@ -174,7 +178,7 @@ public class TextRenderer {
 
     private VertexArray va;
     private VertexBuffer vb;
-    private StripBuilder2f sb;
+    private BufferBuilder2f sb;
 
     private boolean hasBeenModified = false;
 
@@ -182,7 +186,7 @@ public class TextRenderer {
     public void setupBufferObjects() {
         va = new VertexArray();   va.genId();
         vb = new VertexBuffer();  vb.genId();
-        sb = new StripBuilder2f(true);
+        sb = new BufferBuilder2f(true);
 
         sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
         va.pushBuffer(vb, VertexArray.Layout.getDefaultLayout());

@@ -2,6 +2,9 @@ package src.utility;
 
 import java.awt.*;
 
+/**
+ * Setting & getting
+ */
 public class Vec3 {
     public float x;
     public float y;

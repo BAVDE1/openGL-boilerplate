@@ -13,6 +13,9 @@ import java.util.List;
 
 import static org.lwjgl.system.MemoryUtil.memByteBuffer;
 
+/**
+ * Static logger
+ */
 public class Logging {
     private static final ArrayList<Integer> ignoreList = new ArrayList<>(List.of(2));
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");

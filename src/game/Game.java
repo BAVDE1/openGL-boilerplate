@@ -2,8 +2,8 @@ package src.game;
 
 import org.lwjgl.opengl.GL45;
 import src.Main;
-import src.rendering.*;
 import src.rendering.Shape;
+import src.rendering.*;
 import src.rendering.text.FontManager;
 import src.rendering.text.TextRenderer;
 import src.utility.Logging;
@@ -15,21 +15,24 @@ import java.awt.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
+/**
+ * Manages everything. Contains the main loop.
+ */
 public class Game {
     public static boolean debugMode = false;
     public Window window = new Window();
 
     // main buffers
-    ShaderHelper sh_main = new ShaderHelper();
-    VertexArray va_main = new VertexArray();
-    VertexBuffer vb_main = new VertexBuffer();
-    StripBuilder2f sb_main = new StripBuilder2f();
+    ShaderHelper shMain = new ShaderHelper();
+    VertexArray vaMain = new VertexArray();
+    VertexBuffer vbMain = new VertexBuffer();
+    BufferBuilder2f builderMain = new BufferBuilder2f();
 
     // circle buffers
-    ShaderHelper sh_circles = new ShaderHelper();
-    VertexArray va_circles = new VertexArray();
-    VertexBuffer vb_circles = new VertexBuffer();
-    StripBuilder2f sb_circles = new StripBuilder2f();
+    ShaderHelper shCircles = new ShaderHelper();
+    VertexArray vaCircles = new VertexArray();
+    VertexBuffer vbCircles = new VertexBuffer();
+    BufferBuilder2f builderCircles = new BufferBuilder2f();
 
     // text
     TextRenderer.TextObject to1;
@@ -60,7 +63,7 @@ public class Game {
 
         FontManager.init();
         FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 18, true);
-        FontManager.generateAndBindAllFonts(sh_main);
+        FontManager.generateAndBindAllFonts(shMain);
     }
 
     public void close() {
@@ -93,23 +96,23 @@ public class Game {
 
     public void setupBuffers() {
         // MAIN BUFFERS
-        vb_main.genId();
-        va_main.genId();
+        vbMain.genId();
+        vaMain.genId();
 
-        sb_main.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
-        sb_main.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
-        sb_main.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
-        sb_main.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
-        sb_main.pushSeparatedQuad(new Shape.Quad(new Vec2(510, 100), new Vec2(540, 110), new Vec2(560, 180), new Vec2(580, 150), new Shape.Mode(3)));
+        builderMain.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
+        builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
+        builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
+        builderMain.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
+        builderMain.pushSeparatedQuad(new Shape.Quad(new Vec2(510, 100), new Vec2(540, 110), new Vec2(560, 180), new Vec2(580, 150), new Shape.Mode(3)));
         Shape.Poly p = Shape.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new Shape.Mode(3));
-        sb_main.pushSeparatedPolygon(p);
+        builderMain.pushSeparatedPolygon(p);
 
         Shape.Poly p2 = new Shape.Poly(new Vec2(100, 250), new Shape.Mode(Color.RED), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0), new Vec2(-50, 50), new Vec2(0, -50));
         Shape.sortPoints(p2);
-        sb_main.pushSeparatedPolygonSorted(p2);
+        builderMain.pushSeparatedPolygonSorted(p2);
 
-        vb_main.bufferData(sb_main.getSetVertices());
-        va_main.pushBuffer(vb_main, VertexArray.Layout.getDefaultLayout());
+        vbMain.bufferData(builderMain.getSetVertices());
+        vaMain.pushBuffer(vbMain, VertexArray.Layout.getDefaultLayout());
 
         textRenderer.setupBufferObjects();
         to1 = new TextRenderer.TextObject(1, "", new Vec2());
@@ -117,42 +120,41 @@ public class Game {
         textRenderer.pushTextObject(to1);
 
         // CIRCLE BUFFERS
-        vb_circles.genId();
-        va_circles.genId();
+        vbCircles.genId();
+        vaCircles.genId();
 
-        sb_circles.setAdditionalVerts(5);
-        sb_circles.pushCircle(new Vec2(200), 50, Color.BLUE);
-        sb_circles.pushCircleOutline(new Vec2(300), 34, 10, Color.GREEN);
+        builderCircles.setAdditionalVerts(5);
+        builderCircles.pushCircle(new Vec2(200), 50, Color.BLUE);
+        builderCircles.pushCircle(new Vec2(300), 34, 10, Color.GREEN);
 
         VertexArray.Layout instanceLayout = new VertexArray.Layout();
         instanceLayout.pushFloat(2);  // circle pos
         instanceLayout.pushFloat(1);  // radius
         instanceLayout.pushFloat(1);  // inner radius
         instanceLayout.pushFloat(3);  // colour
-        vb_circles.bufferData(sb_circles.getSetVertices());
-        va_circles.pushBuffer(vb_circles, instanceLayout, 1);
+        vbCircles.bufferData(builderCircles.getSetVertices());
+        vaCircles.pushBuffer(vbCircles, instanceLayout, 1);
 
     }
 
     /** Must be called after window is visible */
     public void setupShaders() {
-        sh_main.genProgram();
-        sh_main.attachShaders(Constants.SHADER_VERTEX, Constants.SHADER_FRAGMENT);
-        sh_main.linkProgram();
+        shMain.genProgram();
+        shMain.attachShaders(Constants.SHADER_VERTEX, Constants.SHADER_FRAGMENT);
+        shMain.linkProgram();
 
-        ShaderHelper.uniform2f(sh_main, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        new Texture("res/textures/explosion.png").bind(1, shMain);
+        new Texture("res/textures/closed.png").bind(2, shMain);
 
-        new Texture("res/textures/explosion.png").bind(1, sh_main);
-        new Texture("res/textures/closed.png").bind(2, sh_main);
+        shCircles.genProgram();
+        shCircles.attachShaders("res/shaders/vs_circle.vert", "res/shaders/fs_circle.frag");
+        shCircles.linkProgram();
 
-        sh_circles.genProgram();
-        sh_circles.attachShaders("res/shaders/vs_circle.vert", "res/shaders/fs_circle.frag");
-        sh_circles.linkProgram();
-
-        ShaderHelper.uniform2f(sh_circles, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        ShaderHelper.uniform2f(shMain, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        ShaderHelper.uniform2f(shCircles, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
     }
 
-    public void updateFpsCounter() {
+    public void updateFpsCounterAndDebugText() {
         // updates every second
         int newSeconds = (int) Math.floor(MathUtils.millisToSecond(System.currentTimeMillis()) - MathUtils.millisToSecond(timeStarted));
         if (newSeconds != secondsElapsed) {
@@ -160,22 +162,35 @@ public class Game {
             frameCounter = 0;
             secondsElapsed = newSeconds;
         }
+
+        // debug string
+        to1.setString("Elapsed: %s, FPS: %s\nDebug (tab): %s\ns: %s, v: %s, f: %s/%s (%.5f)",
+                secondsElapsed,
+                fps,
+                debugMode,
+                builderMain.getSeparationsCount(),
+                builderMain.getVertexCount(),
+                builderMain.getFloatCount(),
+                builderMain.getBufferSize(),
+                builderMain.getCurrentFullnessPercent()
+        );
     }
 
     public void toggleDebug() {
         debugMode = !debugMode;
-        ShaderHelper.uniform1i(sh_circles, "debugMode", debugMode ? 1:0);
+        ShaderHelper.uniform1i(shMain, "debugMode", debugMode ? 1:0);
+        ShaderHelper.uniform1i(shCircles, "debugMode", debugMode ? 1:0);
     }
 
     public void render() {
         Renderer.clearScreen();
-        ShaderHelper.uniform1f(sh_main, "time", (float) glfwGetTime());
+        ShaderHelper.uniform1f(shMain, "time", (float) glfwGetTime());
 
-        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, va_main, sb_main.getVertexCount());
+        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, vaMain, builderMain.getVertexCount());
         Renderer.draw(textRenderer);
 
-        sh_circles.bind();
-        Renderer.drawInstanced(GL_TRIANGLES, va_circles, 3, sb_circles.getVertexCount());
+        shCircles.bind();
+        Renderer.drawInstanced(GL_TRIANGLES, vaCircles, 3, builderCircles.getVertexCount());
 
         Renderer.finish(window);
     }
@@ -185,8 +200,7 @@ public class Game {
         frameCounter++;
 
         glfwPollEvents();
-        updateFpsCounter();
-        to1.setString("Secs Elapsed: %s, FPS: %s\nDebug (tab): %s\ns: %s, v: %s, f: %s/%s (%.5f)", secondsElapsed, fps, debugMode, sb_main.getSeparationsCount(), sb_main.getVertexCount(), sb_main.getFloatCount(), sb_main.getBufferSize(), sb_main.getCurrentFullnessPercent());
+        updateFpsCounterAndDebugText();
         render();
 
         return MathUtils.nanoToSecond(System.nanoTime() - tStart);

@@ -1,7 +1,6 @@
 package src.rendering;
 
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL45;
 import src.game.Window;
 import src.rendering.text.TextRenderer;
 import src.utility.Logging;
@@ -9,9 +8,14 @@ import src.utility.Logging;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL45.*;
 
+/**
+ * State Machine
+ * Automatically binds and draws VertexArrays & Shaders
+ */
 public class Renderer {
     private static int boundArray = 0;
     private static int boundBuffer = 0;
+    public static int boundShader = 0;
 
     /** Do before anything GL related */
     public static void setupGLContext() {
@@ -51,9 +55,7 @@ public class Renderer {
     }
 
     public static void bindArray(VertexArray va) {
-        bindArray(va.getId());
-    }
-    public static void bindArray(int id) {
+        int id = va.getId();
         if (id == boundArray) return;
         boundArray = id;
         glBindVertexArray(id);
@@ -64,15 +66,23 @@ public class Renderer {
     }
 
     public static void bindBuffer(VertexBuffer vb) {
-        bindBuffer(vb.getBufferType(), vb.getId());
-    }
-    public static void bindBuffer(int bufferType, int id) {
+        int id = vb.getId();
         if (id == boundBuffer) return;
         boundBuffer = id;
-        glBindBuffer(bufferType, id);
+        glBindBuffer(vb.getBufferType(), id);
     }
     public static void unBindBuffer() {
         boundArray = 0;
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    public static void bindShader(ShaderHelper sh) {
+        if (sh.getProgram() == boundShader) return;
+        boundShader = sh.getProgram();
+        glUseProgram(sh.getProgram());
+    }
+    public static void unBindShader() {
+        boundShader = 0;
+        glUseProgram(0);
     }
 }

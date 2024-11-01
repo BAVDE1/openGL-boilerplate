@@ -5,9 +5,14 @@ import src.utility.Vec2;
 import src.utility.Vec3;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 
+/**
+ * Creates shapes to be passed to a BufferBuilder.
+ */
 public class Shape {
     public static class Mode {
         int type;

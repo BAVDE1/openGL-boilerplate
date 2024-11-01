@@ -6,9 +6,11 @@ import src.utility.Vec2;
 import src.utility.Vec3;
 
 import java.awt.*;
-import java.util.Arrays;
 
-public class StripBuilder2f {
+/**
+ * Some abstracted functions for building a buffer.
+ */
+public class BufferBuilder2f {
     private static final int DEFAULT_SIZE = Constants.BUFF_SIZE_SMALL;
     private static final int POS_FLOAT_COUNT = 2;
 
@@ -23,10 +25,10 @@ public class StripBuilder2f {
     private int additionalVerts = 0;
     private int floatCountPerVert = POS_FLOAT_COUNT;
 
-    public StripBuilder2f() {this(DEFAULT_SIZE, false);}
-    public StripBuilder2f(int size) {this(size, false);}
-    public StripBuilder2f(boolean autoResize) {this(DEFAULT_SIZE, true);}
-    public StripBuilder2f(int size, boolean autoResize){
+    public BufferBuilder2f() {this(DEFAULT_SIZE, false);}
+    public BufferBuilder2f(int size) {this(size, false);}
+    public BufferBuilder2f(boolean autoResize) {this(DEFAULT_SIZE, true);}
+    public BufferBuilder2f(int size, boolean autoResize){
         vertices = new float[size];
         this.size = size;
         this.autoResize = autoResize;
@@ -191,15 +193,15 @@ public class StripBuilder2f {
         pushRawVertices(verts);
     }
 
-    /** Circles should be rendered as GL_TRIANGLES */
+    /** Circles should be rendered as instanced GL_TRIANGLES */
     public void pushCircle(Vec2 pos, float radius, Color col) {
-        pushCircleOutline(pos, radius, 0, col);
+        pushCircle(pos, radius, 0, col);
     }
 
-    /** Circles should be rendered as GL_TRIANGLES */
-    public void pushCircleOutline(Vec2 pos, float radius, float thickness, Color col) {
+    /** Circles should be rendered as instanced GL_TRIANGLES */
+    public void pushCircle(Vec2 pos, float radius, float outline, Color col) {
         pushRawVertices(new float[] {
-                pos.x, pos.y, radius, thickness, col.getRed(), col.getGreen(), col.getBlue()
+                pos.x, pos.y, radius, outline, col.getRed(), col.getGreen(), col.getBlue()
         });
     }
 }
