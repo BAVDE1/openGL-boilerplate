@@ -143,5 +143,8 @@ public class ShaderHelper {
     public static void uniform2f(ShaderHelper sh, String uniform, float f1, float f2) {
         glUniform2f(sh.getUniformLocation(uniform), f1, f2);
     }
-    // todo: matrix4 uniform for projection matrix
+    public static void uniformMatrix4f(ShaderHelper sh, String uniform, float[] matrix4f) {
+        assert matrix4f.length == 4 * 4;
+        glUniformMatrix4fv(sh.getUniformLocation(uniform), false, matrix4f);
+    }
 }
