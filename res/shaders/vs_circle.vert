@@ -37,7 +37,7 @@ vec2 TRI_POSITIONS[3] = vec2[3] (
 
 void main() {
     vec2 circlePos = (circlePosition - viewPos) / viewScale;
-    float scaledRadius = radius / viewScale;
+    float scaledRadius = abs(radius / viewScale);
 
     vec2 radiusMultiplier = TRI_POSITIONS[gl_VertexID % 3];
     vec2 pos = vec2(
@@ -48,6 +48,6 @@ void main() {
 
     v_circlePos = vec2(circlePos.x, resolution.y - circlePos.y);
     v_radius = scaledRadius;
-    v_innerRadius = innerRadius / viewScale;
+    v_innerRadius = abs(innerRadius / viewScale);
     v_colour = colour;
 }

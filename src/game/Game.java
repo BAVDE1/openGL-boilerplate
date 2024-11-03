@@ -39,11 +39,15 @@ public class Game {
     TextRenderer textRenderer = new TextRenderer();
 
     Vec2 mousePos = new Vec2();
+    Vec2 mousePosOnClick = new Vec2();
+
     Vec2 viewPos = new Vec2();
     float viewScale = 1f;
+    float scaleAddition = .1f;
     boolean forceUpdateView = false;
 
-    float[] heldKeys = new float[350];
+    int[] heldMouseKeys = new int[8];
+    int[] heldKeys = new int[350];
 
     double timeStarted = 0;
     int secondsElapsed = 0;
@@ -90,7 +94,6 @@ public class Game {
             if (action == GLFW_PRESS) {
                 heldKeys[key] = 1;
 
-                float scaleAddition = .1f;
                 switch (key) {
                     case GLFW_KEY_E -> {
                         viewScale -= scaleAddition;
@@ -112,6 +115,27 @@ public class Game {
 
             if (action == GLFW_RELEASE) {
                 heldKeys[key] = 0;
+            }
+        });
+
+        glfwSetMouseButtonCallback(window.handle, (window, button, action, mode) -> {
+            if (action == GLFW_PRESS) {
+                heldMouseKeys[button] = 1;
+
+                if (button == GLFW_MOUSE_BUTTON_1) {
+                    mousePosOnClick.set(mousePos.add(viewPos));
+                }
+            }
+
+            if (action == GLFW_RELEASE) {
+                heldMouseKeys[button] = 0;
+            }
+        });
+
+        glfwSetScrollCallback(window.handle, (window, xOffset, yOffset) -> {
+            if (yOffset != 0.0) {
+                viewScale += (float) (scaleAddition * Math.clamp(-yOffset, -1, 1));
+                forceUpdateView = true;
             }
         });
 
@@ -180,7 +204,7 @@ public class Game {
         ShaderHelper.uniform1f(shCircles, "viewScale", viewScale);
     }
 
-    public void updateFpsCounterAndDebugText() {
+    public void updateFpsAndDebugText() {
         // updates every second
         int newSeconds = (int) Math.floor(MathUtils.millisToSecond(System.currentTimeMillis()) - MathUtils.millisToSecond(timeStarted));
         if (newSeconds != secondsElapsed) {
@@ -220,10 +244,16 @@ public class Game {
     public void updateViewPos() {
         Vec2 addition = new Vec2();
 
-        int amnt = 4;
-        addition.x += (-amnt * heldKeys[GLFW_KEY_A]) + (amnt * heldKeys[GLFW_KEY_D]);
-        addition.y += (-amnt * heldKeys[GLFW_KEY_W]) + (amnt * heldKeys[GLFW_KEY_S]);
-        addition.mulSelf(heldKeys[GLFW_KEY_LEFT_SHIFT] == 1 ? 2:1);
+        // mouse prioritised over keys
+        if (heldMouseKeys[GLFW_MOUSE_BUTTON_1] == 1) {
+            addition = mousePos.sub(mousePosOnClick).negate();
+            addition.subSelf(viewPos);
+        } else {
+            int amnt = 4;
+            addition.x += (-amnt * heldKeys[GLFW_KEY_A]) + (amnt * heldKeys[GLFW_KEY_D]);
+            addition.y += (-amnt * heldKeys[GLFW_KEY_W]) + (amnt * heldKeys[GLFW_KEY_S]);
+            addition.mulSelf(heldKeys[GLFW_KEY_LEFT_SHIFT] == 1 ? 2 : 1);
+        }
 
         if (forceUpdateView || !addition.equals(new Vec2())) {
             viewPos.addSelf(addition);
@@ -266,7 +296,7 @@ public class Game {
         frameCounter++;
 
         glfwPollEvents();
-        updateFpsCounterAndDebugText();
+        updateFpsAndDebugText();
         updateViewPos();
         render();
 
