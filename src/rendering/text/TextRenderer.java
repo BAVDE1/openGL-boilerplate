@@ -234,4 +234,8 @@ public class TextRenderer {
         textObjects.clear();
         hasBeenModified = true;
     }
+
+    public BufferBuilder2f getBufferBuilder() {
+        return sb;
+    }
 }

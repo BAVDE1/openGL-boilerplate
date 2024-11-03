@@ -190,9 +190,19 @@ public class Game {
         }
 
         // debug string
-        to1.setString("FPS: %s, Elapsed: %s [debug (tab): %s]\nView pos: %.0f,%.0f %.1f (r)eset\nmain [s:%s, v:%s, f:%s/%s (%.5f)]\ncircles [s:%s, v:%s, f:%s/%s (%.5f)]",
+        BufferBuilder2f textBuff = textRenderer.getBufferBuilder();
+        to1.setString("FPS: %s, Elapsed: %s [debug (tab): %s]" +
+                        "\nView pos: %.0f,%.0f %.1f (r)eset" +
+                        "\ntext [s:%s, v:%s, f:%s/%s (%.5f)]" +
+                        "\nmain [s:%s, v:%s, f:%s/%s (%.5f)]" +
+                        "\ncircles [s:%s, v:%s, f:%s/%s (%.5f)]",
                 fps, secondsElapsed, debugMode,
                 viewPos.x, viewPos.y, viewScale,
+                textBuff.getSeparationsCount(),
+                textBuff.getVertexCount(),
+                textBuff.getFloatCount(),
+                textBuff.getBufferSize(),
+                textBuff.getCurrentFullnessPercent(),
                 builderMain.getSeparationsCount(),
                 builderMain.getVertexCount(),
                 builderMain.getFloatCount(),
