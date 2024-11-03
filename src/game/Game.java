@@ -39,6 +39,11 @@ public class Game {
     TextRenderer textRenderer = new TextRenderer();
 
     Vec2 mousePos = new Vec2();
+    Vec2 viewPos = new Vec2();
+    float viewScale = 1f;
+    boolean forceUpdateView = false;
+
+    float[] heldKeys = new float[350];
 
     double timeStarted = 0;
     int secondsElapsed = 0;
@@ -62,7 +67,7 @@ public class Game {
         setupBuffers();
 
         FontManager.init();
-        FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 18, true);
+        FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 16, true);
         FontManager.generateAndBindAllFonts(shMain);
     }
 
@@ -83,11 +88,30 @@ public class Game {
                 glfwSetWindowShouldClose(window, true);
 
             if (action == GLFW_PRESS) {
+                heldKeys[key] = 1;
+
+                float scaleAddition = .1f;
                 switch (key) {
-                    case GLFW_KEY_E -> to1.setScale(to1.getScale() + .5f);
-                    case GLFW_KEY_Q -> to1.setScale(to1.getScale() - .5f);
+                    case GLFW_KEY_E -> {
+                        viewScale -= scaleAddition;
+                        forceUpdateView = true;
+                    }
+                    case GLFW_KEY_Q -> {
+                        viewScale += scaleAddition;
+                        forceUpdateView = true;
+                    }
+                    case GLFW_KEY_R -> {
+                        viewPos.set(0);
+                        viewScale = 1;
+                        forceUpdateView = true;
+                    }
+
                     case GLFW_KEY_TAB -> toggleDebug();
                 }
+            }
+
+            if (action == GLFW_RELEASE) {
+                heldKeys[key] = 0;
             }
         });
 
@@ -115,7 +139,7 @@ public class Game {
         vaMain.pushBuffer(vbMain, VertexArray.Layout.getDefaultLayout());
 
         textRenderer.setupBufferObjects();
-        to1 = new TextRenderer.TextObject(1, "", new Vec2());
+        to1 = new TextRenderer.TextObject(1, "", new Vec2(), 1, 2);
         to1.setBgColour(Color.BLACK);
         textRenderer.pushTextObject(to1);
 
@@ -151,7 +175,9 @@ public class Game {
         shCircles.linkProgram();
 
         ShaderHelper.uniform2f(shMain, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        ShaderHelper.uniform1f(shMain, "viewScale", viewScale);
         ShaderHelper.uniform2f(shCircles, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        ShaderHelper.uniform1f(shCircles, "viewScale", viewScale);
     }
 
     public void updateFpsCounterAndDebugText() {
@@ -164,16 +190,38 @@ public class Game {
         }
 
         // debug string
-        to1.setString("Elapsed: %s, FPS: %s\nDebug (tab): %s\ns: %s, v: %s, f: %s/%s (%.5f)",
-                secondsElapsed,
-                fps,
-                debugMode,
+        to1.setString("FPS: %s, Elapsed: %s [debug (tab): %s]\nView pos: %.0f,%.0f %.1f (r)eset\nmain [s:%s, v:%s, f:%s/%s (%.5f)]\ncircles [s:%s, v:%s, f:%s/%s (%.5f)]",
+                fps, secondsElapsed, debugMode,
+                viewPos.x, viewPos.y, viewScale,
                 builderMain.getSeparationsCount(),
                 builderMain.getVertexCount(),
                 builderMain.getFloatCount(),
                 builderMain.getBufferSize(),
-                builderMain.getCurrentFullnessPercent()
+                builderMain.getCurrentFullnessPercent(),
+                builderCircles.getSeparationsCount(),
+                builderCircles.getVertexCount(),
+                builderCircles.getFloatCount(),
+                builderCircles.getBufferSize(),
+                builderCircles.getCurrentFullnessPercent()
         );
+    }
+
+    public void updateViewPos() {
+        Vec2 addition = new Vec2();
+
+        int i = 4;
+        addition.x = heldKeys[GLFW_KEY_A] == 1 ? -i : (heldKeys[GLFW_KEY_D] == 1 ?  i : 0);
+        addition.y = heldKeys[GLFW_KEY_S] == 1 ?  i : (heldKeys[GLFW_KEY_W] == 1 ? -i : 0);
+        addition.mulSelf(heldKeys[GLFW_KEY_LEFT_SHIFT] == 1 ? 2:1);
+
+        if (forceUpdateView || !addition.equals(new Vec2())) {
+            viewPos.addSelf(addition);
+            ShaderHelper.uniform2f(shMain, "viewPos", viewPos.x, viewPos.y);
+            ShaderHelper.uniform1f(shMain, "viewScale", viewScale);
+
+            ShaderHelper.uniform2f(shCircles, "viewPos", viewPos.x, viewPos.y);
+            ShaderHelper.uniform1f(shCircles, "viewScale", viewScale);
+        }
     }
 
     public void toggleDebug() {
@@ -184,14 +232,21 @@ public class Game {
 
     public void render() {
         Renderer.clearScreen();
-        ShaderHelper.uniform1f(shMain, "time", (float) glfwGetTime());
 
+        // shape examples
+        ShaderHelper.uniform1i(shMain, "useView", 1);
+        ShaderHelper.uniform1f(shMain, "time", (float) glfwGetTime());
         Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, vaMain, builderMain.getVertexCount());
-        Renderer.draw(textRenderer);
 
         shCircles.bind();
         Renderer.drawInstanced(GL_TRIANGLES, vaCircles, 3, builderCircles.getVertexCount());
 
+        // ui elements
+        shMain.bind();
+        ShaderHelper.uniform1i(shMain, "useView", 0);
+        Renderer.draw(textRenderer);
+
+        // FINISH
         Renderer.finish(window);
     }
 
@@ -201,6 +256,7 @@ public class Game {
 
         glfwPollEvents();
         updateFpsCounterAndDebugText();
+        updateViewPos();
         render();
 
         return MathUtils.nanoToSecond(System.nanoTime() - tStart);

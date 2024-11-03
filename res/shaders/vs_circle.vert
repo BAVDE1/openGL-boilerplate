@@ -8,6 +8,8 @@ layout(location = 3) in vec3 colour;
 
 uniform vec2 resolution;
 uniform highp float time;
+uniform vec2 viewPos;
+uniform float viewScale;
 
 out vec2 v_circlePos;
 out float v_radius;
@@ -34,15 +36,18 @@ vec2 TRI_POSITIONS[3] = vec2[3] (
 );
 
 void main() {
+    vec2 circlePos = (circlePosition - viewPos) / viewScale;
+    float scaledRadius = radius / viewScale;
+
     vec2 radiusMultiplier = TRI_POSITIONS[gl_VertexID % 3];
     vec2 pos = vec2(
-        circlePosition.x + (radius * radiusMultiplier.x),
-        circlePosition.y + (radius * radiusMultiplier.y)
+        circlePos.x + (scaledRadius * radiusMultiplier.x),
+        circlePos.y + (scaledRadius * radiusMultiplier.y)
     );
     gl_Position = vec4(pos, 1, 1) * projectionMatrix;
 
-    v_circlePos = vec2(circlePosition.x, resolution.y - circlePosition.y);
-    v_radius = radius;
-    v_innerRadius = innerRadius;
+    v_circlePos = vec2(circlePos.x, resolution.y - circlePos.y);
+    v_radius = scaledRadius;
+    v_innerRadius = innerRadius / viewScale;
     v_colour = colour;
 }

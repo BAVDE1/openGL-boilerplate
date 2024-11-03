@@ -43,6 +43,10 @@ public class Vec2 {
         set(vec.x, vec.y);
     }
 
+    public void set(float f) {
+        set(f, f);
+    }
+
     public void set(float x, float y) {
         this.x = x;
         this.y = y;
