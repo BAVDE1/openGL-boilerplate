@@ -127,8 +127,19 @@ public class FontManager {
 
         public int findLineWidth(String line) {
             int accumulatedWidth = 0;
-            for (char c : line.toCharArray()) accumulatedWidth += glyphMap.get(c).width;
+            for (char c : line.toCharArray()) accumulatedWidth += getGlyph(c).width;
             return accumulatedWidth;
+        }
+
+        /** Retrieve a glyph with error catching */
+        public Glyph getGlyph(char c) {
+            FontManager.Glyph glyph = glyphMap.get(c);
+
+            if (glyph == null) {
+                Logging.warn("Character '%s' does not exist in the currently loaded font. Using '0' instead.", c);
+                glyph = glyphMap.get('0');
+            }
+            return glyph;
         }
     }
 
@@ -212,7 +223,6 @@ public class FontManager {
 
         graphics.dispose();
         finalTexture = new Texture(fullImage);
-        sh.bind();
         finalTexture.bind(FONT_TEXTURE_SLOT, sh);
         Texture.writeToFile(fullImage);
         Logging.debug("%s fonts generated, bound to slot %s", allLoadedFonts.size(), FONT_TEXTURE_SLOT);

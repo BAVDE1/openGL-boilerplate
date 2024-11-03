@@ -85,12 +85,7 @@ public class TextRenderer {
 
                 // all chars in line
                 for (char c : line.toCharArray()) {
-                    if (!font.glyphMap.containsKey(c)) {
-                        Logging.warn("Character '%s' does not exist in the currently loaded font. Using '0' instead.", c);
-                        c = '0';
-                    }
-
-                    FontManager.Glyph glyph = font.glyphMap.get(c);
+                    FontManager.Glyph glyph = font.getGlyph(c);
                     Vec2 size = new Vec2(glyph.width, glyph.height).mul(scale);
                     Vec2 topLeft = new Vec2(pos.x + accumulatedX, lineY);
 

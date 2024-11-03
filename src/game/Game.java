@@ -192,10 +192,11 @@ public class Game {
         // debug string
         BufferBuilder2f textBuff = textRenderer.getBufferBuilder();
         to1.setString("FPS: %s, Elapsed: %s [debug (tab): %s]" +
-                        "\nView pos: %.0f,%.0f %.1f (r)eset" +
-                        "\ntext [s:%s, v:%s, f:%s/%s (%.5f)]" +
-                        "\nmain [s:%s, v:%s, f:%s/%s (%.5f)]" +
-                        "\ncircles [s:%s, v:%s, f:%s/%s (%.5f)]",
+                        "\nView [pos:%.0f,%.0f, scale:%.1f] (r)eset" +
+                        "\nBuffers:" +
+                        "\n - text [s:%s, v:%s, f:%s/%s (%.5f)]" +
+                        "\n - main [s:%s, v:%s, f:%s/%s (%.5f)]" +
+                        "\n - circles [s:%s, v:%s, f:%s/%s (%.5f)]",
                 fps, secondsElapsed, debugMode,
                 viewPos.x, viewPos.y, viewScale,
                 textBuff.getSeparationsCount(),
@@ -219,9 +220,9 @@ public class Game {
     public void updateViewPos() {
         Vec2 addition = new Vec2();
 
-        int i = 4;
-        addition.x = heldKeys[GLFW_KEY_A] == 1 ? -i : (heldKeys[GLFW_KEY_D] == 1 ?  i : 0);
-        addition.y = heldKeys[GLFW_KEY_S] == 1 ?  i : (heldKeys[GLFW_KEY_W] == 1 ? -i : 0);
+        int amnt = 4;
+        addition.x += (-amnt * heldKeys[GLFW_KEY_A]) + (amnt * heldKeys[GLFW_KEY_D]);
+        addition.y += (-amnt * heldKeys[GLFW_KEY_W]) + (amnt * heldKeys[GLFW_KEY_S]);
         addition.mulSelf(heldKeys[GLFW_KEY_LEFT_SHIFT] == 1 ? 2:1);
 
         if (forceUpdateView || !addition.equals(new Vec2())) {
