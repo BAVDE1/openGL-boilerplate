@@ -104,6 +104,7 @@ public class Game {
                         forceUpdateView = true;
                     }
                     case GLFW_KEY_R -> {
+                        if (heldMouseKeys[GLFW_MOUSE_BUTTON_1] == 1) break;
                         viewPos.set(0);
                         viewScale = 1;
                         forceUpdateView = true;
@@ -155,7 +156,7 @@ public class Game {
         Shape.Poly p = Shape.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new Shape.Mode(3));
         builderMain.pushSeparatedPolygon(p);
 
-        Shape.Poly p2 = new Shape.Poly(new Vec2(100, 250), new Shape.Mode(Color.RED), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0), new Vec2(-50, 50), new Vec2(0, -50));
+        Shape.Poly p2 = new Shape.Poly(new Vec2(100, 250), new Shape.Mode(Color.RED), new Vec2(-50, 50), new Vec2(0, -50), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0));
         Shape.sortPoints(p2);
         builderMain.pushSeparatedPolygonSorted(p2);
 
@@ -241,7 +242,7 @@ public class Game {
         );
     }
 
-    public void updateViewPos() {
+    public void updateViewPos(double dt) {
         Vec2 addition = new Vec2();
 
         // mouse prioritised over keys
@@ -249,7 +250,7 @@ public class Game {
             addition = mousePos.sub(mousePosOnClick).negate();
             addition.subSelf(viewPos);
         } else {
-            int amnt = 4;
+            float amnt = (float) (200 * dt);
             addition.x += (-amnt * heldKeys[GLFW_KEY_A]) + (amnt * heldKeys[GLFW_KEY_D]);
             addition.y += (-amnt * heldKeys[GLFW_KEY_W]) + (amnt * heldKeys[GLFW_KEY_S]);
             addition.mulSelf(heldKeys[GLFW_KEY_LEFT_SHIFT] == 1 ? 2 : 1);
@@ -297,7 +298,7 @@ public class Game {
 
         glfwPollEvents();
         updateFpsAndDebugText();
-        updateViewPos();
+        updateViewPos(dt);
         render();
 
         return MathUtils.nanoToSecond(System.nanoTime() - tStart);
