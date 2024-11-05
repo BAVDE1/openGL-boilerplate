@@ -95,14 +95,8 @@ public class Game {
                 heldKeys[key] = 1;
 
                 switch (key) {
-                    case GLFW_KEY_E -> {
-                        viewScale -= scaleAddition;
-                        forceUpdateView = true;
-                    }
-                    case GLFW_KEY_Q -> {
-                        viewScale += scaleAddition;
-                        forceUpdateView = true;
-                    }
+                    case GLFW_KEY_E -> addToViewScale(-scaleAddition, false);
+                    case GLFW_KEY_Q -> addToViewScale(scaleAddition, false);
                     case GLFW_KEY_R -> {
                         if (heldMouseKeys[GLFW_MOUSE_BUTTON_1] == 1) break;
                         viewPos.set(0);
@@ -134,10 +128,7 @@ public class Game {
         });
 
         glfwSetScrollCallback(window.handle, (window, xOffset, yOffset) -> {
-            if (yOffset != 0.0) {
-                viewScale += (float) (scaleAddition * Math.clamp(-yOffset, -1, 1));
-                forceUpdateView = true;
-            }
+            if (yOffset != 0.0) addToViewScale((float) (scaleAddition * Math.clamp(-yOffset, -1, 1)), true);
         });
 
         glfwSetCursorPosCallback(window.handle, (window, xPos, yPos) -> mousePos.set((float) xPos, (float) yPos));
@@ -183,7 +174,6 @@ public class Game {
         instanceLayout.pushFloat(3);  // colour
         vbCircles.bufferData(builderCircles.getSetVertices());
         vaCircles.pushBuffer(vbCircles, instanceLayout, 1);
-
     }
 
     /** Must be called after window is visible */
@@ -217,7 +207,7 @@ public class Game {
         // debug string
         BufferBuilder2f textBuff = textRenderer.getBufferBuilder();
         to1.setString("FPS: %s, Elapsed: %s [debug (tab): %s]" +
-                        "\nView [pos:%.0f,%.0f, scale:%.1f] (r)eset" +
+                        "\nView [pos:%.0f,%.0f, scale:%.2f] (r)eset" +
                         "\nBuffers:" +
                         "\n - text [s:%s, v:%s, f:%s/%s (%.5f)]" +
                         "\n - main [s:%s, v:%s, f:%s/%s (%.5f)]" +
@@ -242,6 +232,15 @@ public class Game {
         );
     }
 
+    public void addToViewScale(float addition, boolean relativeToMouse) {
+        // mouse or middle of screen
+        Vec2 relativeTo = relativeToMouse ? mousePos : Vec2.fromDim(Constants.SCREEN_SIZE).mul(.5f);
+        viewPos.addSelf(relativeTo.mul(viewScale).sub(relativeTo.mul(viewScale+addition)));
+
+        viewScale += addition;
+        forceUpdateView = true;
+    }
+
     public void updateViewPos(double dt) {
         Vec2 addition = new Vec2();
 
@@ -263,6 +262,7 @@ public class Game {
 
             ShaderHelper.uniform2f(shCircles, "viewPos", viewPos.x, viewPos.y);
             ShaderHelper.uniform1f(shCircles, "viewScale", viewScale);
+            forceUpdateView = false;
         }
     }
 
