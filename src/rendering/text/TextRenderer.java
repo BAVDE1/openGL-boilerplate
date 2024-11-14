@@ -196,7 +196,7 @@ public class TextRenderer {
         }
 
         Renderer.bindBuffer(vb);
-        vb.bufferData(sb.getSetVertices());
+        vb.bufferSetData(sb);
         hasBeenModified = false;
     }
 

@@ -36,9 +36,9 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public static void draw(int mode, VertexArray va, int count) {
+    public static void draw(int mode, VertexArray va, int vertexCount) {
         Renderer.bindArray(va);
-        glDrawArrays(mode, 0, count);
+        glDrawArrays(mode, 0, vertexCount);
     }
 
     public static void draw(TextRenderer tr) {

@@ -151,7 +151,7 @@ public class Game {
         Shape.sortPoints(p2);
         builderMain.pushSeparatedPolygonSorted(p2);
 
-        vbMain.bufferData(builderMain.getSetVertices());
+        vbMain.bufferSetData(builderMain);
         vaMain.pushBuffer(vbMain, VertexArray.Layout.getDefaultLayout());
 
         textRenderer.setupBufferObjects();
@@ -172,7 +172,7 @@ public class Game {
         instanceLayout.pushFloat(1);  // radius
         instanceLayout.pushFloat(1);  // inner radius
         instanceLayout.pushFloat(3);  // colour
-        vbCircles.bufferData(builderCircles.getSetVertices());
+        vbCircles.bufferSetData(builderCircles);
         vaCircles.pushBuffer(vbCircles, instanceLayout, 1);
     }
 

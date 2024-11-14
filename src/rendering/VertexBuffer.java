@@ -16,6 +16,10 @@ public class VertexBuffer {
         GL45.glBufferData(bufferType, data, drawMethod);
     }
 
+    public void bufferSetData(BufferBuilder2f bb) {
+        bufferData(bb.getSetVertices());
+    }
+
     public void bufferSize(int size) {
         Renderer.bindBuffer(this);
         GL45.glBufferData(bufferType, size, drawMethod);
