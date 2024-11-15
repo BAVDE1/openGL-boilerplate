@@ -3,7 +3,6 @@ package src.rendering.text;
 import src.game.Constants;
 import src.rendering.Shape;
 import src.rendering.*;
-import src.utility.Logging;
 import src.utility.Vec2;
 
 import java.awt.*;
@@ -58,7 +57,7 @@ public class TextRenderer {
             if (!hasChanged) return sb.getSetVertices();  // don't even bother re-building
 
             sb.clear();
-            sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
+            sb.setAdditionalVertFloats(VertexArray.Layout.defaultLayoutAdditionalVerts());
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
             int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
@@ -183,7 +182,7 @@ public class TextRenderer {
         vb = new VertexBuffer();  vb.genId();
         sb = new BufferBuilder2f(true);
 
-        sb.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
+        sb.setAdditionalVertFloats(VertexArray.Layout.defaultLayoutAdditionalVerts());
         va.pushBuffer(vb, VertexArray.Layout.getDefaultLayout());
     }
 

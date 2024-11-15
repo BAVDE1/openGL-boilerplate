@@ -22,7 +22,7 @@ public class BufferBuilder2f {
     private int vertexCount = 0;
     private int separationsCount = 0;
 
-    private int additionalVerts = 0;
+    private int additionalVertFloats = 0;
     private int floatCountPerVert = POS_FLOAT_COUNT;
 
     public BufferBuilder2f() {this(DEFAULT_SIZE, false);}
@@ -57,10 +57,10 @@ public class BufferBuilder2f {
         clear();
     }
 
-    public void setAdditionalVerts(int num) {
-        if (additionalVerts != 0 && additionalVerts != num)
+    public void setAdditionalVertFloats(int num) {
+        if (additionalVertFloats != 0 && additionalVertFloats != num)
             Logging.warn("Changing already set 'additional vertices'. This could warp the buffer");
-        additionalVerts = num;
+        additionalVertFloats = num;
         floatCountPerVert = POS_FLOAT_COUNT + num;
     }
 
@@ -99,10 +99,10 @@ public class BufferBuilder2f {
         separationsCount++;
 
         float[] f = new float[floatCountPerVert * 2];  // pushing 2 vertices
-        f[0] = vertices[floatCount-2-additionalVerts];  // just trust me here bro
-        f[1] = vertices[floatCount-1-additionalVerts];
-        f[2+additionalVerts] = toX;
-        f[2+additionalVerts+1] = toY;
+        f[0] = vertices[floatCount-2- additionalVertFloats];  // just trust me here bro
+        f[1] = vertices[floatCount-1- additionalVertFloats];
+        f[2+ additionalVertFloats] = toX;
+        f[2+ additionalVertFloats +1] = toY;
         pushRawVertices(f);
     }
 

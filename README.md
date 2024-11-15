@@ -24,7 +24,7 @@ Used for batching things & abstraction of float arrays.
 Can be initialized with a set buffer size (amount of floats it can hold) or can auto-resize itself.
 
 The 2f signifies that it assumes every vertex starts with 2 vertices at location 0 (for x and y position)
-To allow for any VAO layout, call `BufferBuilder2f.serAdditionalVerts(n)` where n is the number of vertices in the `VertexArray` minus 2 (as x and y are assumed).
+To allow for any VAO layout, call `BufferBuilder2f.setAdditionalVertFloats(n)` where n is the number of floats in the vertex's `Layout` minus 2 (again, as x and y are assumed).
 
 Any shape from the `Shape` class can be passed to a `BufferBuilder`.
 

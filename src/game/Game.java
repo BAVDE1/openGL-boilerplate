@@ -139,7 +139,7 @@ public class Game {
         vbMain.genId();
         vaMain.genId();
 
-        builderMain.setAdditionalVerts(VertexArray.Layout.defaultLayoutAdditionalVerts());
+        builderMain.setAdditionalVertFloats(VertexArray.Layout.defaultLayoutAdditionalVerts());
         builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
         builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
         builderMain.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
@@ -163,7 +163,7 @@ public class Game {
         vbCircles.genId();
         vaCircles.genId();
 
-        builderCircles.setAdditionalVerts(5);
+        builderCircles.setAdditionalVertFloats(5);
         builderCircles.pushCircle(new Vec2(200), 50, Color.BLUE);
         builderCircles.pushCircle(new Vec2(300), 34, 10, Color.GREEN);
 
