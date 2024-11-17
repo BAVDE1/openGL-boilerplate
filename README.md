@@ -50,6 +50,8 @@ Any shape from the `Shape` class can be passed to a `BufferBuilder`.
 * fullness percentage
 * is auto resizing
 
+**note:** the shape class is configured for the current default layout. so you may want to make your own shape class if your layout is different
+
 ### Text Rendering
 
 `FontManager` manages the currently loaded fonts that can be used in any `TextRenderer`.
