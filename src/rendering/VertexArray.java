@@ -37,7 +37,7 @@ public class VertexArray {
     }
 
     public static class Layout {
-        private final static int[] defaultLayout = new int[] {2, 1, 3};  // 2x pos, 1x mode, 3x mode vars
+        private static int[] defaultLayout = new int[] {2, 1, 3};  // 2x pos, 1x mode, 3x mode vars
 
         private final ArrayList<Element> elements = new ArrayList<>();
         private int totalItems = 0;
@@ -62,6 +62,14 @@ public class VertexArray {
             return totalItems;
         }
 
+        public static void setDefaultLayout(int[] newDefault) {
+            defaultLayout = newDefault;
+        }
+
+        public static int[] getDefaultLayout() {
+            return defaultLayout;
+        }
+
         /** Push the default vertex layout: 2 pos, 2 texCoords, 1 slot */
         public void setupDefaultLayout() {
             for (int f : defaultLayout) {
@@ -69,19 +77,19 @@ public class VertexArray {
             }
         }
 
-        public static Layout getDefaultLayout() {
+        public static Layout createDefaultLayout() {
             Layout l = new Layout();
             l.setupDefaultLayout();
             return l;
         }
 
         /** returns the additional verts to add for the default layout */
-        public static int defaultLayoutAdditionalVerts() {
-            return defaultLayoutTotalFloatCount() - defaultLayout[0];
+        public static int getDefaultLayoutAdditionalVerts() {
+            return getDefaultLayoutTotalFloatCount() - defaultLayout[0];
         }
 
         /** returns the number of float in 1 vertex from the default layout */
-        public static int defaultLayoutTotalFloatCount() {
+        public static int getDefaultLayoutTotalFloatCount() {
             return Arrays.stream(defaultLayout).sum();
         }
     }

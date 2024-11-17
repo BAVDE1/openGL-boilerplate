@@ -1,5 +1,9 @@
 # some 2d openGL "boilerplate"
 
+> todo
+> - text renderer has its own vertex layout
+> - font manager need its own shader for all text renderers to use
+
 abstraction and demonstration of openGl and glfw (from the lwjgl module).
 
 ---
@@ -13,9 +17,16 @@ Also please see: References.md
 
 ### some information
 
-VBO has its own `VertexBuffer`, VAO has `VertexArray`, layouts for `VertexArray` can be created with `VertexArray.Layout`.
 
 To pass data onto the `VertexBuffer` use a `BufferBuilder`.
+
+VBO has its own `VertexBuffer`, VAO has `VertexArray`, layouts for `VertexArray` can be created with `VertexArray.Layout`.
+
+### Layout
+
+Create a `VertexArray`'s layout with `VertexArray.Layout`.
+
+An optional static default layout can be set and used to quickly create that layout wherever.
 
 ### BufferBuilder2f (and Shape)
 

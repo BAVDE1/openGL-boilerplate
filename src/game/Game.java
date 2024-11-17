@@ -139,7 +139,7 @@ public class Game {
         vbMain.genId();
         vaMain.genId();
 
-        builderMain.setAdditionalVertFloats(VertexArray.Layout.defaultLayoutAdditionalVerts());
+        builderMain.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
         builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
         builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
         builderMain.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
@@ -152,7 +152,7 @@ public class Game {
         builderMain.pushSeparatedPolygonSorted(p2);
 
         vbMain.bufferSetData(builderMain);
-        vaMain.pushBuffer(vbMain, VertexArray.Layout.getDefaultLayout());
+        vaMain.pushBuffer(vbMain, VertexArray.Layout.createDefaultLayout());
 
         textRenderer.setupBufferObjects();
         to1 = new TextRenderer.TextObject(1, "", new Vec2(), 1, 2);

@@ -57,7 +57,7 @@ public class TextRenderer {
             if (!hasChanged) return sb.getSetVertices();  // don't even bother re-building
 
             sb.clear();
-            sb.setAdditionalVertFloats(VertexArray.Layout.defaultLayoutAdditionalVerts());
+            sb.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
             int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
@@ -182,8 +182,8 @@ public class TextRenderer {
         vb = new VertexBuffer();  vb.genId();
         sb = new BufferBuilder2f(true);
 
-        sb.setAdditionalVertFloats(VertexArray.Layout.defaultLayoutAdditionalVerts());
-        va.pushBuffer(vb, VertexArray.Layout.getDefaultLayout());
+        sb.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
+        va.pushBuffer(vb, VertexArray.Layout.createDefaultLayout());
     }
 
     private void buildBuffer() {
