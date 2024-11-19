@@ -53,6 +53,9 @@ Any shape from the `Shape` class can be passed to a `BufferBuilder`.
 `FontManager` manages the currently loaded fonts that can be used in any `TextRenderer`.
 the `FontManager`'s fonts should be loaded at runtime before any text rendering is attempted. use `init()` before loading any font, and `generateAndBindAllFonts()` to complete the loading.
 
+`FontManager` also contains the shader and vertex layout all `TextRenderer`s use.
+But these are set up and initialized automatically.
+
 `TextRenderer` takes any number `TextRenderer.TextObject`s and buffers them all together for easy rendering. A `TextRenderer`s buffer is only rebuilt when one of its `TextObjects` is modified. or if one is added to removed.
 
 **Note:** there is 1 default font thats loaded (at font id 0) before anything else (also italicised fonts are kinda broken atm)
@@ -73,7 +76,9 @@ It can also be used do "draw" buffers, instanced buffers, and `TextRenderers`. (
 
 `Texture` loads an image from a file path or a `BufferedImage` that can be bound and used.
 
-**Note:** Texture slot 0 is reserved by the `FontManager` so don't use that.
+Use texture slots that are > 1.
+
+**Note:** Texture slot 1 is reserved by the `FontManager` so don't use that.
 
 ### Circles
 

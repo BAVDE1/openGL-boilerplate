@@ -113,24 +113,28 @@ public class Texture {
         }
     }
 
-    /** We add 1 to slot secretly cause slot 0 unbinds */
     public void bind(int slot) {
-        if (boundSlots.contains(slot)) {
-            Logging.warn("Overriding already set texture slot '%s'", slot);
-            boundSlots.remove(slot);
+        if (slot == 0) {
+            Logging.danger("cannot bind texture to slot 0, use anything > 0");
+            return;
         }
 
-        glBindTextureUnit(slot + 1, texId);
+        if (boundSlots.contains(slot)) {
+            Logging.warn("Overriding already set texture slot '%s'", slot);
+            boundSlots.remove((Integer) slot);
+        }
+
+        glBindTextureUnit(slot, texId);
         boundSlots.add(slot);
         boundSlots.sort(Comparator.naturalOrder());
     }
 
     public void bindToTexArray(int slot, ShaderHelper sh) {
         bind(slot);
-        ShaderHelper.uniform1iv(sh, "textures", boundSlots.stream().mapToInt(i -> ++i).toArray());
+        ShaderHelper.uniform1iv(sh, "textures", boundSlots.stream().mapToInt(i -> i).toArray());
     }
 
-    public void unbind() {
+    public static void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 

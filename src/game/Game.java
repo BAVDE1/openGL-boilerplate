@@ -67,7 +67,7 @@ public class Game {
         window.show();
 
         FontManager.init();
-        FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 16, true);
+        FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 14, true);
         FontManager.generateAndBindAllFonts();
 
         bindEvents();
@@ -182,8 +182,8 @@ public class Game {
         shMain.attachShaders(Constants.SHADER_VERTEX, Constants.SHADER_FRAGMENT);
         shMain.linkProgram();
 
-        new Texture("res/textures/explosion.png").bindToTexArray(1, shMain);
-        new Texture("res/textures/closed.png").bindToTexArray(2, shMain);
+        new Texture("res/textures/explosion.png").bindToTexArray(2, shMain);
+        new Texture("res/textures/closed.png").bindToTexArray(3, shMain);
 
         shCircles.genProgram();
         shCircles.attachShaders("res/shaders/circle_vertex.vert", "res/shaders/circle_fragment.frag");

@@ -144,7 +144,7 @@ public class FontManager {
         }
     }
 
-    public static final int FONT_TEXTURE_SLOT = 0;
+    public static final int FONT_TEXTURE_SLOT = 1;
 
     public static final int FONT_NOVA = 0;
     public static final int FONT_JACQUARD = 1;  // recommended size: 42
@@ -240,7 +240,7 @@ public class FontManager {
         textShader.attachShaders("res/shaders/text_vertex.vert", "res/shaders/text_fragment.frag");
         textShader.linkProgram();
         ShaderHelper.uniformResolutionData(textShader);
-        ShaderHelper.uniform1i(textShader, "fontTexture", FONT_TEXTURE_SLOT+1);
+        ShaderHelper.uniform1i(textShader, "fontTexture", FONT_TEXTURE_SLOT);
     }
 
     private static void setupTextLayout() {
