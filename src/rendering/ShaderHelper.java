@@ -1,5 +1,6 @@
 package src.rendering;
 
+import src.game.Constants;
 import src.utility.Logging;
 
 import java.io.File;
@@ -16,6 +17,7 @@ import static org.lwjgl.opengl.GL45.*;
 public class ShaderHelper {
     public final HashMap<String, Integer> uniformCache = new HashMap<>();
     private Integer program;
+    private boolean linked = false;
 
     public void genProgram() {
         if (program != null) {
@@ -94,6 +96,9 @@ public class ShaderHelper {
     }
 
     public void linkProgram() {
+        if (linked) return;
+
+        linked = true;
         glLinkProgram(program);
         int[] programLinked = new int[1];
 
@@ -119,11 +124,21 @@ public class ShaderHelper {
         return shaderType;
     }
 
+    public static void uniformResolutionData(ShaderHelper sh) {
+        ShaderHelper.uniform2f(sh, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        ShaderHelper.uniformMatrix4f(sh, "projectionMatrix", Constants.PROJECTION_MATRIX);
+    }
+
     public void bind() {Renderer.bindShader(this);}
     public void unbind() {Renderer.unBindShader();}
     public int getProgram() {return program;}
 
     public int getUniformLocation(String uniform) {
+        if (!linked) {
+            Logging.danger("Shader has not been linked!");
+            return -1;
+        }
+
         bind();
         if (!uniformCache.containsKey(uniform)) {
             uniformCache.put(uniform, glGetUniformLocation(program, uniform));
@@ -144,7 +159,10 @@ public class ShaderHelper {
         glUniform2f(sh.getUniformLocation(uniform), f1, f2);
     }
     public static void uniformMatrix4f(ShaderHelper sh, String uniform, float[] matrix4f) {
-        assert matrix4f.length == 4 * 4;
+        if (matrix4f.length != 4*4) {
+            Logging.danger("matrix4 given does not have exactly %s items", 4*4);
+            return;
+        }
         glUniformMatrix4fv(sh.getUniformLocation(uniform), false, matrix4f);
     }
 }

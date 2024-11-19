@@ -7,6 +7,8 @@ layout(location = 2) in float innerRadius;
 layout(location = 3) in vec3 colour;
 
 uniform vec2 resolution;
+uniform mat4 projectionMatrix;
+
 uniform highp float time;
 uniform vec2 viewPos;
 uniform float viewScale;
@@ -15,19 +17,6 @@ out vec2 v_circlePos;
 out float v_radius;
 out float v_innerRadius;
 out vec3 v_colour;
-
-/**
- https://en.wikipedia.org/wiki/Orthographic_projection
- l = 0     r = width
- b = 0     t = height
- n = -1    f = 1
-*/
-mat4 projectionMatrix = mat4(
-    2/resolution.x, 0,               0, -1,
-    0,              2/-resolution.y, 0,  1,
-    0,              0,              -1,  0,
-    0,              0,               0,  1
-);
 
 vec2 TRI_POSITIONS[3] = vec2[3] (
         vec2(0,       -2),

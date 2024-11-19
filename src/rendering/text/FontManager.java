@@ -2,6 +2,7 @@ package src.rendering.text;
 
 import src.rendering.ShaderHelper;
 import src.rendering.Texture;
+import src.rendering.VertexArray;
 import src.utility.Logging;
 import src.utility.Vec2;
 
@@ -158,6 +159,9 @@ public class FontManager {
     private final static ArrayList<LoadedFont> allLoadedFonts = new ArrayList<>();
     private final static HashMap<String, Integer> loadedFontUids = new HashMap<>();
 
+    private final static VertexArray.Layout textVertexLayout = new VertexArray.Layout();
+    private final static ShaderHelper textShader = new ShaderHelper();
+
     public static int fullWidth = 0, fullHeight = 0;
     private static Texture finalTexture;
     private static boolean initialized = false;
@@ -211,7 +215,7 @@ public class FontManager {
     }
 
     /** generate all font images onto one universal image atlas at their y offsets */
-    public static void generateAndBindAllFonts(ShaderHelper sh) {
+    public static void generateAndBindAllFonts() {
         BufferedImage fullImage = new BufferedImage(fullWidth, fullHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = fullImage.createGraphics();
 
@@ -223,9 +227,33 @@ public class FontManager {
 
         graphics.dispose();
         finalTexture = new Texture(fullImage);
-        finalTexture.bind(FONT_TEXTURE_SLOT, sh);
+        finalTexture.bind(FONT_TEXTURE_SLOT);
         Texture.writeToFile(fullImage);
         Logging.debug("%s fonts generated, bound to slot %s", allLoadedFonts.size(), FONT_TEXTURE_SLOT);
+
+        setupTextShader();
+        setupTextLayout();
+    }
+
+    private static void setupTextShader() {
+        textShader.genProgram();
+        textShader.attachShaders("res/shaders/text_vertex.vert", "res/shaders/text_fragment.frag");
+        textShader.linkProgram();
+        ShaderHelper.uniformResolutionData(textShader);
+        ShaderHelper.uniform1i(textShader, "fontTexture", FONT_TEXTURE_SLOT+1);
+    }
+
+    private static void setupTextLayout() {
+        textVertexLayout.pushFloat(2);  // vertex pos
+        textVertexLayout.pushFloat(3);  // tex coord (x,y,-1) / color (x,y,z)
+    }
+
+    public static VertexArray.Layout getTextVertexLayout() {
+        return textVertexLayout;
+    }
+
+    public static void bindTextShader() {
+        textShader.bind();
     }
 
     public static LoadedFont getLoadedFont(int loadedFontId) {

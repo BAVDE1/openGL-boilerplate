@@ -51,7 +51,10 @@ public class Window {
 
                 glfwGetWindowSize(handle, winWidth, winHeight);
                 GLFWVidMode screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
-                assert screen != null;
+                if (screen == null) {
+                    Logging.danger("An error occurred when attempting to get the screen");
+                    return;
+                }
 
                 glfwSetWindowPos(
                         handle,

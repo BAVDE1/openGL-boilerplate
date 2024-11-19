@@ -40,7 +40,10 @@ public class Texture {
 
     public Texture(String filePath) {
         Image image = loadImageFromFilePath(filePath);
-        assert image != null;
+        if (image == null) {
+            Logging.danger("Image failed to load from given filepath: '%s'", filePath);
+            return;
+        }
 
         width = image.width;
         height = image.height;
@@ -111,7 +114,7 @@ public class Texture {
     }
 
     /** We add 1 to slot secretly cause slot 0 unbinds */
-    public void bind(int slot, ShaderHelper sh) {
+    public void bind(int slot) {
         if (boundSlots.contains(slot)) {
             Logging.warn("Overriding already set texture slot '%s'", slot);
             boundSlots.remove(slot);
@@ -120,7 +123,10 @@ public class Texture {
         glBindTextureUnit(slot + 1, texId);
         boundSlots.add(slot);
         boundSlots.sort(Comparator.naturalOrder());
+    }
 
+    public void bindToTexArray(int slot, ShaderHelper sh) {
+        bind(slot);
         ShaderHelper.uniform1iv(sh, "textures", boundSlots.stream().mapToInt(i -> ++i).toArray());
     }
 

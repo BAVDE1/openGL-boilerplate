@@ -5,6 +5,8 @@ layout(location = 1) in float mode;
 layout(location = 2) in vec3 modeVars;
 
 uniform vec2 resolution;
+uniform mat4 projectionMatrix;
+
 uniform highp float time;
 uniform vec2 viewPos;
 uniform float viewScale;
@@ -12,19 +14,6 @@ uniform int useView;
 
 out float v_mode;
 out vec3 v_modeVars;
-
-/**
- https://en.wikipedia.org/wiki/Orthographic_projection
- l = 0     r = width
- b = 0     t = height
- n = -1    f = 1
-*/
-mat4 projectionMatrix = mat4(
-    2/resolution.x, 0,               0, -1,
-    0,              2/-resolution.y, 0,  1,
-    0,              0,              -1,  0,
-    0,              0,               0,  1
-);
 
 void main() {
     vec4 pos = vec4((position.xy - (viewPos.xy * useView)) / (useView == 0 ? 1.:viewScale), 1, 1);

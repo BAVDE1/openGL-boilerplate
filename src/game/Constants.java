@@ -25,11 +25,19 @@ public class Constants {
     public static final int FPS = 60;
     public static final double DT = 1 / (double) FPS;
 
-    public static final String SHADER_VERTEX = "res/shaders/vs.vert";
-    public static final String SHADER_FRAGMENT = "res/shaders/fs.frag";
+    public static final String SHADER_VERTEX = "res/shaders/main_vertex.vert";
+    public static final String SHADER_FRAGMENT = "res/shaders/main_fragment.frag";
     public static final String SHADERS_FOLDER = "res/shaders";
 
     public static final Dimension SCREEN_SIZE = new Dimension(900, 400);
+    // https://en.wikipedia.org/wiki/Orthographic_projection
+    public static final float[] PROJECTION_MATRIX = new float[] {
+            2f/SCREEN_SIZE.width, 0,                       0,  -1,
+            0,                    2f/-SCREEN_SIZE.height,  0,   1,
+            0,                    0,                      -1,   0,
+            0,                    0,                       0,   1
+    };
+
     public static final boolean OPTIMIZE_TIME_STEPPER = true;
     public static final boolean V_SYNC = false;
 

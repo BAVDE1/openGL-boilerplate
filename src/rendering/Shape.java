@@ -136,7 +136,7 @@ public class Shape {
 
     /** Sort points of a polygon so they are all listed in a clockwise direction */
     public static void sortPoints(Poly p, Vec2 center) {
-        assert !center.equals(new Vec2());
+        if (center.equals(0)) center = new Vec2(1);
         final int fidelity = 2;
 
         // functions

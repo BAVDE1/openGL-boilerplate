@@ -113,7 +113,8 @@ public class BufferBuilder2f {
 
     public void pushRawVertices(float[] verts) {
         int fCount = verts.length;
-        assert fCount > 0;
+        if (fCount == 0) return;
+
         if (floatCount + fCount > size) {
             if (!autoResize) {
                 Logging.danger("Cannot add an additional '%s' items to an array at '%s' fullness, with '%s / %s' items already set. Aborting.",

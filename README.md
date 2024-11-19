@@ -1,9 +1,5 @@
 # some 2d openGL "boilerplate"
 
-> todo
-> - text renderer has its own vertex layout
-> - font manager need its own shader for all text renderers to use
-
 abstraction and demonstration of openGl and glfw (from the lwjgl module).
 
 ---

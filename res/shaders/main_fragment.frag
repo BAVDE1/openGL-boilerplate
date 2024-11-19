@@ -3,7 +3,7 @@
 uniform vec2 resolution;
 uniform highp float time;
 uniform int debugMode;
-uniform sampler2D textures[3];
+uniform sampler2D textures[16];
 
 const float EPSILON = 0.0001;
 

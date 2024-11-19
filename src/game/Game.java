@@ -64,15 +64,15 @@ public class Game {
         window.setVSync(Constants.V_SYNC);
 
         Renderer.setupGLContext();
-
         window.show();
-        bindEvents();
-        setupShaders();
-        setupBuffers();
 
         FontManager.init();
         FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 16, true);
-        FontManager.generateAndBindAllFonts(shMain);
+        FontManager.generateAndBindAllFonts();
+
+        bindEvents();
+        setupShaders();
+        setupBuffers();
     }
 
     public void close() {
@@ -156,7 +156,7 @@ public class Game {
 
         textRenderer.setupBufferObjects();
         to1 = new TextRenderer.TextObject(1, "", new Vec2(), 1, 2);
-        to1.setBgColour(Color.BLACK);
+        to1.setBgCol(Color.BLACK);
         textRenderer.pushTextObject(to1);
 
         // CIRCLE BUFFERS
@@ -182,16 +182,16 @@ public class Game {
         shMain.attachShaders(Constants.SHADER_VERTEX, Constants.SHADER_FRAGMENT);
         shMain.linkProgram();
 
-        new Texture("res/textures/explosion.png").bind(1, shMain);
-        new Texture("res/textures/closed.png").bind(2, shMain);
+        new Texture("res/textures/explosion.png").bindToTexArray(1, shMain);
+        new Texture("res/textures/closed.png").bindToTexArray(2, shMain);
 
         shCircles.genProgram();
-        shCircles.attachShaders("res/shaders/vs_circle.vert", "res/shaders/fs_circle.frag");
+        shCircles.attachShaders("res/shaders/circle_vertex.vert", "res/shaders/circle_fragment.frag");
         shCircles.linkProgram();
 
-        ShaderHelper.uniform2f(shMain, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        ShaderHelper.uniformResolutionData(shMain);
         ShaderHelper.uniform1f(shMain, "viewScale", viewScale);
-        ShaderHelper.uniform2f(shCircles, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
+        ShaderHelper.uniformResolutionData(shCircles);
         ShaderHelper.uniform1f(shCircles, "viewScale", viewScale);
     }
 

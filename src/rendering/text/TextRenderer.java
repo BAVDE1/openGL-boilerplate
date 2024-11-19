@@ -3,10 +3,13 @@ package src.rendering.text;
 import src.game.Constants;
 import src.rendering.Shape;
 import src.rendering.*;
+import src.utility.Logging;
 import src.utility.Vec2;
+import src.utility.Vec3;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
@@ -28,7 +31,7 @@ public class TextRenderer {
         private final BufferBuilder2f sb = new BufferBuilder2f(true);
         private boolean hasChanged = true;
 
-        private Color bgColour = new Color(0, 0, 0, 0);
+        private Color bgCol = new Color(0, 0, 0, 0);
         private boolean seamlessBg = false;
 
         public TextObject(int loadedFontId, String string, Vec2 pos, float scale, int ySpacing) {
@@ -44,12 +47,15 @@ public class TextRenderer {
         }
 
         private void addParent(TextRenderer parent) {
-            assert this.parent == null;
+            if (this.parent != null) {
+                Logging.danger("parent is already assigned to this text object, aborting");
+                return;
+            }
             this.parent = parent;
         }
 
         private void removeParent() {
-            assert this.parent != null;
+            if (this.parent == null) return;
             this.parent = null;
         }
 
@@ -57,7 +63,7 @@ public class TextRenderer {
             if (!hasChanged) return sb.getSetVertices();  // don't even bother re-building
 
             sb.clear();
-            sb.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
+            sb.setAdditionalVertFloats(3);
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
             int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
@@ -74,12 +80,18 @@ public class TextRenderer {
                 int accumulatedX = 0;
 
                 // line background
-                if (bgColour.getAlpha() > Constants.EPSILON) {
+                if (bgCol.getAlpha() > Constants.EPSILON) {
                     Vec2 topLeft = new Vec2(pos.x, lineY);
                     Vec2 size = new Vec2(font.findLineWidth(line) * scale, yAddition);
                     if (!seamlessBg) size.y -= ySpacing;
 
-                    sb.pushSeparatedQuad(Shape.createRect(topLeft, size, new Shape.Mode(bgColour)));
+                    Shape.Quad quad = Shape.createRect(topLeft, size);
+                    sb.pushRawSeparatedVertices(new float[] {
+                            quad.a.x, quad.a.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
+                            quad.b.x, quad.b.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
+                            quad.c.x, quad.c.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
+                            quad.d.x, quad.d.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
+                    });
                 }
 
                 // all chars in line
@@ -89,9 +101,18 @@ public class TextRenderer {
                     Vec2 topLeft = new Vec2(pos.x + accumulatedX, lineY);
 
                     Shape.Mode mode = new Shape.Mode(FontManager.FONT_TEXTURE_SLOT, glyph.texTopLeft, glyph.texSize);
-                    Shape.Quad quad = Shape.createRect(topLeft, size, mode);
-                    if (accumulatedX == 0) sb.pushSeparatedQuad(quad);
-                    else sb.pushQuad(quad);
+                    Shape.Quad q = Shape.createRect(topLeft, size, mode);
+                    Vec3 v1 = q.mode.getVar(0); Vec3 v2 = q.mode.getVar(1);
+                    Vec3 v3 = q.mode.getVar(2); Vec3 v4 = q.mode.getVar(3);
+
+                    float[] verts = new float[] {
+                            q.a.x, q.a.y, v1.x, v1.y, -1,
+                            q.b.x, q.b.y, v2.x, v2.y, -1,
+                            q.c.x, q.c.y, v3.x, v3.y, -1,
+                            q.d.x, q.d.y, v4.x, v4.y, -1
+                    };
+                    if (accumulatedX == 0) sb.pushRawSeparatedVertices(verts);
+                    else sb.pushRawVertices(verts);
 
                     accumulatedX += (int) size.x;
                 }
@@ -146,10 +167,10 @@ public class TextRenderer {
             }
         }
 
-        public Color getBgColour() {return bgColour;}
-        public void setBgColour(Color newBgColour) {
-            if (newBgColour != bgColour) {
-                bgColour = newBgColour;
+        public Color getBgCol() {return bgCol;}
+        public void setBgCol(Color newBgColour) {
+            if (newBgColour != bgCol) {
+                bgCol = newBgColour;
                 setHasChanged();
             }
         }
@@ -182,8 +203,8 @@ public class TextRenderer {
         vb = new VertexBuffer();  vb.genId();
         sb = new BufferBuilder2f(true);
 
-        sb.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
-        va.pushBuffer(vb, VertexArray.Layout.createDefaultLayout());
+        sb.setAdditionalVertFloats(3);
+        va.pushBuffer(vb, FontManager.getTextVertexLayout());
     }
 
     private void buildBuffer() {
@@ -203,6 +224,7 @@ public class TextRenderer {
         if (hasBeenModified) buildBuffer();
 
         if (sb.getFloatCount() > 0) {
+            FontManager.bindTextShader();
             Renderer.draw(GL_TRIANGLE_STRIP, va, sb.getVertexCount());
         }
     }
