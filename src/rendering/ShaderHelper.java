@@ -5,9 +5,7 @@ import src.utility.Logging;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -16,6 +14,8 @@ import static org.lwjgl.opengl.GL45.*;
  */
 public class ShaderHelper {
     public final HashMap<String, Integer> uniformCache = new HashMap<>();
+    public ArrayList<String> attachedShaderFiles = new ArrayList<>();
+
     private Integer program;
     private boolean linked = false;
 
@@ -52,9 +52,9 @@ public class ShaderHelper {
      * adds new GL shader from given file (if applicable)
      * <a href="https://docs.gl/gl2/glAttachShader">Shader setup example</a>
      */
-    public static void attachShader(int program, File file) {
-        if (program < 0) {
-            Logging.danger("No program set!");
+    public void attachShader(File file) {
+        if (program == null || program < 0) {
+            Logging.danger("No program set or program failed to be created.");
             return;
         }
 
@@ -88,11 +88,7 @@ public class ShaderHelper {
         }
 
         glAttachShader(program, shader);
-        Logging.debug("Shader Attached: '%s', %s chars (type %s)", file, charSequence.length(), shaderType);
-    }
-
-    public void attachShader(File file) {
-        attachShader(program, file);
+        attachedShaderFiles.add(file.getName());
     }
 
     public void linkProgram() {
@@ -105,7 +101,9 @@ public class ShaderHelper {
         glGetProgramiv(program, GL_LINK_STATUS, programLinked);
         if (programLinked[0] != GL_TRUE) {
             Logging.danger("Shader Linking Error: %s", glGetProgramInfoLog(program, 1024));
+            return;
         }
+        Logging.debug("Shader program '%s' linked with %s", program, attachedShaderFiles);
     }
 
     /** <a href="https://www.khronos.org/opengl/wiki/Shader">OpenGL shaders</a> */
