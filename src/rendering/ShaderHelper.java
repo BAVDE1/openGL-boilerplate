@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL45.*;
  */
 public class ShaderHelper {
     public final HashMap<String, Integer> uniformCache = new HashMap<>();
-    public ArrayList<String> attachedShaderFiles = new ArrayList<>();
+    public final HashMap<Integer, String> attachedShaders = new HashMap<>();
 
     private Integer program;
     private boolean linked = false;
@@ -87,7 +87,7 @@ public class ShaderHelper {
         }
 
         glAttachShader(program, shader);
-        attachedShaderFiles.add(file.getName());
+        attachedShaders.put(shader, file.getName());
     }
 
     public void linkProgram() {
@@ -102,7 +102,7 @@ public class ShaderHelper {
             Logging.danger("Shader Linking Error: %s", glGetProgramInfoLog(program, 1024));
             return;
         }
-        Logging.debug("Shader program '%s' linked with %s", program, attachedShaderFiles);
+        Logging.debug("Shaders %s [linked with program %s]", attachedShaders, program);
     }
 
     /** <a href="https://www.khronos.org/opengl/wiki/Shader">OpenGL shaders</a> */
