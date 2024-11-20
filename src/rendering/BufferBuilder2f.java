@@ -140,13 +140,13 @@ public class BufferBuilder2f {
     }
 
     public void pushQuad(Shape.Quad q) {
-        Vec3 v1 = q.mode.getVar(0); Vec3 v2 = q.mode.getVar(1);
-        Vec3 v3 = q.mode.getVar(2); Vec3 v4 = q.mode.getVar(3);
+        Vec3 va = q.mode.getVar(0); Vec3 vb = q.mode.getVar(1);
+        Vec3 vc = q.mode.getVar(2); Vec3 vd = q.mode.getVar(3);
         pushRawVertices(new float[] {
-                q.a.x, q.a.y, q.mode.type, v1.x, v1.y, v1.z,
-                q.b.x, q.b.y, q.mode.type, v2.x, v2.y, v2.z,
-                q.c.x, q.c.y, q.mode.type, v3.x, v3.y, v3.z,
-                q.d.x, q.d.y, q.mode.type, v4.x, v4.y, v4.z
+                q.a.x, q.a.y, q.mode.type, va.x, va.y, va.z,
+                q.b.x, q.b.y, q.mode.type, vb.x, vb.y, vb.z,
+                q.c.x, q.c.y, q.mode.type, vc.x, vc.y, vc.z,
+                q.d.x, q.d.y, q.mode.type, vd.x, vd.y, vd.z
         });
     }
 

@@ -228,8 +228,8 @@ public class FontManager {
         graphics.dispose();
         finalTexture = new Texture(fullImage);
         finalTexture.bind(FONT_TEXTURE_SLOT);
-        Texture.writeToFile(fullImage);
-        Logging.debug("%s fonts generated, bound to slot %s", allLoadedFonts.size(), FONT_TEXTURE_SLOT);
+//        Texture.writeToFile(fullImage);
+        Logging.debug("%s fonts generated, texture bound to slot %s", allLoadedFonts.size(), FONT_TEXTURE_SLOT);
 
         setupTextShader();
         setupTextLayout();

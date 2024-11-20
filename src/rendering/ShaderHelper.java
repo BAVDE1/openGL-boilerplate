@@ -32,7 +32,6 @@ public class ShaderHelper {
         for (final File fileEntry : Objects.requireNonNull(dir.listFiles())) {
             if (fileEntry.isDirectory()) {
                 if (fileEntry.getName().equals("ignore")) continue;
-
                 attachShadersInDir(fileEntry.getAbsoluteFile());
                 continue;
             }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 /**
@@ -85,12 +86,12 @@ public class TextRenderer {
                     Vec2 size = new Vec2(font.findLineWidth(line) * scale, yAddition);
                     if (!seamlessBg) size.y -= ySpacing;
 
-                    Shape.Quad quad = Shape.createRect(topLeft, size);
+                    Shape.Quad q = Shape.createRect(topLeft, size);
                     sb.pushRawSeparatedVertices(new float[] {
-                            quad.a.x, quad.a.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
-                            quad.b.x, quad.b.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
-                            quad.c.x, quad.c.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
-                            quad.d.x, quad.d.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
+                            q.a.x, q.a.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
+                            q.b.x, q.b.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
+                            q.c.x, q.c.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
+                            q.d.x, q.d.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
                     });
                 }
 
@@ -102,14 +103,14 @@ public class TextRenderer {
 
                     Shape.Mode mode = new Shape.Mode(FontManager.FONT_TEXTURE_SLOT, glyph.texTopLeft, glyph.texSize);
                     Shape.Quad q = Shape.createRect(topLeft, size, mode);
-                    Vec3 v1 = q.mode.getVar(0); Vec3 v2 = q.mode.getVar(1);
-                    Vec3 v3 = q.mode.getVar(2); Vec3 v4 = q.mode.getVar(3);
+                    Vec3 va = q.mode.getVar(0); Vec3 vb = q.mode.getVar(1);
+                    Vec3 vc = q.mode.getVar(2); Vec3 vd = q.mode.getVar(3);
 
                     float[] verts = new float[] {
-                            q.a.x, q.a.y, v1.x, v1.y, -1,
-                            q.b.x, q.b.y, v2.x, v2.y, -1,
-                            q.c.x, q.c.y, v3.x, v3.y, -1,
-                            q.d.x, q.d.y, v4.x, v4.y, -1
+                            q.a.x, q.a.y, va.x, va.y, -1,
+                            q.b.x, q.b.y, vb.x, vb.y, -1,
+                            q.c.x, q.c.y, vc.x, vc.y, -1,
+                            q.d.x, q.d.y, vd.x, vd.y, -1
                     };
                     if (accumulatedX == 0) sb.pushRawSeparatedVertices(verts);
                     else sb.pushRawVertices(verts);
