@@ -46,7 +46,7 @@ public class Logging {
     }
 
     public static void debug(String msg, Object... args) {
-        if (Constants.logDebug) {
+        if (Constants.DEBUG) {
             log(grey, msg, "DEBUG", args);
         }
     }

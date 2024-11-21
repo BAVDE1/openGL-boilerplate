@@ -13,11 +13,34 @@ import static org.lwjgl.opengl.GL45.*;
  * Loads, compiles and links shaders from file / file paths to its own shader program.
  */
 public class ShaderHelper {
+    public static class Shader {
+        int id, type;
+        String absFilePath, fileName;
+
+        Shader(int id, int type, File file) {
+            this.id = id;
+            this.type = type;
+            absFilePath = file.getAbsolutePath();
+            fileName = file.getName();
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Shader(%s, %s, %s)", id, getShaderTypeString(type), fileName);
+        }
+    }
+
     public final HashMap<String, Integer> uniformCache = new HashMap<>();
-    public final HashMap<Integer, String> attachedShaders = new HashMap<>();
+    public final ArrayList<Shader> attachedShaders = new ArrayList<>();
 
     private Integer program;
     private boolean linked = false;
+
+    public void autoInitializeShadersMulti(String filePath) {
+        genProgram();
+        attachShaderMulti(filePath);
+        linkProgram();
+    }
 
     public void genProgram() {
         if (program != null) {
@@ -40,11 +63,44 @@ public class ShaderHelper {
     }
 
     /** Attach the 2 necessary shaders */
-    public void attachShaders(String vertexFilePath, String fragmentFilePath) {
-        File vertexFile = new File(vertexFilePath);
-        File fragmentFile = new File(fragmentFilePath);
-        attachShader(vertexFile);
-        attachShader(fragmentFile);
+    public void attachShaders(String... allFilePaths) {
+        for (String filePath : allFilePaths) {
+            attachShader(new File(filePath));
+        }
+    }
+
+    /** Attach different shaders that are in the same file. MUST be separated with a "//--- SHADER_TYPE" line */
+    public void attachShaderMulti(String filePath) {
+        int currentShaderType = -1;
+
+        File file = new File(filePath);
+        try {
+            Scanner scanner = new Scanner(file);
+            StringBuilder charSequence = new StringBuilder();
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+
+                if (line.startsWith("//---")) {
+                    // finish last shader
+                    if (!charSequence.isEmpty()) {
+                        attachShader(charSequence.toString(), currentShaderType, file);
+                    }
+
+                    // start next shader
+                    line = line.replace(" ", "").toLowerCase();
+                    currentShaderType = getShaderType(line.split("//---")[1]);
+                    charSequence = new StringBuilder();
+                    continue;
+                }
+
+                charSequence.append("\n").append(line);
+            }
+
+            // finish
+            attachShader(charSequence.toString(), currentShaderType, file);
+        } catch (FileNotFoundException e) {
+            Logging.danger("'%s' at '%s' could not be read.\nError message: %s%n", file.getName(), file.getAbsolutePath(), e);
+        }
     }
 
     /**
@@ -52,11 +108,6 @@ public class ShaderHelper {
      * <a href="https://docs.gl/gl2/glAttachShader">Shader setup example</a>
      */
     public void attachShader(File file) {
-        if (program == null || program < 0) {
-            Logging.danger("No program set or program failed to be created.");
-            return;
-        }
-
         int shaderType = getShaderType(file);
         if (shaderType < 0) return;  // not a shader file
 
@@ -74,20 +125,30 @@ public class ShaderHelper {
             return;
         }
 
+        attachShader(charSequence, shaderType, file);
+    }
+
+    public void attachShader(String shaderCode, int shaderType, File sourceFile) {
+        if (program == null || program < 0) {
+            Logging.danger("No program set or program failed to be created.");
+            return;
+        }
+
         // compile shader
         int shader = glCreateShader(shaderType);
-        glShaderSource(shader, charSequence);
+        glShaderSource(shader, shaderCode);
 
         glCompileShader(shader);
         int[] shaderCompiled = new int[1];  // only needs size of 1
         glGetShaderiv(shader, GL_COMPILE_STATUS, shaderCompiled);
         if (shaderCompiled[0] != GL_TRUE) {
-            Logging.danger("Shader Compile Error (%s): %s", file, glGetShaderInfoLog(shader, 1024));
+            Logging.danger("Shader Compile Error (%s): %s", sourceFile, glGetShaderInfoLog(shader, 1024));
             return;
         }
 
         glAttachShader(program, shader);
-        attachedShaders.put(shader, file.getName());
+        attachedShaders.add(new Shader(shader, shaderType, sourceFile));
+
     }
 
     public void linkProgram() {
@@ -108,17 +169,29 @@ public class ShaderHelper {
     /** <a href="https://www.khronos.org/opengl/wiki/Shader">OpenGL shaders</a> */
     private static int getShaderType(File file) {
         String[] splitName = file.getName().split("\\.");
-        String ext = splitName[splitName.length - 1];
+        return getShaderType(splitName[splitName.length - 1]);  // file extension
+    }
 
-        int shaderType = -1;
-        switch (ext) {
-            case "vert" -> shaderType = GL_VERTEX_SHADER;
-            case "tesc" -> shaderType = GL_TESS_CONTROL_SHADER;
-            case "tese" -> shaderType = GL_TESS_EVALUATION_SHADER;
-            case "geom" -> shaderType = GL_GEOMETRY_SHADER;
-            case "frag" -> shaderType = GL_FRAGMENT_SHADER;
-        }
-        return shaderType;
+    private static int getShaderType(String typeString) {
+        return switch (typeString) {
+            case "vert" -> GL_VERTEX_SHADER;
+            case "tesc" -> GL_TESS_CONTROL_SHADER;
+            case "tese" -> GL_TESS_EVALUATION_SHADER;
+            case "geom" -> GL_GEOMETRY_SHADER;
+            case "frag" -> GL_FRAGMENT_SHADER;
+            default -> -1;
+        };
+    }
+
+    private static String getShaderTypeString(int shaderType) {
+        return switch (shaderType) {
+            case GL_VERTEX_SHADER -> "VERTEX";
+            case GL_TESS_CONTROL_SHADER -> "TESS_CONTROL";
+            case GL_TESS_EVALUATION_SHADER -> "TESS_EVALUATION";
+            case GL_GEOMETRY_SHADER -> "GEOMETRY";
+            case GL_FRAGMENT_SHADER -> "FRAGMENT";
+            default -> "UNKNOWN";
+        };
     }
 
     public static void uniformResolutionData(ShaderHelper sh) {

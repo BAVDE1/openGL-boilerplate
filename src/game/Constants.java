@@ -5,7 +5,7 @@ import src.utility.Logging;
 import java.awt.*;
 
 public class Constants {
-    public static final Boolean logDebug = true;
+    public static final Boolean DEBUG = true;
 
     public static final int BUFF_SIZE_SMALL    = 1024;
     public static final int BUFF_SIZE_MEDIUM   = BUFF_SIZE_SMALL   * 2;
@@ -24,10 +24,6 @@ public class Constants {
     public static final double EPSILON_SQ = EPSILON * EPSILON;
     public static final int FPS = 60;
     public static final double DT = 1 / (double) FPS;
-
-    public static final String SHADER_VERTEX = "res/shaders/main_vertex.vert";
-    public static final String SHADER_FRAGMENT = "res/shaders/main_fragment.frag";
-    public static final String SHADERS_FOLDER = "res/shaders";
 
     public static final Dimension SCREEN_SIZE = new Dimension(900, 400);
     // https://en.wikipedia.org/wiki/Orthographic_projection

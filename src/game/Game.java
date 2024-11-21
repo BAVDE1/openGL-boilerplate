@@ -136,8 +136,7 @@ public class Game {
 
     public void setupBuffers() {
         // MAIN BUFFERS
-        vbMain.genId();
-        vaMain.genId();
+        vbMain.genId(); vaMain.genId();
 
         builderMain.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
         builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
@@ -160,8 +159,7 @@ public class Game {
         textRenderer.pushTextObject(to1);
 
         // CIRCLE BUFFERS
-        vbCircles.genId();
-        vaCircles.genId();
+        vbCircles.genId(); vaCircles.genId();
 
         builderCircles.setAdditionalVertFloats(5);
         builderCircles.pushCircle(new Vec2(200), 50, Color.BLUE);
@@ -178,16 +176,11 @@ public class Game {
 
     /** Must be called after window is visible */
     public void setupShaders() {
-        shMain.genProgram();
-        shMain.attachShaders(Constants.SHADER_VERTEX, Constants.SHADER_FRAGMENT);
-        shMain.linkProgram();
+        shMain.autoInitializeShadersMulti("res/shaders/main.glsl");
+        shCircles.autoInitializeShadersMulti("res/shaders/circle.glsl");
 
         new Texture("res/textures/explosion.png").bindToTexArray(2, shMain);
         new Texture("res/textures/closed.png").bindToTexArray(3, shMain);
-
-        shCircles.genProgram();
-        shCircles.attachShaders("res/shaders/circle_vertex.vert", "res/shaders/circle_fragment.frag");
-        shCircles.linkProgram();
 
         ShaderHelper.uniformResolutionData(shMain);
         ShaderHelper.uniform1f(shMain, "viewScale", viewScale);

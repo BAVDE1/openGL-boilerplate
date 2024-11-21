@@ -1,5 +1,6 @@
 package src.rendering.text;
 
+import src.game.Constants;
 import src.rendering.ShaderHelper;
 import src.rendering.Texture;
 import src.rendering.VertexArray;
@@ -228,17 +229,16 @@ public class FontManager {
         graphics.dispose();
         finalTexture = new Texture(fullImage);
         finalTexture.bind(FONT_TEXTURE_SLOT);
-//        Texture.writeToFile(fullImage);
         Logging.debug("%s fonts generated, texture bound to slot %s", allLoadedFonts.size(), FONT_TEXTURE_SLOT);
 
         setupTextShader();
         setupTextLayout();
+
+        if (Constants.DEBUG) Texture.writeToFile(fullImage);
     }
 
     private static void setupTextShader() {
-        textShader.genProgram();
-        textShader.attachShaders("res/shaders/text_vertex.vert", "res/shaders/text_fragment.frag");
-        textShader.linkProgram();
+        textShader.autoInitializeShadersMulti("res/shaders/text.glsl");
         ShaderHelper.uniformResolutionData(textShader);
         ShaderHelper.uniform1i(textShader, "fontTexture", FONT_TEXTURE_SLOT);
     }
