@@ -36,7 +36,7 @@ To allow for any VAO layout, call `BufferBuilder2f.setAdditionalVertFloats(n)` w
 Any shape from the `Shape` class can be passed to a `BufferBuilder`.
 
 `Shape.Mode` can be used to specify the colour, texture, or other fragment shader property for a shape.
-(yea i know its bad to have branches in the shader but too bad)
+(yea i know its bad to have branches in the shader but too bad, its just trying to demonstrate everything)
 
 `BufferBuildsr` also keeps track of some useful stats like:
 * float count
@@ -46,7 +46,7 @@ Any shape from the `Shape` class can be passed to a `BufferBuilder`.
 * fullness percentage
 * is auto resizing
 
-**note:** the shape class is configured for the current default layout. so you may want to make your own shape class if your layout is different
+**note:** the `Shape` class is configured for the current default layout. so you may want to make your own shape class if your layout is different.
 
 ### Text Rendering
 
@@ -64,7 +64,11 @@ But these are set up and initialized automatically.
 
 `ShaderHelper` instance loads, compiles & links shaders from any directory or file. Recommended minimum of 1 vertex and 1 fragment shader.
 
-can also be used to send uniforms to its linked shaders.
+Multiple shaders can be in one file, they just need to be separated with a `//--- <SHADER_TYPE>` line (and use the `multi` function)
+
+Supported shader types are `VERT`, `TESC`, `TECE`, `GEOM`, `FRAG`.
+
+Can also be used to send uniforms to its attached shaders.
 
 ### Renderer
 
@@ -83,8 +87,6 @@ Use texture slots that are > 1.
 ### Circles
 
 in this project, they need their own VAO/VBO cause they're special and are instanced.
-
-`BufferBuilder` can be reused between `VertexBuffers`, but that could get messy so probably dont.
 
 ### Logger
 
