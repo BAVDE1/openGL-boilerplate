@@ -58,6 +58,17 @@ But these are set up and initialized automatically.
 
 `TextRenderer` takes any number `TextRenderer.TextObject`s and buffers them all together for easy rendering. A `TextRenderer`s buffer is only rebuilt when one of its `TextObjects` is modified. or if one is added to removed.
 
+Some `TextObject` values that can be set include:
+* string
+* pos
+* font
+* text alignment
+* scale
+* line y spacing
+* bg colour (with an alpha of 0, a bg won't be added)
+* bg margin
+* are bg lines seamless (for if line y spacing is greater than 0)
+
 **Note:** there is 1 default font thats loaded (at font id 0) before anything else (also italicised fonts are kinda broken atm)
 
 ### Shader Helper

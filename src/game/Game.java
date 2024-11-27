@@ -153,7 +153,7 @@ public class Game {
         vaMain.pushBuffer(vbMain, VertexArray.Layout.createDefaultLayout());
 
         textRenderer.setupBufferObjects();
-        to1 = new TextRenderer.TextObject(1, "", new Vec2(), 1, 2);
+        to1 = new TextRenderer.TextObject(1, "", new Vec2());
         to1.setBgCol(Color.BLACK);
         textRenderer.pushTextObject(to1);
 
@@ -198,16 +198,22 @@ public class Game {
 
         // debug string
         BufferBuilder2f textBuff = textRenderer.getBufferBuilder();
-        to1.setString("FPS: %s, Elapsed: %s [debug (tab): %s]" +
-                        "\nView [pos:%.0f,%.0f, scale:%.2f] (r)eset" +
-                        "\nBuffers:" +
-                        "\n - text [s:%s, v:%s, f:%s/%s (%.5f)]" +
-                        "\n - main [s:%s, v:%s, f:%s/%s (%.5f)]" +
-                        "\n - circles [s:%s, v:%s, f:%s/%s (%.5f)]",
+        to1.setString("""
+                        FPS: %s, Elapsed: %s [debug (tab): %s]\
+
+                        View [pos:%.0f,%.0f, scale:%.2f] (r)eset\
+
+                        Buffers:\
+
+                         - text [s:%s, v:%s, f:%s/%s (%.5f)]\
+
+                         - main [s:%s, v:%s, f:%s/%s (%.5f)]\
+
+                         - circles [s:%s, v:%s, f:%s/%s (%.5f)]""",
                 fps, secondsElapsed, debugMode,
                 viewPos.x, viewPos.y, viewScale,
-                textBuff.getSeparationsCount(),
-                textBuff.getVertexCount(),
+                textBuff.getSeparationsCount(),  // note: cause we're using the text buffers own values in this text
+                textBuff.getVertexCount(),       // object it'll need to re-build itself a few extra times than normal
                 textBuff.getFloatCount(),
                 textBuff.getBufferSize(),
                 textBuff.getCurrentFullnessPercent(),
@@ -268,16 +274,13 @@ public class Game {
         Renderer.clearScreen();
 
         // shape examples
-        ShaderHelper.uniform1i(shMain, "useView", 1);
+        shMain.bind();
         ShaderHelper.uniform1f(shMain, "time", (float) glfwGetTime());
         Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, vaMain, builderMain.getVertexCount());
 
         shCircles.bind();
         Renderer.drawInstanced(GL_TRIANGLES, vaCircles, 3, builderCircles.getVertexCount());
 
-        // ui elements
-        shMain.bind();
-        ShaderHelper.uniform1i(shMain, "useView", 0);
         Renderer.draw(textRenderer);
 
         // FINISH
@@ -289,8 +292,8 @@ public class Game {
         frameCounter++;
 
         glfwPollEvents();
-        updateFpsAndDebugText();
         updateViewPos(dt);
+        updateFpsAndDebugText();
         render();
 
         return MathUtils.nanoToSecond(System.nanoTime() - tStart);

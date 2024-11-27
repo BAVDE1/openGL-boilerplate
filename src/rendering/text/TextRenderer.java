@@ -9,10 +9,8 @@ import src.utility.Vec3;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
-import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 /**
@@ -21,30 +19,37 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
  */
 public class TextRenderer {
     public static class TextObject {
+        public static final int ALIGN_LEFT = 0;
+        public static final int ALIGN_RIGHT = 1;
+        public static final int ALIGN_MIDDLE = 2;
+
         private TextRenderer parent;
         private float scale = 1;
-        private int ySpacing = 5;
+        private int ySpacing = 0;
+        private int alignment = ALIGN_LEFT;
 
         private int loadedFontId;
         private String string;
         private Vec2 pos;
 
         private final BufferBuilder2f sb = new BufferBuilder2f(true);
+        private final BufferBuilder2f bgSb = new BufferBuilder2f(true);
         private boolean hasChanged = true;
 
         private Color bgCol = new Color(0, 0, 0, 0);
-        private boolean seamlessBg = false;
+        private final Vec2 bgMargin = new Vec2();
+        private boolean seamlessBgLines = false;
 
         public TextObject(int loadedFontId, String string, Vec2 pos, float scale, int ySpacing) {
             this(loadedFontId, string, pos);
-            this.scale = scale;
-            this.ySpacing = ySpacing;
+            setScale(scale);
+            setYSpacing(ySpacing);
         }
 
         public TextObject(int loadedFontId, String string, Vec2 pos) {
-            this.loadedFontId = loadedFontId;
-            this.string = string;
-            this.pos = pos;
+            setLoadedFontId(loadedFontId);
+            setString(string);
+            setPos(pos);
         }
 
         private void addParent(TextRenderer parent) {
@@ -65,29 +70,33 @@ public class TextRenderer {
 
             sb.clear();
             sb.setAdditionalVertFloats(3);
+            bgSb.clear();
+            bgSb.setAdditionalVertFloats(3);
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
             int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
             int yAddition = genericHeight + ySpacing;
 
+            String[] lines = string.split("\n");
+
             int accumulatedY = 0;
-            for (String line : string.split("\n")) {
+            for (String line : lines) {
                 if (line.isEmpty()) {
                     accumulatedY += genericHeight + ySpacing;
                     continue;
                 }
 
-                float lineY = pos.y + accumulatedY;
                 int accumulatedX = 0;
+                float lineWidth = font.findLineWidth(line) * scale;
+                Vec2 linePos = new Vec2(alignment == 0 ? pos.x : pos.x - (lineWidth * (1f / alignment)), pos.y + accumulatedY);
 
                 // line background
                 if (bgCol.getAlpha() > Constants.EPSILON) {
-                    Vec2 topLeft = new Vec2(pos.x, lineY);
-                    Vec2 size = new Vec2(font.findLineWidth(line) * scale, yAddition);
-                    if (!seamlessBg) size.y -= ySpacing;
+                    Vec2 size = new Vec2(lineWidth, yAddition);
+                    if (!seamlessBgLines) size.y -= ySpacing;
 
-                    Shape.Quad q = Shape.createRect(topLeft, size);
-                    sb.pushRawSeparatedVertices(new float[] {
+                    Shape.Quad q = Shape.createRect(linePos.sub(bgMargin), size.add(bgMargin.mul(2)));
+                    bgSb.pushRawSeparatedVertices(new float[] {
                             q.a.x, q.a.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
                             q.b.x, q.b.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
                             q.c.x, q.c.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
@@ -99,7 +108,7 @@ public class TextRenderer {
                 for (char c : line.toCharArray()) {
                     FontManager.Glyph glyph = font.getGlyph(c);
                     Vec2 size = new Vec2(glyph.width, glyph.height).mul(scale);
-                    Vec2 topLeft = new Vec2(pos.x + accumulatedX, lineY);
+                    Vec2 topLeft = new Vec2(linePos.x + accumulatedX, linePos.y);
 
                     Shape.Mode mode = new Shape.Mode(FontManager.FONT_TEXTURE_SLOT, glyph.texTopLeft, glyph.texSize);
                     Shape.Quad q = Shape.createRect(topLeft, size, mode);
@@ -121,6 +130,8 @@ public class TextRenderer {
             }
 
             hasChanged = false;
+
+            sb.prependBuffer(bgSb, true);
             return sb.getSetVertices();
         }
 
@@ -145,7 +156,7 @@ public class TextRenderer {
         }
 
         public int getLoadedFontId() {return loadedFontId;}
-        public void setFontId(int newFontId) {
+        public void setLoadedFontId(int newFontId) {
             if (newFontId != loadedFontId) {
                 loadedFontId = newFontId;
                 setHasChanged();
@@ -176,10 +187,25 @@ public class TextRenderer {
             }
         }
 
-        public boolean getSeamlessBg() {return seamlessBg;}
-        public void setSeamlessBg(boolean isSeamlessBg) {
-            if (isSeamlessBg != seamlessBg) {
-                seamlessBg = isSeamlessBg;
+        public boolean getSeamlessBgLines() {return seamlessBgLines;}
+        public void setSeamlessBgLines(boolean isSeamlessBg) {
+            if (isSeamlessBg != seamlessBgLines) {
+                seamlessBgLines = isSeamlessBg;
+                setHasChanged();
+            }
+        }
+
+        public int getAlignment() {return alignment;}
+        public void setAlignment(int newAlignment) {
+            if (newAlignment == alignment || newAlignment < ALIGN_LEFT || newAlignment > ALIGN_MIDDLE) return;
+            alignment = newAlignment;
+            setHasChanged();
+        }
+
+        public Vec2 getBgMargin() {return bgMargin;}
+        public void setBgMargin(Vec2 newBgMargin) {
+            if (!newBgMargin.equals(bgMargin)) {
+                bgMargin.set(newBgMargin);
                 setHasChanged();
             }
         }

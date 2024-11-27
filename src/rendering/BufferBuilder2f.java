@@ -205,4 +205,23 @@ public class BufferBuilder2f {
                 pos.x, pos.y, radius, outline, col.getRed(), col.getGreen(), col.getBlue()
         });
     }
+
+    public void appendBuffer(BufferBuilder2f builder2f) {appendBuffer(builder2f, false);}
+    public void appendBuffer(BufferBuilder2f builder2f, boolean useSeparation) {
+        if (builder2f.getVertexCount() == 0) return;
+
+        if (useSeparation) pushRawSeparatedVertices(builder2f.getSetVertices());
+        else pushRawVertices(builder2f.getSetVertices());
+    }
+
+    public void prependBuffer(BufferBuilder2f builder2f) {prependBuffer(builder2f, false);}
+    public void prependBuffer(BufferBuilder2f builder2f, boolean useSeparation) {
+        if (builder2f.getVertexCount() == 0) return;
+
+        float[] temp = getSetVertices();
+        clear();
+        pushRawVertices(builder2f.getSetVertices());
+        if (useSeparation) pushRawSeparatedVertices(temp);
+        else pushRawVertices(temp);
+    }
 }
