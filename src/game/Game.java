@@ -155,6 +155,8 @@ public class Game {
         textRenderer.setupBufferObjects();
         to1 = new TextRenderer.TextObject(1, "", new Vec2());
         to1.setBgCol(Color.BLACK);
+        to1.setBgMargin(new Vec2(10));
+//        to1.setTextColour(Color.RED);
         textRenderer.pushTextObject(to1);
 
         // CIRCLE BUFFERS

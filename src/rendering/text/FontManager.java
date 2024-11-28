@@ -245,7 +245,8 @@ public class FontManager {
 
     private static void setupTextLayout() {
         textVertexLayout.pushFloat(2);  // vertex pos
-        textVertexLayout.pushFloat(3);  // tex coord (x,y,-1) / color (x,y,z)
+        textVertexLayout.pushFloat(2);  // tex coord (x,y) [or is bg colour (-1,-1)]
+        textVertexLayout.pushFloat(4);  // colour (text colour or bg colour)
     }
 
     public static VertexArray.Layout getTextVertexLayout() {

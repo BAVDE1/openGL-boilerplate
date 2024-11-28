@@ -6,9 +6,11 @@ import src.rendering.*;
 import src.utility.Logging;
 import src.utility.Vec2;
 import src.utility.Vec3;
+import src.utility.Vec4;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
@@ -24,6 +26,7 @@ public class TextRenderer {
         public static final int ALIGN_MIDDLE = 2;
 
         private TextRenderer parent;
+        private Color textColour = Color.WHITE;
         private float scale = 1;
         private int ySpacing = 0;
         private int alignment = ALIGN_LEFT;
@@ -69,9 +72,9 @@ public class TextRenderer {
             if (!hasChanged) return sb.getSetVertices();  // don't even bother re-building
 
             sb.clear();
-            sb.setAdditionalVertFloats(3);
+            sb.setAdditionalVertFloats(6);
             bgSb.clear();
-            bgSb.setAdditionalVertFloats(3);
+            bgSb.setAdditionalVertFloats(6);
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
             int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
@@ -96,11 +99,12 @@ public class TextRenderer {
                     if (!seamlessBgLines) size.y -= ySpacing;
 
                     Shape.Quad q = Shape.createRect(linePos.sub(bgMargin), size.add(bgMargin.mul(2)));
+                    Vec4 col = new Vec4(bgCol);
                     bgSb.pushRawSeparatedVertices(new float[] {
-                            q.a.x, q.a.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
-                            q.b.x, q.b.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
-                            q.c.x, q.c.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
-                            q.d.x, q.d.y, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(),
+                            q.a.x, q.a.y, -1, -1, col.x, col.y, col.z, col.w,
+                            q.b.x, q.b.y, -1, -1, col.x, col.y, col.z, col.w,
+                            q.c.x, q.c.y, -1, -1, col.x, col.y, col.z, col.w,
+                            q.d.x, q.d.y, -1, -1, col.x, col.y, col.z, col.w
                     });
                 }
 
@@ -115,11 +119,12 @@ public class TextRenderer {
                     Vec3 va = q.mode.getVar(0); Vec3 vb = q.mode.getVar(1);
                     Vec3 vc = q.mode.getVar(2); Vec3 vd = q.mode.getVar(3);
 
+                    Vec4 col = new Vec4(textColour);
                     float[] verts = new float[] {
-                            q.a.x, q.a.y, va.x, va.y, -1,
-                            q.b.x, q.b.y, vb.x, vb.y, -1,
-                            q.c.x, q.c.y, vc.x, vc.y, -1,
-                            q.d.x, q.d.y, vd.x, vd.y, -1
+                            q.a.x, q.a.y, va.x, va.y, col.x, col.y, col.z, col.w,
+                            q.b.x, q.b.y, vb.x, vb.y, col.x, col.y, col.z, col.w,
+                            q.c.x, q.c.y, vc.x, vc.y, col.x, col.y, col.z, col.w,
+                            q.d.x, q.d.y, vd.x, vd.y, col.x, col.y, col.z, col.w
                     };
                     if (accumulatedX == 0) sb.pushRawSeparatedVertices(verts);
                     else sb.pushRawVertices(verts);
@@ -132,6 +137,7 @@ public class TextRenderer {
             hasChanged = false;
 
             sb.prependBuffer(bgSb, true);
+            System.out.println(sb);
             return sb.getSetVertices();
         }
 
@@ -179,6 +185,14 @@ public class TextRenderer {
             }
         }
 
+        public Color getTextColour() {return textColour;}
+        public void setTextColour(Color newColour) {
+            if (!newColour.equals(textColour)) {
+                textColour = newColour;
+                setHasChanged();
+            }
+        }
+
         public Color getBgCol() {return bgCol;}
         public void setBgCol(Color newBgColour) {
             if (newBgColour != bgCol) {
@@ -197,9 +211,15 @@ public class TextRenderer {
 
         public int getAlignment() {return alignment;}
         public void setAlignment(int newAlignment) {
-            if (newAlignment == alignment || newAlignment < ALIGN_LEFT || newAlignment > ALIGN_MIDDLE) return;
-            alignment = newAlignment;
-            setHasChanged();
+            if (newAlignment < ALIGN_LEFT || newAlignment > ALIGN_MIDDLE) {
+                Logging.warn("Alignment '%s' is not valid", newAlignment);
+                return;
+            }
+
+            if (newAlignment != alignment) {
+                alignment = newAlignment;
+                setHasChanged();
+            }
         }
 
         public Vec2 getBgMargin() {return bgMargin;}
