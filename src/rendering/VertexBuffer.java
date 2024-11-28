@@ -10,6 +10,7 @@ public class VertexBuffer {
     private Integer bufferId;
 
     public VertexBuffer(){}
+    public VertexBuffer(boolean genId) {if (genId) genId();}
 
     public void bufferData(float[] data) {
         Renderer.bindBuffer(this);

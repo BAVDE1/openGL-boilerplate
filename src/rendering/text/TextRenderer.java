@@ -10,10 +10,8 @@ import src.utility.Vec4;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
-import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 /**
@@ -29,15 +27,15 @@ public class TextRenderer {
         private TextRenderer parent;
         private Color textColour = Color.WHITE;
         private float scale = 1;
-        private int ySpacing = 10;
+        private int ySpacing = 0;
         private int alignment = ALIGN_LEFT;
 
         private int loadedFontId;
         private String string;
         private Vec2 pos;
 
-        private final BufferBuilder2f sb = new BufferBuilder2f(true);
-        private final BufferBuilder2f bgSb = new BufferBuilder2f(true);
+        private final BufferBuilder2f sb = new BufferBuilder2f(true, FontManager.textLayoutAdditionalVerts());
+        private final BufferBuilder2f bgSb = new BufferBuilder2f(true, FontManager.textLayoutAdditionalVerts());
         private boolean hasChanged = true;
 
         private Color bgCol = new Color(0, 0, 0, 0);
@@ -50,13 +48,16 @@ public class TextRenderer {
             setYSpacing(ySpacing);
         }
 
+        public TextObject(int loadedFontId, String string, Vec2 pos, Color textColour, Color bgCol) {
+            this(loadedFontId, string, pos);
+            setTextColour(textColour);
+            setBgCol(bgCol);
+        }
+
         public TextObject(int loadedFontId, String string, Vec2 pos) {
             setLoadedFontId(loadedFontId);
             setString(string);
             setPos(pos);
-
-            sb.setAdditionalVertFloats(FontManager.textLayoutAdditionalVerts());
-            bgSb.setAdditionalVertFloats(FontManager.textLayoutAdditionalVerts());
         }
 
         private void addParent(TextRenderer parent) {
@@ -247,11 +248,10 @@ public class TextRenderer {
 
     /** after GL context created */
     public void setupBufferObjects() {
-        va = new VertexArray();   va.genId();
-        vb = new VertexBuffer();  vb.genId();
-        sb = new BufferBuilder2f(true);
+        va = new VertexArray(true);
+        vb = new VertexBuffer(true);
+        sb = new BufferBuilder2f(true, FontManager.textLayoutAdditionalVerts());
 
-        sb.setAdditionalVertFloats(FontManager.textLayoutAdditionalVerts());
         va.pushBuffer(vb, FontManager.getTextVertexLayout());
     }
 
@@ -280,10 +280,12 @@ public class TextRenderer {
         return textObjects;
     }
 
-    public void pushTextObject(TextObject to) {
-        to.addParent(this);
-        textObjects.add(to);
-        hasBeenModified = true;
+    public void pushTextObject(TextObject... tos) {
+        for (TextObject to : tos) {
+            to.addParent(this);
+            textObjects.add(to);
+            hasBeenModified = true;
+        }
     }
 
     public void removeTextObject(TextObject to) {

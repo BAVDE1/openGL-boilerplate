@@ -36,6 +36,7 @@ public class Game {
 
     // text
     TextRenderer.TextObject to1;
+    TextRenderer.TextObject to2;
     TextRenderer textRenderer = new TextRenderer();
 
     Vec2 mousePos = new Vec2();
@@ -152,12 +153,12 @@ public class Game {
         vbMain.bufferSetData(builderMain);
         vaMain.pushBuffer(vbMain, VertexArray.Layout.createDefaultLayout());
 
+        to1 = new TextRenderer.TextObject(1, "", new Vec2(5), Color.CYAN, Color.BLACK);
+        to2 = new TextRenderer.TextObject(1, "", new Vec2(5, 40), Color.WHITE, Color.BLACK);
+        to1.setBgMargin(new Vec2(5));
+        to2.setBgMargin(new Vec2(5));
         textRenderer.setupBufferObjects();
-        to1 = new TextRenderer.TextObject(1, "", new Vec2());
-        to1.setBgCol(Color.BLACK);
-        to1.setBgMargin(new Vec2(10));
-//        to1.setTextColour(Color.RED);
-        textRenderer.pushTextObject(to1);
+        textRenderer.pushTextObject(to1, to2);
 
         // CIRCLE BUFFERS
         vbCircles.genId(); vaCircles.genId();
@@ -200,11 +201,11 @@ public class Game {
 
         // debug string
         BufferBuilder2f textBuff = textRenderer.getBufferBuilder();
-        to1.setString("""
-                        FPS: %s, Elapsed: %s [debug (tab): %s]\
-
-                        View [pos:%.0f,%.0f, scale:%.2f] (r)eset\
-
+        to1.setString("FPS: %s, Elapsed: %s [debug (tab): %s]\nView [pos:%.0f,%.0f, scale:%.2f] (r)eset",
+                fps, secondsElapsed, debugMode,
+                viewPos.x, viewPos.y, viewScale
+        );
+        to2.setString("""
                         Buffers:\
 
                          - text [s:%s, v:%s, f:%s/%s (%.5f)]\
@@ -212,8 +213,6 @@ public class Game {
                          - main [s:%s, v:%s, f:%s/%s (%.5f)]\
 
                          - circles [s:%s, v:%s, f:%s/%s (%.5f)]""",
-                fps, secondsElapsed, debugMode,
-                viewPos.x, viewPos.y, viewScale,
                 textBuff.getSeparationsCount(),  // note: cause we're using the text buffers own values in this text
                 textBuff.getVertexCount(),       // object it'll need to re-build itself a few extra times than normal
                 textBuff.getFloatCount(),

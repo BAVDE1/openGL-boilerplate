@@ -25,13 +25,15 @@ public class BufferBuilder2f {
     private int additionalVertFloats = 0;
     private int floatCountPerVert = POS_FLOAT_COUNT;
 
-    public BufferBuilder2f() {this(DEFAULT_SIZE, false);}
-    public BufferBuilder2f(int size) {this(size, false);}
-    public BufferBuilder2f(boolean autoResize) {this(DEFAULT_SIZE, true);}
-    public BufferBuilder2f(int size, boolean autoResize){
+    public BufferBuilder2f() {this(DEFAULT_SIZE, false, 0);}
+    public BufferBuilder2f(int size) {this(size, false, 0);}
+    public BufferBuilder2f(boolean autoResize) {this(DEFAULT_SIZE, autoResize, 0);}
+    public BufferBuilder2f(boolean autoResize, int additionalVertFloats) {this(DEFAULT_SIZE, autoResize, additionalVertFloats);}
+    public BufferBuilder2f(int size, boolean autoResize, int additionalVertFloats){
         vertices = new float[size];
         this.size = size;
         this.autoResize = autoResize;
+        setAdditionalVertFloats(additionalVertFloats);
     }
 
     public void clear() {

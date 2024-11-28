@@ -5,7 +5,10 @@ import src.utility.Logging;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Scanner;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -36,6 +39,7 @@ public class ShaderHelper {
     private Integer program;
     private boolean linked = false;
 
+    /** Gen program, attach shader multi, & then link program */
     public void autoInitializeShadersMulti(String filePath) {
         genProgram();
         attachShaderMulti(filePath);

@@ -98,6 +98,9 @@ public class VertexArray {
     private Integer arrayId;
     public int attribCount = 0;
 
+    public VertexArray() {}
+    public VertexArray(boolean genId) {if (genId) genId();}
+
     public void genId() {
         if (arrayId != null) {
             Logging.warn("Attempting to re-generate already generated array id, aborting");
