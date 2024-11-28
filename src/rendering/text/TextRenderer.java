@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 
 /**
@@ -28,7 +29,7 @@ public class TextRenderer {
         private TextRenderer parent;
         private Color textColour = Color.WHITE;
         private float scale = 1;
-        private int ySpacing = 0;
+        private int ySpacing = 10;
         private int alignment = ALIGN_LEFT;
 
         private int loadedFontId;
@@ -53,6 +54,9 @@ public class TextRenderer {
             setLoadedFontId(loadedFontId);
             setString(string);
             setPos(pos);
+
+            sb.setAdditionalVertFloats(FontManager.textLayoutAdditionalVerts());
+            bgSb.setAdditionalVertFloats(FontManager.textLayoutAdditionalVerts());
         }
 
         private void addParent(TextRenderer parent) {
@@ -72,9 +76,7 @@ public class TextRenderer {
             if (!hasChanged) return sb.getSetVertices();  // don't even bother re-building
 
             sb.clear();
-            sb.setAdditionalVertFloats(6);
             bgSb.clear();
-            bgSb.setAdditionalVertFloats(6);
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
             int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
@@ -137,7 +139,6 @@ public class TextRenderer {
             hasChanged = false;
 
             sb.prependBuffer(bgSb, true);
-            System.out.println(sb);
             return sb.getSetVertices();
         }
 
@@ -250,7 +251,7 @@ public class TextRenderer {
         vb = new VertexBuffer();  vb.genId();
         sb = new BufferBuilder2f(true);
 
-        sb.setAdditionalVertFloats(3);
+        sb.setAdditionalVertFloats(FontManager.textLayoutAdditionalVerts());
         va.pushBuffer(vb, FontManager.getTextVertexLayout());
     }
 
@@ -262,7 +263,6 @@ public class TextRenderer {
             sb.pushRawSeparatedVertices(to.buildStrip());
         }
 
-        Renderer.bindBuffer(vb);
         vb.bufferSetData(sb);
         hasBeenModified = false;
     }

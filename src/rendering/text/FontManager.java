@@ -249,6 +249,7 @@ public class FontManager {
         textVertexLayout.pushFloat(4);  // colour (text colour or bg colour)
     }
 
+    public static int textLayoutAdditionalVerts() {return 6;}
     public static VertexArray.Layout getTextVertexLayout() {
         return textVertexLayout;
     }
