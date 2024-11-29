@@ -154,7 +154,7 @@ public class Game {
         vaMain.pushBuffer(vbMain, VertexArray.Layout.createDefaultLayout());
 
         to1 = new TextRenderer.TextObject(1, "", new Vec2(5), Color.CYAN, Color.BLACK);
-        to2 = new TextRenderer.TextObject(1, "", new Vec2(5, 40), Color.WHITE, Color.BLACK);
+        to2 = new TextRenderer.TextObject(1, "", new Vec2(5, 50), Color.WHITE, Color.BLACK);
         to1.setBgMargin(new Vec2(5));
         to2.setBgMargin(new Vec2(5));
         textRenderer.setupBufferObjects();
