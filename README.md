@@ -60,10 +60,11 @@ But these are set up and initialized automatically.
 
 Some `TextObject` values that can be set include:
 * string
-* pos
 * font
-* text alignment
+* pos
 * scale
+* text colour
+* text alignment
 * line y spacing
 * bg colour (with an alpha of 0, a bg won't be added)
 * bg margin
