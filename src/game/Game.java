@@ -57,7 +57,7 @@ public class Game {
 
     public void start() {
         timeStarted = System.currentTimeMillis();
-        Main.startTimeStepper(Constants.DT, this);
+        TimeStepper.startTimeStepper(Constants.DT, this);
     }
 
     public void createCapabilitiesAndOpen() {
