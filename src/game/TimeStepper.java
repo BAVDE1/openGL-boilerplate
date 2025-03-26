@@ -1,7 +1,7 @@
-package src.game;
+package game;
 
-import src.utility.Logging;
-import src.utility.MathUtils;
+import utility.Logging;
+import utility.MathUtils;
 
 public class TimeStepper {
     /**

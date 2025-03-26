@@ -1,11 +1,11 @@
-package src.game;
+package game;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryStack;
-import src.utility.Logging;
+import utility.Logging;
 
 import java.nio.IntBuffer;
 import java.util.Objects;

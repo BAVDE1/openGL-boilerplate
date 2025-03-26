@@ -1,14 +1,13 @@
-package src.game;
+package game;
 
 import org.lwjgl.opengl.GL45;
-import src.Main;
-import src.rendering.Shape;
-import src.rendering.*;
-import src.rendering.text.FontManager;
-import src.rendering.text.TextRenderer;
-import src.utility.Logging;
-import src.utility.MathUtils;
-import src.utility.Vec2;
+import rendering.Shape;
+import rendering.*;
+import rendering.text.FontManager;
+import rendering.text.TextRenderer;
+import utility.Logging;
+import utility.MathUtils;
+import utility.Vec2;
 
 import java.awt.*;
 

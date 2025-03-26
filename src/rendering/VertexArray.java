@@ -1,6 +1,6 @@
-package src.rendering;
+package rendering;
 
-import src.utility.Logging;
+import utility.Logging;
 
 import java.util.ArrayList;
 import java.util.Arrays;

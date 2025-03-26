@@ -1,11 +1,11 @@
-package src.rendering.text;
+package rendering.text;
 
-import src.game.Constants;
-import src.rendering.ShaderHelper;
-import src.rendering.Texture;
-import src.rendering.VertexArray;
-import src.utility.Logging;
-import src.utility.Vec2;
+import game.Constants;
+import rendering.ShaderHelper;
+import rendering.Texture;
+import rendering.VertexArray;
+import utility.Logging;
+import utility.Vec2;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

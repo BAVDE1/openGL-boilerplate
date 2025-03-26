@@ -1,4 +1,4 @@
-package src.rendering.text;
+package rendering.text;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

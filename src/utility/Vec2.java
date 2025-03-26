@@ -1,6 +1,6 @@
-package src.utility;
+package utility;
 
-import src.game.Constants;
+import game.Constants;
 
 import java.awt.*;
 

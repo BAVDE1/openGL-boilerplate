@@ -1,4 +1,4 @@
-package src.utility;
+package utility;
 
 import java.awt.*;
 

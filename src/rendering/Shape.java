@@ -1,8 +1,8 @@
-package src.rendering;
+package rendering;
 
-import src.game.Constants;
-import src.utility.Vec2;
-import src.utility.Vec3;
+import game.Constants;
+import utility.Vec2;
+import utility.Vec3;
 
 import java.awt.*;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
-package src.game;
+package game;
 
-import src.utility.Logging;
+import utility.Logging;
 
 import java.awt.*;
 

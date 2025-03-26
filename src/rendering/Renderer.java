@@ -1,9 +1,9 @@
-package src.rendering;
+package rendering;
 
 import org.lwjgl.opengl.GL;
-import src.game.Window;
-import src.rendering.text.TextRenderer;
-import src.utility.Logging;
+import game.Window;
+import rendering.text.TextRenderer;
+import utility.Logging;
 
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL45.*;

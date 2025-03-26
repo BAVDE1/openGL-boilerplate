@@ -1,12 +1,12 @@
-package src.rendering.text;
+package rendering.text;
 
-import src.game.Constants;
-import src.rendering.Shape;
-import src.rendering.*;
-import src.utility.Logging;
-import src.utility.Vec2;
-import src.utility.Vec3;
-import src.utility.Vec4;
+import game.Constants;
+import rendering.Shape;
+import rendering.*;
+import utility.Logging;
+import utility.Vec2;
+import utility.Vec3;
+import utility.Vec4;
 
 import java.awt.*;
 import java.util.ArrayList;

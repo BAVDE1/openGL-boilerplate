@@ -1,7 +1,7 @@
-package src.rendering;
+package rendering;
 
-import src.game.Constants;
-import src.utility.Logging;
+import game.Constants;
+import utility.Logging;
 
 import java.io.File;
 import java.io.FileNotFoundException;
