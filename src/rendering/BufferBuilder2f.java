@@ -1,6 +1,6 @@
 package rendering;
 
-import common.Constants;
+import common.BoilerplateConstants;
 import utility.Logging;
 import utility.Vec2;
 import utility.Vec3;
@@ -11,7 +11,7 @@ import java.awt.*;
  * Some abstracted functions for building a buffer.
  */
 public class BufferBuilder2f {
-    private static final int DEFAULT_SIZE = Constants.BUFF_SIZE_SMALL;
+    private static final int DEFAULT_SIZE = BoilerplateConstants.BUFF_SIZE_SMALL;
     private static final int POS_FLOAT_COUNT = 2;
 
     private float[] vertices;
@@ -84,8 +84,8 @@ public class BufferBuilder2f {
     public void setAutoResize(boolean val) {autoResize = val;}
 
     private int autoResizeBuffer(int minSize) {
-        int newSize = Constants.findNextLargestBuffSize(minSize);
-        if (newSize == Constants.ERROR) return Constants.ERROR;
+        int newSize = BoilerplateConstants.findNextLargestBuffSize(minSize);
+        if (newSize == BoilerplateConstants.ERROR) return BoilerplateConstants.ERROR;
         resizeBufferAndKeepElements(newSize);
         return size;
     }
@@ -125,7 +125,7 @@ public class BufferBuilder2f {
                 return;
             }
 
-            if (autoResizeBuffer(floatCount + fCount) == Constants.ERROR) {
+            if (autoResizeBuffer(floatCount + fCount) == BoilerplateConstants.ERROR) {
                 Logging.danger("An error occurred attempting to resize this buffer! Aborting.");
                 return;
             }

@@ -77,6 +77,7 @@ public class FontManager {
                 return;
             }
 
+            Logging.debug("Attempting to load font from resource path: %s", fontFile);
             try {
                 font = Font.createFont(Font.TRUETYPE_FONT, fontFile);
                 font = font.deriveFont(fontStyle, fontSize);

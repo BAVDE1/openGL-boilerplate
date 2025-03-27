@@ -1,6 +1,6 @@
 package rendering.text;
 
-import common.Constants;
+import common.BoilerplateConstants;
 import rendering.Shape;
 import rendering.*;
 import utility.Logging;
@@ -97,7 +97,7 @@ public class TextRenderer {
                 Vec2 linePos = new Vec2(alignment == 0 ? pos.x : pos.x - (lineWidth * (1f / alignment)), pos.y + accumulatedY);
 
                 // line background
-                if (bgCol.getAlpha() > Constants.EPSILON) {
+                if (bgCol.getAlpha() > BoilerplateConstants.EPSILON) {
                     Vec2 size = new Vec2(lineWidth, yAddition);
                     if (!seamlessBgLines) size.y -= ySpacing;
 
@@ -259,7 +259,7 @@ public class TextRenderer {
         sb.clear();
 
         for (TextObject to : textObjects) {
-            if (to.string.isEmpty() || to.scale < Constants.EPSILON) continue;
+            if (to.string.isEmpty() || to.scale < BoilerplateConstants.EPSILON) continue;
             sb.pushRawSeparatedVertices(to.buildStrip());
         }
 

@@ -2,7 +2,6 @@ package utility;
 
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GLDebugMessageCallbackI;
-import common.Constants;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;

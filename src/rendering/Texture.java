@@ -42,17 +42,18 @@ public class Texture {
     private int texId;
     public int width, height;
 
-    public Texture(String filePath) {
-        URL url = ClassLoader.getSystemResource(filePath);
+    public Texture(String resourcePath) {
+        Logging.debug("Attempting to create texture from resource path: %s", resourcePath);
+        URL url = ClassLoader.getSystemResource(resourcePath);
         if (url == null) {
-            Logging.danger("Image failed to load from given filepath: '%s'", filePath);
+            Logging.danger("Image failed to load from given filepath: '%s'", resourcePath);
             return;
         }
 
         try {
             createTexture(ImageIO.read(url));
         } catch (IOException e) {
-            Logging.danger("Image failed to load from given filepath: '%s'\nError:\n%s", filePath, e);
+            Logging.danger("Image failed to load from given filepath: '%s'\nError:\n%s", resourcePath, e);
         }
     }
 
@@ -95,6 +96,7 @@ public class Texture {
         unbind();
 
         MemoryUtil.memFree(buffer);  // may want to keep for later though :shrug:
+        Logging.debug("Texture created, texId: %s", texId);
     }
 
     private void setupTextureDefaults() {
@@ -107,14 +109,14 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    public static Image loadImageFromFilePath(String filePath) {
+    public static Image loadImageFromFilePath(String resourcePath) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Prepare image buffers
             IntBuffer w = stack.mallocInt(1);
             IntBuffer h = stack.mallocInt(1);
             IntBuffer comp = stack.mallocInt(1);
 
-            ByteBuffer buffer = stbi_load(filePath, w, h, comp, BPP);
+            ByteBuffer buffer = stbi_load(resourcePath, w, h, comp, BPP);
             if (buffer == null) {
                 Logging.danger("Failed to load a texture file! %s: %s",  System.lineSeparator(), stbi_failure_reason());
                 return null;

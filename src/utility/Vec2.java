@@ -1,6 +1,6 @@
 package utility;
 
-import common.Constants;
+import common.BoilerplateConstants;
 
 import java.awt.*;
 
@@ -88,7 +88,7 @@ public class Vec2 {
 
     public static Vec2 normalise(Vec2 out) {
         float lsq = (float) out.lengthSq();
-        if (lsq > Constants.EPSILON_SQ) {
+        if (lsq > BoilerplateConstants.EPSILON_SQ) {
             float inv_len = (float) (1 / Math.sqrt(out.lengthSq()));
             out.mulSelf(inv_len);
         }

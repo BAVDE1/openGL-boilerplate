@@ -57,12 +57,12 @@ public class ExampleGame extends Game {
 
     public void start() {
         timeStarted = System.currentTimeMillis();
-        TimeStepper.startTimeStepper(Constants.DT, this);
+        TimeStepper.startTimeStepper(BoilerplateConstants.DT, this);
     }
 
     public void createCapabilitiesAndOpen() {
         window.setupGLFWContext();
-        window.setVSync(Constants.V_SYNC);
+        window.setVSync(BoilerplateConstants.V_SYNC);
 
         Renderer.setupGLContext();
         window.show();
@@ -233,7 +233,7 @@ public class ExampleGame extends Game {
 
     public void addToViewScale(float addition, boolean relativeToMouse) {
         // mouse or middle of screen
-        Vec2 relativeTo = relativeToMouse ? mousePos : Vec2.fromDim(Constants.SCREEN_SIZE).mul(.5f);
+        Vec2 relativeTo = relativeToMouse ? mousePos : Vec2.fromDim(BoilerplateConstants.SCREEN_SIZE).mul(.5f);
         viewPos.addSelf(relativeTo.mul(viewScale).sub(relativeTo.mul(viewScale+addition)));
 
         viewScale += addition;

@@ -1,6 +1,6 @@
 package rendering;
 
-import common.Constants;
+import common.BoilerplateConstants;
 import utility.Vec2;
 import utility.Vec3;
 
@@ -18,9 +18,9 @@ public class Shape {
         int type;
         List<Vec3> vars;
 
-        public Mode() {this(Constants.MODE_NIL);}
+        public Mode() {this(BoilerplateConstants.MODE_NIL);}
         public Mode(int texSlot, Vec2 texTopLeft, Vec2 texSize) {
-            this(Constants.MODE_TEX);
+            this(BoilerplateConstants.MODE_TEX);
             this.vars = List.of(new Vec3[] {
                     new Vec3(texTopLeft, texSlot),
                     new Vec3(texTopLeft.add(0, texSize.y), texSlot),
@@ -29,7 +29,7 @@ public class Shape {
             });
         }
         public Mode(Color col) {
-            this(Constants.MODE_COL);
+            this(BoilerplateConstants.MODE_COL);
             this.vars = List.of(new Vec3[] {new Vec3(col)});
         }
 

@@ -1,6 +1,6 @@
 package rendering;
 
-import common.Constants;
+import common.BoilerplateConstants;
 import utility.Logging;
 
 import java.io.*;
@@ -14,17 +14,17 @@ import static org.lwjgl.opengl.GL45.*;
 public class ShaderHelper {
     public static class Shader {
         int id, type;
-        String filePath;
+        String resourcePath;
 
-        Shader(int id, int type, String filePath) {
+        Shader(int id, int type, String resourcePath) {
             this.id = id;
             this.type = type;
-            this.filePath = filePath;
+            this.resourcePath = resourcePath;
         }
 
         @Override
         public String toString() {
-            return String.format("Shader(%s, %s, %s)", id, getShaderTypeString(type), filePath);
+            return String.format("Shader(%s, %s, %s)", id, getShaderTypeString(type), resourcePath);
         }
     }
 
@@ -35,9 +35,9 @@ public class ShaderHelper {
     private boolean linked = false;
 
     /** Gen program, attach shader multi, & then link program */
-    public void autoInitializeShadersMulti(String filePath) {
+    public void autoInitializeShadersMulti(String resourcePath) {
         genProgram();
-        attachShaderMulti(filePath);
+        attachShaderMulti(resourcePath);
         linkProgram();
     }
 
@@ -50,12 +50,12 @@ public class ShaderHelper {
     }
 
     /** Attach different shaders that are in the same file. MUST be separated with a "//--- SHADER_TYPE" line */
-    public void attachShaderMulti(String filePath) {
+    public void attachShaderMulti(String resourcePath) {
         int currentShaderType = -1;
 
-        InputStream is = ClassLoader.getSystemResourceAsStream(filePath);
+        InputStream is = ClassLoader.getSystemResourceAsStream(resourcePath);
         if (is == null) {
-            Logging.danger("'%s' could not be read. Aborting", filePath);
+            Logging.danger("'%s' could not be read. Aborting", resourcePath);
             return;
         }
 
@@ -67,7 +67,7 @@ public class ShaderHelper {
             if (line.startsWith("//---")) {
                 // finish last shader
                 if (!charSequence.isEmpty()) {
-                    attachShader(charSequence.toString(), currentShaderType, filePath);
+                    attachShader(charSequence.toString(), currentShaderType, resourcePath);
                 }
 
                 // start next shader
@@ -81,33 +81,33 @@ public class ShaderHelper {
         }
 
         // finish
-        attachShader(charSequence.toString(), currentShaderType, filePath);
+        attachShader(charSequence.toString(), currentShaderType, resourcePath);
     }
 
     /**
      * adds new GL shader from given file (if applicable)
      * <a href="https://docs.gl/gl2/glAttachShader">Shader setup example</a>
      */
-    public void attachShader(String filePath) {
-        int shaderType = getShaderType(filePath);
+    public void attachShader(String resourcePath) {
+        int shaderType = getShaderType(resourcePath);
         if (shaderType < 0) return;  // not a shader file
 
         // get file contents
-        InputStream is = ClassLoader.getSystemResourceAsStream(filePath);
+        InputStream is = ClassLoader.getSystemResourceAsStream(resourcePath);
         if (is == null) {
-            Logging.danger("'%s' could not be read. Aborting", filePath);
+            Logging.danger("'%s' could not be read. Aborting", resourcePath);
             return;
         }
 
         String charSequence;
-        Scanner scanner = new Scanner(filePath);
+        Scanner scanner = new Scanner(resourcePath);
         StringBuilder fileContents = new StringBuilder();
         while (scanner.hasNextLine()) {
             fileContents.append("\n").append(scanner.nextLine());
         }
         charSequence = fileContents.toString();
 
-        attachShader(charSequence, shaderType, filePath);
+        attachShader(charSequence, shaderType, resourcePath);
     }
 
     public void attachShader(String shaderCode, int shaderType, String filePath) {
@@ -177,8 +177,8 @@ public class ShaderHelper {
     }
 
     public static void uniformResolutionData(ShaderHelper sh) {
-        ShaderHelper.uniform2f(sh, "resolution", Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height);
-        ShaderHelper.uniformMatrix4f(sh, "projectionMatrix", Constants.PROJECTION_MATRIX);
+        ShaderHelper.uniform2f(sh, "resolution", BoilerplateConstants.SCREEN_SIZE.width, BoilerplateConstants.SCREEN_SIZE.height);
+        ShaderHelper.uniformMatrix4f(sh, "projectionMatrix", BoilerplateConstants.PROJECTION_MATRIX);
     }
 
     public void bind() {Renderer.bindShader(this);}

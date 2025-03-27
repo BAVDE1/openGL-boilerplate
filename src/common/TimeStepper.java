@@ -27,7 +27,7 @@ public class TimeStepper {
 
                 try {
                     double loopTime = game.mainLoop(staticDeltaTime);  // in seconds
-                    if (Constants.OPTIMIZE_TIME_STEPPER && accumulator + loopTime < halfDt) {  // only sleep if there is enough time
+                    if (BoilerplateConstants.OPTIMIZE_TIME_STEPPER && accumulator + loopTime < halfDt) {  // only sleep if there is enough time
                         Thread.sleep((long) Math.floor(halfDt * 1_000));  // give it a little break *-*
                     }
                 } catch (InterruptedException e) {

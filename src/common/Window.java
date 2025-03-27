@@ -38,7 +38,7 @@ public class Window {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         // Create the window
-        handle = glfwCreateWindow(Constants.SCREEN_SIZE.width, Constants.SCREEN_SIZE.height, "ARGG IT HURTS", NULL, NULL);
+        handle = glfwCreateWindow(BoilerplateConstants.SCREEN_SIZE.width, BoilerplateConstants.SCREEN_SIZE.height, "ARGG IT HURTS", NULL, NULL);
         if (handle == NULL) throw new RuntimeException("Failed to create the GLFW window");
     }
 
