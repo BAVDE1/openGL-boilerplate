@@ -1,6 +1,5 @@
 package rendering.text;
 
-import common.Constants;
 import rendering.ShaderHelper;
 import rendering.Texture;
 import rendering.VertexArray;
@@ -241,7 +240,7 @@ public class FontManager {
     }
 
     private static void setupTextShader() {
-        textShader.autoInitializeShadersMulti("res/shaders/text.glsl");
+        textShader.autoInitializeShadersMulti("shaders/text.glsl");
         ShaderHelper.uniformResolutionData(textShader);
         ShaderHelper.uniform1i(textShader, "fontTexture", FONT_TEXTURE_SLOT);
     }

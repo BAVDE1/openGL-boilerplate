@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -42,19 +43,25 @@ public class Texture {
     public int width, height;
 
     public Texture(String filePath) {
-        Image image = loadImageFromFilePath(filePath);
-        if (image == null) {
+        URL url = ClassLoader.getSystemResource(filePath);
+        if (url == null) {
             Logging.danger("Image failed to load from given filepath: '%s'", filePath);
             return;
         }
 
-        width = image.width;
-        height = image.height;
-        createTexture(image.buffer);
+        try {
+            createTexture(ImageIO.read(url));
+        } catch (IOException e) {
+            Logging.danger("Image failed to load from given filepath: '%s'\nError:\n%s", filePath, e);
+        }
     }
 
     public Texture(BufferedImage buffImg) {
-        // essentially: BufferedImage to ByteBuffer
+        createTexture(buffImg);
+    }
+
+    /** essentially BufferedImage to ByteBuffer */
+    public void createTexture(BufferedImage buffImg) {
         width = buffImg.getWidth();
         height = buffImg.getHeight();
 

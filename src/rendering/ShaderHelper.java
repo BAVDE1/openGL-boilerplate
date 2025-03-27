@@ -3,12 +3,8 @@ package rendering;
 import common.Constants;
 import utility.Logging;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -18,18 +14,17 @@ import static org.lwjgl.opengl.GL45.*;
 public class ShaderHelper {
     public static class Shader {
         int id, type;
-        String absFilePath, fileName;
+        String filePath;
 
-        Shader(int id, int type, File file) {
+        Shader(int id, int type, String filePath) {
             this.id = id;
             this.type = type;
-            absFilePath = file.getAbsolutePath();
-            fileName = file.getName();
+            this.filePath = filePath;
         }
 
         @Override
         public String toString() {
-            return String.format("Shader(%s, %s, %s)", id, getShaderTypeString(type), fileName);
+            return String.format("Shader(%s, %s, %s)", id, getShaderTypeString(type), filePath);
         }
     }
 
@@ -54,85 +49,68 @@ public class ShaderHelper {
         program = glCreateProgram();
     }
 
-    /** Search entire directory (including folders within folders) until a file is found, and pass it to applyShader() */
-    public void attachShadersInDir(File dir) {
-        for (final File fileEntry : Objects.requireNonNull(dir.listFiles())) {
-            if (fileEntry.isDirectory()) {
-                if (fileEntry.getName().equals("ignore")) continue;
-                attachShadersInDir(fileEntry.getAbsoluteFile());
-                continue;
-            }
-            attachShader(fileEntry);
-        }
-    }
-
-    /** Attach the 2 necessary shaders */
-    public void attachShaders(String... allFilePaths) {
-        for (String filePath : allFilePaths) {
-            attachShader(new File(filePath));
-        }
-    }
-
     /** Attach different shaders that are in the same file. MUST be separated with a "//--- SHADER_TYPE" line */
     public void attachShaderMulti(String filePath) {
         int currentShaderType = -1;
 
-        File file = new File(filePath);
-        try {
-            Scanner scanner = new Scanner(file);
-            StringBuilder charSequence = new StringBuilder();
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+        InputStream is = ClassLoader.getSystemResourceAsStream(filePath);
+        if (is == null) {
+            Logging.danger("'%s' could not be read. Aborting", filePath);
+            return;
+        }
 
-                if (line.startsWith("//---")) {
-                    // finish last shader
-                    if (!charSequence.isEmpty()) {
-                        attachShader(charSequence.toString(), currentShaderType, file);
-                    }
+        Scanner scanner = new Scanner(is);
+        StringBuilder charSequence = new StringBuilder();
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
 
-                    // start next shader
-                    line = line.replace(" ", "").toLowerCase();
-                    currentShaderType = getShaderType(line.split("//---")[1]);
-                    charSequence = new StringBuilder();
-                    continue;
+            if (line.startsWith("//---")) {
+                // finish last shader
+                if (!charSequence.isEmpty()) {
+                    attachShader(charSequence.toString(), currentShaderType, filePath);
                 }
 
-                charSequence.append("\n").append(line);
+                // start next shader
+                line = line.replace(" ", "").toLowerCase();
+                currentShaderType = getShaderType(line.split("//---")[1]);
+                charSequence = new StringBuilder();
+                continue;
             }
 
-            // finish
-            attachShader(charSequence.toString(), currentShaderType, file);
-        } catch (FileNotFoundException e) {
-            Logging.danger("'%s' at '%s' could not be read.\nError message: %s%n", file.getName(), file.getAbsolutePath(), e);
+            charSequence.append("\n").append(line);
         }
+
+        // finish
+        attachShader(charSequence.toString(), currentShaderType, filePath);
     }
 
     /**
      * adds new GL shader from given file (if applicable)
      * <a href="https://docs.gl/gl2/glAttachShader">Shader setup example</a>
      */
-    public void attachShader(File file) {
-        int shaderType = getShaderType(file);
+    public void attachShader(String filePath) {
+        int shaderType = getShaderType(filePath);
         if (shaderType < 0) return;  // not a shader file
 
         // get file contents
-        String charSequence;
-        try {
-            Scanner scanner = new Scanner(file);
-            StringBuilder fileContents = new StringBuilder();
-            while (scanner.hasNextLine()) {
-                fileContents.append("\n").append(scanner.nextLine());
-            }
-            charSequence = fileContents.toString();
-        } catch (FileNotFoundException e) {
-            Logging.danger("'%s' at '%s' could not be read.\nError message: %s%n", file.getName(), file.getAbsolutePath(), e);
+        InputStream is = ClassLoader.getSystemResourceAsStream(filePath);
+        if (is == null) {
+            Logging.danger("'%s' could not be read. Aborting", filePath);
             return;
         }
 
-        attachShader(charSequence, shaderType, file);
+        String charSequence;
+        Scanner scanner = new Scanner(filePath);
+        StringBuilder fileContents = new StringBuilder();
+        while (scanner.hasNextLine()) {
+            fileContents.append("\n").append(scanner.nextLine());
+        }
+        charSequence = fileContents.toString();
+
+        attachShader(charSequence, shaderType, filePath);
     }
 
-    public void attachShader(String shaderCode, int shaderType, File sourceFile) {
+    public void attachShader(String shaderCode, int shaderType, String filePath) {
         if (program == null || program < 0) {
             Logging.danger("No program set or program failed to be created.");
             return;
@@ -146,12 +124,12 @@ public class ShaderHelper {
         int[] shaderCompiled = new int[1];  // only needs size of 1
         glGetShaderiv(shader, GL_COMPILE_STATUS, shaderCompiled);
         if (shaderCompiled[0] != GL_TRUE) {
-            Logging.danger("Shader Compile Error (%s): %s", sourceFile, glGetShaderInfoLog(shader, 1024));
+            Logging.danger("Shader Compile Error (%s): %s", filePath, glGetShaderInfoLog(shader, 1024));
             return;
         }
 
         glAttachShader(program, shader);
-        attachedShaders.add(new Shader(shader, shaderType, sourceFile));
+        attachedShaders.add(new Shader(shader, shaderType, filePath));
 
     }
 

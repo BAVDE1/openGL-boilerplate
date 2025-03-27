@@ -178,11 +178,11 @@ public class ExampleGame extends Game {
 
     /** Must be called after window is visible */
     public void setupShaders() {
-        shMain.autoInitializeShadersMulti("res/shaders/main.glsl");
-        shCircles.autoInitializeShadersMulti("res/shaders/circle.glsl");
+        shMain.autoInitializeShadersMulti("shaders/main.glsl");
+        shCircles.autoInitializeShadersMulti("shaders/circle.glsl");
 
-        new Texture("res/textures/explosion.png").bindToTexArray(2, shMain);
-        new Texture("res/textures/closed.png").bindToTexArray(3, shMain);
+        new Texture("textures/explosion.png").bindToTexArray(2, shMain);
+        new Texture("textures/closed.png").bindToTexArray(3, shMain);
 
         ShaderHelper.uniformResolutionData(shMain);
         ShaderHelper.uniform1f(shMain, "viewScale", viewScale);
