@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -71,35 +72,40 @@ public class FontManager {
             aa = antiAlias;
             name = String.format("%s_%s_%s_%s", fontEnum, fontStyle, fontSize, aa);
 
-            File fontFile = getCustomFontFile(fontEnum);
-            if (fontFile == null) {
+            String resourcePath = getCustomFontResourcePath(fontEnum);
+            if (resourcePath == null) {
                 Logging.danger("Font with enum value '%s' does not exist or has not been registered.", fontEnum);
                 return;
             }
 
-            Logging.debug("Attempting to load font from resource path: %s", fontFile);
+            Logging.debug("Attempting to load font from resource path: %s", resourcePath);
             try {
-                font = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+                InputStream customFontStream = ClassLoader.getSystemResourceAsStream(resourcePath);
+                if (customFontStream == null) {
+                    Logging.danger("Error, could not load custom font resource: %s", resourcePath);
+                    return;
+                }
+
+                font = Font.createFont(Font.TRUETYPE_FONT, customFontStream);
                 font = font.deriveFont(fontStyle, fontSize);
             } catch (IOException | FontFormatException e) {
-                Logging.danger("Failed to load the font file '%s'\nError message: %s", fontFile.getPath(), e);
+                Logging.danger("Failed to load the font resource '%s'\nError message: %s", resourcePath, e);
                 return;
             }
 
             findImageDimensions();
         }
 
-        private File getCustomFontFile(int fontEnum) {
-            File fontFile = null;
-            switch (fontEnum) {
-                case FONT_NOVA -> fontFile = new File("res/fonts/Bona_Nova_SC/BonaNovaSC-Regular.ttf");
-                case FONT_JACQUARD -> fontFile = new File("res/fonts/Jacquard_24/Jacquard24-Regular.ttf");
-                case FONT_TINY -> fontFile = new File("res/fonts/Tiny5/Tiny5-Regular.ttf");
-                case FONT_CASTORO -> fontFile = new File("res/fonts/Castoro_Titling/CastoroTitling-Regular.ttf");
-                case FONT_LUGRASIMO -> fontFile = new File("res/fonts/Lugrasimo/Lugrasimo-Regular.ttf");
-                case FONT_KINGS -> fontFile = new File("res/fonts/Kings/Kings-Regular.ttf");
-            }
-            return fontFile;
+        private String getCustomFontResourcePath(int fontEnum) {
+            return switch (fontEnum) {
+                case FONT_NOVA -> "fonts/Bona_Nova_SC/BonaNovaSC-Regular.ttf";
+                case FONT_JACQUARD -> "fonts/Jacquard_24/Jacquard24-Regular.ttf";
+                case FONT_TINY -> "fonts/Tiny5/Tiny5-Regular.ttf";
+                case FONT_CASTORO -> "fonts/Castoro_Titling/CastoroTitling-Regular.ttf";
+                case FONT_LUGRASIMO -> "fonts/Lugrasimo/Lugrasimo-Regular.ttf";
+                case FONT_KINGS -> "fonts/Kings/Kings-Regular.ttf";
+                default -> null;
+            };
         }
 
         /** Find the dimensions of the image */
