@@ -1,6 +1,6 @@
 package rendering;
 
-import game.Constants;
+import common.Constants;
 import utility.Vec2;
 import utility.Vec3;
 

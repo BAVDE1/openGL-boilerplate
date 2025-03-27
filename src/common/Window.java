@@ -1,4 +1,4 @@
-package game;
+package common;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -70,7 +70,7 @@ public class Window {
     }
 
     public void show() {
-        Logging.mystical("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'",  glfwGetVersionString(), GL45.glGetString(GL11.GL_VERSION));
+        Logging.info("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'",  glfwGetVersionString(), GL45.glGetString(GL11.GL_VERSION));
         glfwShowWindow(handle);
     }
 

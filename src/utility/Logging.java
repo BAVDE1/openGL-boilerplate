@@ -2,7 +2,7 @@ package utility;
 
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GLDebugMessageCallbackI;
-import game.Constants;
+import common.Constants;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +32,8 @@ public class Logging {
     private static final String grey = "37";
     private static final String white = "2";
 
+    public static Boolean logDebug = true;
+
     private static void log(String col, String msg, String level, Object... args) {
         String callerFile = Thread.currentThread().getStackTrace()[tracebackInx].getFileName();
         int callersLineNumber = Thread.currentThread().getStackTrace()[tracebackInx].getLineNumber();
@@ -46,9 +48,7 @@ public class Logging {
     }
 
     public static void debug(String msg, Object... args) {
-        if (Constants.DEBUG) {
-            log(grey, msg, "DEBUG", args);
-        }
+        if (logDebug) log(grey, msg, "DEBUG", args);
     }
 
     public static void info(String msg, Object... args) {

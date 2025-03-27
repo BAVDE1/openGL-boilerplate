@@ -25,6 +25,6 @@ good video series: https://www.youtube.com/playlist?list=PLlrATfBNZ98foTJPJ_Ev03
 ---
 
 lwjgl demos: https://github.com/LWJGL/lwjgl3-demos/tree/main \
-voxel example: https://github.com/LWJGL/lwjgl3-demos/blob/main/src/org/lwjgl/demo/game/VoxelGameGL.java#L3319
+voxel example: https://github.com/LWJGL/lwjgl3-demos/blob/main/src/org/lwjgl/demo/exampleGame/VoxelGameGL.java#L3319
 
 unfinished wiki: https://en.wikibooks.org/wiki/OpenGL_Programming

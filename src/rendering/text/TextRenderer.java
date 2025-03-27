@@ -1,6 +1,6 @@
 package rendering.text;
 
-import game.Constants;
+import common.Constants;
 import rendering.Shape;
 import rendering.*;
 import utility.Logging;

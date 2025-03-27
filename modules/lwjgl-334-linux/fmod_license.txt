@@ -26,7 +26,7 @@ subject to the following:
     i. FMOD Studio Engine is integrated and redistributed in a software
     application (Product) only;
 
-    ii. FMOD Studio Engine is not distributed as part of a game engine or tool
+    ii. FMOD Studio Engine is not distributed as part of a java engine or tool
     set;
 
     iii. FMOD Studio Engine is not used in any Commercial enterprise or for any
@@ -46,7 +46,7 @@ information.
 
 3. CREDITS
 
-All Products require an in game credit line which must include the words “FMOD
+All Products require an in java credit line which must include the words “FMOD
 Studio” and “Firelight Technologies Pty Ltd”. Refer to www.fmod.com/attribution
 for examples.
 

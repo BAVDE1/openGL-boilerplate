@@ -1,7 +1,7 @@
 package rendering;
 
 import org.lwjgl.opengl.GL;
-import game.Window;
+import common.Window;
 import rendering.text.TextRenderer;
 import utility.Logging;
 

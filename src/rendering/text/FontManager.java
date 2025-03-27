@@ -1,6 +1,6 @@
 package rendering.text;
 
-import game.Constants;
+import common.Constants;
 import rendering.ShaderHelper;
 import rendering.Texture;
 import rendering.VertexArray;
@@ -167,6 +167,9 @@ public class FontManager {
     private static Texture finalTexture;
     private static boolean initialized = false;
 
+    /** writes to Texture's outputFile when fonts are generated and bound */
+    public static Boolean writeFontsToFile = false;
+
     /** Loads the default font first */
     public static void init() {
         initialized = true;
@@ -234,7 +237,7 @@ public class FontManager {
         setupTextShader();
         setupTextLayout();
 
-        if (Constants.DEBUG) Texture.writeToFile(fullImage);
+        if (writeFontsToFile) Texture.writeToFile(fullImage);
     }
 
     private static void setupTextShader() {

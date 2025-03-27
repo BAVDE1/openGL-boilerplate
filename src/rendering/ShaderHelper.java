@@ -1,6 +1,6 @@
 package rendering;
 
-import game.Constants;
+import common.Constants;
 import utility.Logging;
 
 import java.io.File;

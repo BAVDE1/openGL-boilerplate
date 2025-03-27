@@ -1,6 +1,6 @@
 package utility;
 
-import game.Constants;
+import common.Constants;
 
 import java.awt.*;
 
@@ -36,7 +36,7 @@ public class Vec2 {
         if (point == null) {
             point = new Point(0, 0);
         }
-        this(point.x, point.y);
+        set(point.x, point.y);
     }
 
     public void set(Vec2 vec) {

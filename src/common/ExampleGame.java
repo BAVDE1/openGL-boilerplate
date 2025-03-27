@@ -1,4 +1,4 @@
-package game;
+package common;
 
 import org.lwjgl.opengl.GL45;
 import rendering.Shape;
@@ -17,9 +17,10 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * Manages everything. Contains the main loop.
  */
-public class Game {
-    public static boolean debugMode = false;
+public class ExampleGame extends Game {
     public Window window = new Window();
+
+    public static boolean debugMode = false;
 
     // main buffers
     ShaderHelper shMain = new ShaderHelper();

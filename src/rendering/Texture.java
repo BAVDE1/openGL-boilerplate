@@ -33,7 +33,10 @@ public class Texture {
     }
 
     static final ArrayList<Integer> boundSlots = new ArrayList<>();
-    static final int BPP = 4;  // bytes per pixel
+    /** bytes per pixel */
+    static final int BPP = 4;
+    /** for debugging, if you wanted to write the texture to file to inspect it */
+    static File outputFile = new File("image.png");
 
     private int texId;
     public int width, height;
@@ -140,9 +143,8 @@ public class Texture {
 
     /** debug function writes given image to src/image.png */
     public static void writeToFile(BufferedImage img) {
-        File outputfile = new File("image.png");
         try {
-            ImageIO.write(img, "png", outputfile);
+            ImageIO.write(img, "png", outputFile);
         } catch (IOException e) {
             Logging.danger("Failed to write given image to file 'src/image.png'\nError message thrown:\n%s", e);
         }
