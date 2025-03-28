@@ -1,4 +1,4 @@
-package utility;
+package boilerplate.utility;
 
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GLDebugMessageCallbackI;

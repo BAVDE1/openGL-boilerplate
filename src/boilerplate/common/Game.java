@@ -1,4 +1,4 @@
-package common;
+package boilerplate.common;
 
 public abstract class Game {
     public abstract void createCapabilitiesAndOpen();

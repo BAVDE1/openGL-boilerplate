@@ -1,14 +1,13 @@
-package rendering.text;
+package boilerplate.rendering.text;
 
-import rendering.ShaderHelper;
-import rendering.Texture;
-import rendering.VertexArray;
-import utility.Logging;
-import utility.Vec2;
+import boilerplate.rendering.ShaderHelper;
+import boilerplate.rendering.Texture;
+import boilerplate.rendering.VertexArray;
+import boilerplate.utility.Logging;
+import boilerplate.utility.Vec2;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

@@ -1,9 +1,9 @@
-package rendering;
+package boilerplate.rendering;
 
-import common.BoilerplateConstants;
-import utility.Logging;
-import utility.Vec2;
-import utility.Vec3;
+import boilerplate.common.BoilerplateConstants;
+import boilerplate.utility.Logging;
+import boilerplate.utility.Vec2;
+import boilerplate.utility.Vec3;
 
 import java.awt.*;
 

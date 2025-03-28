@@ -1,12 +1,12 @@
-package rendering.text;
+package boilerplate.rendering.text;
 
-import common.BoilerplateConstants;
-import rendering.Shape;
-import rendering.*;
-import utility.Logging;
-import utility.Vec2;
-import utility.Vec3;
-import utility.Vec4;
+import boilerplate.common.BoilerplateConstants;
+import boilerplate.rendering.Shape;
+import boilerplate.rendering.*;
+import boilerplate.utility.Logging;
+import boilerplate.utility.Vec2;
+import boilerplate.utility.Vec3;
+import boilerplate.utility.Vec4;
 
 import java.awt.*;
 import java.util.ArrayList;

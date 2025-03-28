@@ -1,13 +1,17 @@
-package common;
+package boilerplate.example;
 
+import boilerplate.common.BoilerplateConstants;
+import boilerplate.common.Game;
+import boilerplate.common.TimeStepper;
+import boilerplate.common.Window;
 import org.lwjgl.opengl.GL45;
-import rendering.Shape;
-import rendering.*;
-import rendering.text.FontManager;
-import rendering.text.TextRenderer;
-import utility.Logging;
-import utility.MathUtils;
-import utility.Vec2;
+import boilerplate.rendering.Shape;
+import boilerplate.rendering.*;
+import boilerplate.rendering.text.FontManager;
+import boilerplate.rendering.text.TextRenderer;
+import boilerplate.utility.Logging;
+import boilerplate.utility.MathUtils;
+import boilerplate.utility.Vec2;
 
 import java.awt.*;
 
@@ -18,7 +22,7 @@ import static org.lwjgl.opengl.GL11.*;
  * Manages everything. Contains the main loop.
  */
 public class ExampleGame extends Game {
-    public Window window = new Window();
+    public boilerplate.common.Window window = new Window();
 
     public static boolean debugMode = false;
 

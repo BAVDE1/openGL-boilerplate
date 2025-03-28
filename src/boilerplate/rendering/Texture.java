@@ -1,8 +1,8 @@
-package rendering;
+package boilerplate.rendering;
 
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
-import utility.Logging;
+import boilerplate.utility.Logging;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

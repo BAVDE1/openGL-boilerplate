@@ -1,7 +1,9 @@
-import common.BoilerplateConstants;
-import common.ExampleGame;
+package boilerplate;
 
-import utility.Logging;
+import boilerplate.common.BoilerplateConstants;
+
+import boilerplate.example.ExampleGame;
+import boilerplate.utility.Logging;
 
 public class ExampleMain {
     public static void main(String[] args) {

@@ -1,10 +1,10 @@
-package rendering.text;
+package boilerplate.rendering.text;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Various functions for finding char rendering information
+ * Various functions for finding char boilerplate.rendering information
  */
 public class CharFondler {
     public static class CharMetrics {

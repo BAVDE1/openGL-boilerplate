@@ -1,11 +1,11 @@
-package common;
+package boilerplate.common;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryStack;
-import utility.Logging;
+import boilerplate.utility.Logging;
 
 import java.nio.IntBuffer;
 import java.util.Objects;

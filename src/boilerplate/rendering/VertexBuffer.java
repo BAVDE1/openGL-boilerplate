@@ -1,8 +1,8 @@
-package rendering;
+package boilerplate.rendering;
 
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL45;
-import utility.Logging;
+import boilerplate.utility.Logging;
 
 public class VertexBuffer {
     private final int bufferType = GL45.GL_ARRAY_BUFFER;

@@ -1,8 +1,8 @@
-package rendering;
+package boilerplate.rendering;
 
-import common.BoilerplateConstants;
-import utility.Vec2;
-import utility.Vec3;
+import boilerplate.common.BoilerplateConstants;
+import boilerplate.utility.Vec2;
+import boilerplate.utility.Vec3;
 
 import java.awt.*;
 import java.util.ArrayList;

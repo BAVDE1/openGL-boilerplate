@@ -1,6 +1,6 @@
-package common;
+package boilerplate.common;
 
-import utility.Logging;
+import boilerplate.utility.Logging;
 
 import java.awt.*;
 

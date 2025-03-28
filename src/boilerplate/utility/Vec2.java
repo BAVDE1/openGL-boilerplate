@@ -1,6 +1,6 @@
-package utility;
+package boilerplate.utility;
 
-import common.BoilerplateConstants;
+import boilerplate.common.BoilerplateConstants;
 
 import java.awt.*;
 

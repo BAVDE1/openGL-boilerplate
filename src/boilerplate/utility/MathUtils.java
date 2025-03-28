@@ -1,4 +1,4 @@
-package utility;
+package boilerplate.utility;
 
 public class MathUtils {
     public static double nanoToSecond(double nanoSecs) {

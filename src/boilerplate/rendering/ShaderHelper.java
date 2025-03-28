@@ -1,7 +1,7 @@
-package rendering;
+package boilerplate.rendering;
 
-import common.BoilerplateConstants;
-import utility.Logging;
+import boilerplate.common.BoilerplateConstants;
+import boilerplate.utility.Logging;
 
 import java.io.*;
 import java.util.*;

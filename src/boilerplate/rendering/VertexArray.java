@@ -1,6 +1,6 @@
-package rendering;
+package boilerplate.rendering;
 
-import utility.Logging;
+import boilerplate.utility.Logging;
 
 import java.util.ArrayList;
 import java.util.Arrays;

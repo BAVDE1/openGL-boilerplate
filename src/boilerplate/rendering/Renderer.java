@@ -1,9 +1,9 @@
-package rendering;
+package boilerplate.rendering;
 
 import org.lwjgl.opengl.GL;
-import common.Window;
-import rendering.text.TextRenderer;
-import utility.Logging;
+import boilerplate.common.Window;
+import boilerplate.rendering.text.TextRenderer;
+import boilerplate.utility.Logging;
 
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL45.*;

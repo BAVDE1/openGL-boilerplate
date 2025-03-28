@@ -1,7 +1,7 @@
-package common;
+package boilerplate.common;
 
-import utility.Logging;
-import utility.MathUtils;
+import boilerplate.utility.Logging;
+import boilerplate.utility.MathUtils;
 
 public class TimeStepper {
     /**
