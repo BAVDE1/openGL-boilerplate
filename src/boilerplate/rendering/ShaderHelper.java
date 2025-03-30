@@ -3,6 +3,7 @@ package boilerplate.rendering;
 import boilerplate.common.BoilerplateConstants;
 import boilerplate.utility.Logging;
 
+import java.awt.*;
 import java.io.*;
 import java.util.*;
 
@@ -177,8 +178,12 @@ public class ShaderHelper {
     }
 
     public static void uniformResolutionData(ShaderHelper sh) {
-        ShaderHelper.uniform2f(sh, "resolution", BoilerplateConstants.SCREEN_SIZE.width, BoilerplateConstants.SCREEN_SIZE.height);
-        ShaderHelper.uniformMatrix4f(sh, "projectionMatrix", BoilerplateConstants.PROJECTION_MATRIX);
+        uniformResolutionData(sh, BoilerplateConstants.SCREEN_SIZE, BoilerplateConstants.PROJECTION_MATRIX);
+    }
+
+    public static void uniformResolutionData(ShaderHelper sh, Dimension screenSize, float[] projectionMatrix) {
+        ShaderHelper.uniform2f(sh, "resolution", screenSize.width, screenSize.height);
+        ShaderHelper.uniformMatrix4f(sh, "projectionMatrix", projectionMatrix);
     }
 
     public void bind() {Renderer.bindShader(this);}
