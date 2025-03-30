@@ -100,7 +100,7 @@ public class ShaderHelper {
         }
 
         String charSequence;
-        Scanner scanner = new Scanner(resourcePath);
+        Scanner scanner = new Scanner(is);
         StringBuilder fileContents = new StringBuilder();
         while (scanner.hasNextLine()) {
             fileContents.append("\n").append(scanner.nextLine());
