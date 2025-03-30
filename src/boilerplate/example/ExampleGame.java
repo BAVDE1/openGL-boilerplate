@@ -1,7 +1,7 @@
 package boilerplate.example;
 
 import boilerplate.common.BoilerplateConstants;
-import boilerplate.common.Game;
+import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import org.lwjgl.opengl.GL45;
@@ -21,8 +21,8 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * Manages everything. Contains the main loop.
  */
-public class ExampleGame extends Game {
-    public boilerplate.common.Window window = new Window();
+public class ExampleGame extends GameBase {
+    public Window window = new Window();
 
     public static boolean debugMode = false;
 
@@ -65,9 +65,7 @@ public class ExampleGame extends Game {
     }
 
     public void createCapabilitiesAndOpen() {
-        window.setupGLFWContext();
-        window.setVSync(BoilerplateConstants.V_SYNC);
-
+        window.setup();
         Renderer.setupGLContext();
         window.show();
 
@@ -292,15 +290,12 @@ public class ExampleGame extends Game {
         Renderer.finish(window);
     }
 
-    public double mainLoop(double dt) {
-        double tStart = System.nanoTime();
+    public void mainLoop(double dt) {
         frameCounter++;
 
         glfwPollEvents();
         updateViewPos(dt);
         updateFpsAndDebugText();
         render();
-
-        return MathUtils.nanoToSecond(System.nanoTime() - tStart);
     }
 }

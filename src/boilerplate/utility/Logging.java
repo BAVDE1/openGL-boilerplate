@@ -31,9 +31,11 @@ public class Logging {
     private static final String grey = "37";
     private static final String white = "2";
 
+    public static Boolean silenceLogs = false;
     public static Boolean logDebug = true;
 
     private static void log(String col, String msg, String level, Object... args) {
+        if (silenceLogs) return;
         String callerFile = Thread.currentThread().getStackTrace()[tracebackInx].getFileName();
         int callersLineNumber = Thread.currentThread().getStackTrace()[tracebackInx].getLineNumber();
         System.out.printf(
