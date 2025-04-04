@@ -180,8 +180,8 @@ public class ExampleGame extends GameBase {
 
     /** Must be called after window is visible */
     public void setupShaders() {
-        shMain.autoInitializeShadersMulti("shaders/main.glsl");
-        shCircles.autoInitializeShadersMulti("shaders/circle.glsl");
+        shMain.useMainShader();
+        shCircles.useCircleShader();
 
         new Texture("textures/explosion.png").bindToTexArray(2, shMain);
         new Texture("textures/closed.png").bindToTexArray(3, shMain);

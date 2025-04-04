@@ -246,7 +246,7 @@ public class FontManager {
     }
 
     private static void setupTextShader() {
-        textShader.autoInitializeShadersMulti("shaders/text.glsl");
+        textShader.useTextShader();
         ShaderHelper.uniformResolutionData(textShader);
         ShaderHelper.uniform1i(textShader, "fontTexture", FONT_TEXTURE_SLOT);
     }

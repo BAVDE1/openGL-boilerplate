@@ -222,4 +222,14 @@ public class ShaderHelper {
         }
         glUniformMatrix4fv(sh.getUniformLocation(uniform), false, matrix4f);
     }
+
+    public void useMainShader() {
+        autoInitializeShadersMulti("shaders/main.glsl");
+    }
+    public void useTextShader() {
+        autoInitializeShadersMulti("shaders/text.glsl");
+    }
+    public void useCircleShader() {
+        autoInitializeShadersMulti("shaders/circle.glsl");
+    }
 }
