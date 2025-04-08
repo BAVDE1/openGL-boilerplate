@@ -1,5 +1,6 @@
 package boilerplate.rendering.text;
 
+import boilerplate.common.BoilerplateConstants;
 import boilerplate.rendering.ShaderHelper;
 import boilerplate.rendering.Texture;
 import boilerplate.rendering.VertexArray;
@@ -246,8 +247,12 @@ public class FontManager {
     }
 
     private static void setupTextShader() {
+        setupTextShader(BoilerplateConstants.SCREEN_SIZE, BoilerplateConstants.PROJECTION_MATRIX);
+    }
+
+    private static void setupTextShader(Dimension screenSize, float[] projectionMatrix) {
         textShader.useTextShader();
-        ShaderHelper.uniformResolutionData(textShader);
+        ShaderHelper.uniformResolutionData(textShader, screenSize, projectionMatrix);
         ShaderHelper.uniform1i(textShader, "fontTexture", FONT_TEXTURE_SLOT);
     }
 
