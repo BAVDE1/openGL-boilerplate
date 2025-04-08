@@ -1,12 +1,8 @@
 package boilerplate.rendering;
 
-import boilerplate.common.BoilerplateConstants;
 import boilerplate.utility.Vec2;
-import boilerplate.utility.Vec3;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -14,41 +10,8 @@ import java.util.ListIterator;
  * Creates shapes to be passed to a BufferBuilder.
  */
 public class Shape {
-    public static class Mode {
-        int type;
-        List<Vec3> vars;
-
-        public Mode() {this(BoilerplateConstants.MODE_NIL);}
-        public Mode(int texSlot, Vec2 texTopLeft, Vec2 texSize) {
-            this(BoilerplateConstants.MODE_TEX);
-            this.vars = List.of(new Vec3[] {
-                    new Vec3(texTopLeft, texSlot),
-                    new Vec3(texTopLeft.add(0, texSize.y), texSlot),
-                    new Vec3(texTopLeft.add(texSize.x, 0), texSlot),
-                    new Vec3(texTopLeft.add(texSize), texSlot)
-            });
-        }
-        public Mode(Color col) {
-            this(BoilerplateConstants.MODE_COL);
-            this.vars = List.of(new Vec3[] {new Vec3(col)});
-        }
-
-        public Mode(int mode) {this.type = mode;}
-        public Mode(int mode, Vec3... modeVars) {
-            this(mode);
-            this.vars = Arrays.stream(modeVars).toList();
-        }
-
-        /** Get vec3 at inx, or last (or empty vec3 if no vars exist) */
-        public Vec3 getVar(int inx) {
-            if (vars == null || vars.isEmpty()) return new Vec3();
-            if (inx >= vars.size()) return vars.getLast();
-            return vars.get(inx);
-        }
-    }
-
     public static class Quad {
-        public Mode mode = new Mode();
+        public ShapeMode.Type mode = new ShapeMode.Type();
         public Vec2 a; public Vec2 b;
         public Vec2 c; public Vec2 d;
 
@@ -56,7 +19,7 @@ public class Shape {
             this.a = a; this.b = b;
             this.c = c; this.d = d;
         }
-        public Quad(Vec2 a, Vec2 b, Vec2 c, Vec2 d, Mode mode) {
+        public Quad(Vec2 a, Vec2 b, Vec2 c, Vec2 d, ShapeMode.Type mode) {
             this(a, b, c, d);
             this.mode = mode;
         }
@@ -66,7 +29,7 @@ public class Shape {
     }
 
     public static class Poly {
-        public Mode mode = new Mode();
+        public ShapeMode.Type mode = new ShapeMode.Type();
         public List<Vec2> points;
         public Vec2 pos;
 
@@ -74,7 +37,7 @@ public class Shape {
             this.points = List.of(points);
             this.pos = pos;
         }
-        public Poly(Vec2 pos, Mode mode, Vec2... points) {
+        public Poly(Vec2 pos, ShapeMode.Type mode, Vec2... points) {
             this(pos, points);
             this.mode = mode;
         }
@@ -88,7 +51,7 @@ public class Shape {
                 topLeft.add(size)
         );
     }
-    public static Quad createRect(Vec2 topLeft, Vec2 size, Mode mode) {
+    public static Quad createRect(Vec2 topLeft, Vec2 size, ShapeMode.Type mode) {
         Quad q = createRect(topLeft, size);
         q.mode = mode;
         return q;
@@ -102,7 +65,7 @@ public class Shape {
             point2.add(perp), point2.sub(perp)
         );
     }
-    public static Quad createLine(Vec2 point1, Vec2 point2, int thickness, Mode mode) {
+    public static Quad createLine(Vec2 point1, Vec2 point2, int thickness, ShapeMode.Type mode) {
         Quad q = createLine(point1, point2, thickness);
         q.mode = mode;
         return q;
@@ -124,7 +87,7 @@ public class Shape {
                 topLeft,  topLeft.add(thickness)
         );
     }
-    public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness, Mode mode) {
+    public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness, ShapeMode.Type mode) {
         Poly p = createRectOutline(topLeft, size, thickness);
         p.mode = mode;
         return p;

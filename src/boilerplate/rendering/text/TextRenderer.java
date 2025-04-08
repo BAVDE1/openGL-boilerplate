@@ -117,7 +117,7 @@ public class TextRenderer {
                     Vec2 size = new Vec2(glyph.width, glyph.height).mul(scale);
                     Vec2 topLeft = new Vec2(linePos.x + accumulatedX, linePos.y);
 
-                    Shape.Mode mode = new Shape.Mode(FontManager.FONT_TEXTURE_SLOT, glyph.texTopLeft, glyph.texSize);
+                    ShapeMode.Type mode = new ShapeMode.Type(FontManager.FONT_TEXTURE_SLOT, glyph.texTopLeft, glyph.texSize);
                     Shape.Quad q = Shape.createRect(topLeft, size, mode);
                     Vec3 va = q.mode.getVar(0); Vec3 vb = q.mode.getVar(1);
                     Vec3 vc = q.mode.getVar(2); Vec3 vd = q.mode.getVar(3);

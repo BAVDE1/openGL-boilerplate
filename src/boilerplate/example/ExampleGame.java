@@ -142,13 +142,13 @@ public class ExampleGame extends GameBase {
         vbMain.genId(); vaMain.genId();
 
         builderMain.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
-        builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new Shape.Mode(1, new Vec2(), new Vec2(1))));
-        builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new Shape.Mode(2, new Vec2(), new Vec2(1))));
-        builderMain.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new Shape.Mode(3)));
-        builderMain.pushSeparatedQuad(new Shape.Quad(new Vec2(510, 100), new Vec2(540, 110), new Vec2(560, 180), new Vec2(580, 150), new Shape.Mode(3)));
-        builderMain.pushSeparatedPolygon(Shape.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new Shape.Mode(3)));
+        builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new ShapeMode.Type(1, new Vec2(), new Vec2(1))));
+        builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new ShapeMode.Type(2, new Vec2(), new Vec2(1))));
+        builderMain.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new ShapeMode.Type(3)));
+        builderMain.pushSeparatedQuad(new Shape.Quad(new Vec2(510, 100), new Vec2(540, 110), new Vec2(560, 180), new Vec2(580, 150), new ShapeMode.Type(3)));
+        builderMain.pushSeparatedPolygon(Shape.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new ShapeMode.Type(3)));
 
-        Shape.Poly p2 = new Shape.Poly(new Vec2(100, 250), new Shape.Mode(Color.RED), new Vec2(-50, 50), new Vec2(0, -50), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0));
+        Shape.Poly p2 = new Shape.Poly(new Vec2(100, 250), new ShapeMode.Type(Color.RED), new Vec2(-50, 50), new Vec2(0, -50), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0));
         Shape.sortPoints(p2);
         builderMain.pushSeparatedPolygonSorted(p2);
 
