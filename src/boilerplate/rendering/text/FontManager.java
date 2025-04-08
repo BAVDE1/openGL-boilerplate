@@ -226,6 +226,10 @@ public class FontManager {
 
     /** generate all font images onto one universal image atlas at their y offsets */
     public static void generateAndBindAllFonts() {
+        generateAndBindAllFonts(BoilerplateConstants.SCREEN_SIZE, BoilerplateConstants.PROJECTION_MATRIX);
+    }
+
+    public static void generateAndBindAllFonts(Dimension screenSize, float[] projectionMatrix) {
         BufferedImage fullImage = new BufferedImage(fullWidth, fullHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = fullImage.createGraphics();
 
@@ -240,7 +244,7 @@ public class FontManager {
         finalTexture.bind(FONT_TEXTURE_SLOT);
         Logging.debug("%s fonts generated, texture bound to slot %s", allLoadedFonts.size(), FONT_TEXTURE_SLOT);
 
-        setupTextShader();
+        setupTextShader(screenSize, projectionMatrix);
         setupTextLayout();
 
         if (writeFontsToFile) Texture.writeToFile(fullImage);
