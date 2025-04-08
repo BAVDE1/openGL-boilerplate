@@ -1,9 +1,13 @@
 package boilerplate.utility;
 
+import boilerplate.ExampleMain;
+import boilerplate.common.BoilerplateConstants;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GLDebugMessageCallbackI;
 
-import java.io.PrintStream;
+import javax.print.URIException;
+import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -17,7 +21,7 @@ import static org.lwjgl.system.MemoryUtil.memByteBuffer;
  */
 public class Logging {
     private static final ArrayList<Integer> ignoreList = new ArrayList<>(List.of(2));
-    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+    private static final DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
     private static final int tracebackInx = 3;
 
     // more ansi escape codes: https://talyian.github.io/ansicolors/
@@ -31,16 +35,19 @@ public class Logging {
     private static final String grey = "37";
     private static final String white = "2";
 
+    private static boolean isFileLogging = false;
+    public static String defaultLoggingDir = "logs";
     public static Boolean silenceLogs = false;
     public static Boolean logDebug = true;
 
     private static void log(String col, String msg, String level, Object... args) {
         if (silenceLogs) return;
+        String colorFormat = isFileLogging ? "%s %s [%s:%s] %s%n" : "\u001B[" + col + "m%s %s [%s:%s] %s\u001B[0m%n";
         String callerFile = Thread.currentThread().getStackTrace()[tracebackInx].getFileName();
         int callersLineNumber = Thread.currentThread().getStackTrace()[tracebackInx].getLineNumber();
         System.out.printf(
-                "\u001B[" + col + "m%s %s [%s:%s] %s\u001B[0m%n",
-                LocalTime.now().format(format),
+                colorFormat,
+                LocalTime.now().format(dateTimeFormat),
                 level,
                 callerFile,
                 callersLineNumber,
@@ -78,6 +85,29 @@ public class Logging {
 
     public static void drag(String msg, Object... args) {
         log(pink, msg, "DRAG", args);
+    }
+
+    public static void setupFileLogging(String fileName) {
+        try {
+            String jarFolder = BoilerplateConstants.getJarFolder();
+            if (jarFolder == null) {
+                debug("File logging aborted, not a valid jar file.");
+                return;
+            }
+
+            String loggingDir = String.format("%s/%s", jarFolder, defaultLoggingDir);
+            File loggingDirFile = new File(loggingDir);
+            if (!loggingDirFile.exists()) {
+                if (!loggingDirFile.mkdirs()) danger("Error making directory: %s", loggingDir);
+            }
+
+            PrintStream ps = new PrintStream(String.format("%s/%s", loggingDir, fileName));
+            System.setOut(ps);
+            System.setErr(ps);
+            isFileLogging = true;
+        } catch (IOException e) {
+            danger("Error setting up file logging:\n%s", e);
+        }
     }
 
     public static GLDebugMessageCallbackI debugCallback() {

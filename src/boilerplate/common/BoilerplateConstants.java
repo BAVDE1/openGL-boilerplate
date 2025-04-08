@@ -3,11 +3,14 @@ package boilerplate.common;
 import boilerplate.utility.Logging;
 
 import java.awt.*;
+import java.io.File;
+import java.net.URISyntaxException;
 
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
 
 public class BoilerplateConstants {
     public static final String VERSION = "1.2.0";
+    public static final String LOGGING_FILE_NAME = "latest.log";
     public static final int GLFW_VERSION_MAJOR = 4;
     public static final int GLFW_VERSION_MINOR = 5;
     public static final int GLFW_OPENGL_PROFILE = GLFW_OPENGL_CORE_PROFILE;
@@ -54,5 +57,22 @@ public class BoilerplateConstants {
             if (size > givenSize) return size;
         }
         return BUFF_SIZE_ENORMOUS_PLUS;
+    }
+
+    public static String getJarFolder() {
+        try {
+            String path = new File(BoilerplateConstants.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+            path = path.replace('/', File.separatorChar);
+
+            int jarInx = path.indexOf(".jar");
+            if (jarInx == -1) return null;
+            path = path.substring(0, jarInx + 4);
+
+            int driveInx = path.lastIndexOf(':');
+            if (driveInx != -1) path = path.substring(driveInx - 1);
+            return path.substring(0, path.lastIndexOf(File.separatorChar) + 1);
+        } catch (URISyntaxException e) {
+            return String.format("Error: %s", e);
+        }
     }
 }
