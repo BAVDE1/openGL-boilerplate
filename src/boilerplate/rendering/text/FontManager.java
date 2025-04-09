@@ -41,6 +41,10 @@ public class FontManager {
             );
         }
 
+        public Vec2 getSize() {
+            return new Vec2(width, height);
+        }
+
         @Override
         public String toString() {
             return String.format("(x=%s, y=%s, w=%s, h=%s)", x, y, width, height);
@@ -137,6 +141,10 @@ public class FontManager {
             int accumulatedWidth = 0;
             for (char c : line.toCharArray()) accumulatedWidth += getGlyph(c).width;
             return accumulatedWidth;
+        }
+
+        public int getLineHeight() {
+            return glyphMap.get(' ').height;
         }
 
         /** Retrieve a glyph with error catching */

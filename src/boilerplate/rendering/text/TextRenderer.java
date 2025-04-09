@@ -78,7 +78,7 @@ public class TextRenderer {
             bgSb.clear();
 
             FontManager.LoadedFont font = FontManager.getLoadedFont(loadedFontId);
-            int genericHeight = (int) (font.glyphMap.get(' ').height * scale);
+            int genericHeight = (int) (font.getLineHeight() * scale);
             int yAddition = genericHeight + ySpacing;
 
             String[] lines = string.split("\n");
@@ -99,16 +99,16 @@ public class TextRenderer {
                     Vec2 size = new Vec2(lineWidth, yAddition);
                     if (!seamlessBgLines) size.y -= ySpacing;
 
-                    Shape2d.Poly p = Shape2d.createRect(linePos.sub(bgMargin), size.add(bgMargin.mul(2)));
-                    p.mode = new ShapeMode.Append(new float[] {-1, -1, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(), bgCol.getAlpha()});
+                    float[] color = new float[] {-1, -1, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(), bgCol.getAlpha()};
+                    Shape2d.Poly p = Shape2d.createRect(linePos.sub(bgMargin), size.add(bgMargin.mul(2)), new ShapeMode.Append(color));
                     bgSb.pushSeparatedPolygon(p);
                 }
 
                 // all chars in line
                 for (char c : line.toCharArray()) {
                     FontManager.Glyph glyph = font.getGlyph(c);
-                    Vec2 size = new Vec2(glyph.width, glyph.height).mul(scale);
-                    Vec2 topLeft = new Vec2(linePos.x + accumulatedX, linePos.y);
+                    Vec2 size = glyph.getSize();
+                    Vec2 topLeft = linePos.add(accumulatedX, 0);
 
                     Shape2d.Poly texturePoints = Shape2d.createRect(glyph.texTopLeft, glyph.texSize);
                     float[] colorVars = new float[] {textColour.getRed(), textColour.getGreen(), textColour.getBlue(), textColour.getAlpha()};

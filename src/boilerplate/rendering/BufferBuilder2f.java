@@ -25,6 +25,8 @@ public class BufferBuilder2f {
     private int additionalVertFloats = 0;
     private int floatCountPerVert = POS_FLOAT_COUNT;
 
+    private boolean shouldNextBeSeparated = false;  // should the next time raw vertices are pushed be separated
+
     public BufferBuilder2f() {this(DEFAULT_SIZE, false, 0);}
     public BufferBuilder2f(int size) {this(size, false, 0);}
     public BufferBuilder2f(boolean autoResize) {this(DEFAULT_SIZE, autoResize, 0);}
@@ -94,28 +96,15 @@ public class BufferBuilder2f {
      * PUSHING VERTICES & SHAPES
      */
 
-    // Adds 2 "invisible" vertices
-    private void pushSeparation(Vec2 v) {
-        pushSeparation(v.x, v.y);
-    }
-    private void pushSeparation(float toX, float toY) {
-        if (floatCount < 2) return;
-        separationsCount++;
-
-        float[] f = new float[floatCountPerVert * 2];  // pushing 2 vertices
-        f[0] = vertices[floatCount-2- additionalVertFloats];  // just trust me here bro
-        f[1] = vertices[floatCount-1- additionalVertFloats];
-        f[2+ additionalVertFloats] = toX;
-        f[2+ additionalVertFloats +1] = toY;
-        pushRawVertices(f);
-    }
-
     public void pushRawSeparatedVertices(float[] verts) {
-        pushSeparation(verts[0], verts[1]);
-        pushRawVertices(verts);
+        pushRawVertices(verts, true);
     }
 
     public void pushRawVertices(float[] verts) {
+        pushRawVertices(verts, false);
+    }
+
+    public void pushRawVertices(float[] verts, boolean separation) {
         int fCount = verts.length;
         if (fCount == 0) return;
 
@@ -130,6 +119,18 @@ public class BufferBuilder2f {
             if (autoResizeBuffer(floatCount + fCount) == BoilerplateConstants.ERROR) {
                 Logging.danger("An error occurred attempting to resize this buffer! Aborting.");
                 return;
+            }
+        }
+
+        // perform separation
+        if (separation || shouldNextBeSeparated) {
+            shouldNextBeSeparated = false;
+            if (floatCount >= floatCountPerVert) {
+                separationsCount++;
+                float[] separationVerts = new float[floatCountPerVert * 2];  // pushing 2 vertices (last of current verts and first of new verts)
+                System.arraycopy(vertices, floatCount - floatCountPerVert, separationVerts, 0, floatCountPerVert);
+                System.arraycopy(verts, 0, separationVerts, floatCountPerVert, floatCountPerVert);
+                pushRawVertices(separationVerts, false);  // FALSE!!!
             }
         }
 
@@ -171,7 +172,7 @@ public class BufferBuilder2f {
     }
 
     public void pushSeparatedPolygon(Shape2d.Poly p) {
-        pushSeparation(p.points.getFirst().add(p.pos));
+        shouldNextBeSeparated = true;
         pushPolygon(p);
     }
 
@@ -187,7 +188,7 @@ public class BufferBuilder2f {
     }
 
     public void pushSeparatedPolygonSorted(Shape2d.Poly p) {
-        pushSeparation(p.points.getFirst().add(p.pos));
+        shouldNextBeSeparated = true;
         pushPolygonSorted(p);
     }
 
