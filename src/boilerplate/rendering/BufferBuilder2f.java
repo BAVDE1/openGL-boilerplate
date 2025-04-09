@@ -168,6 +168,10 @@ public class BufferBuilder2f {
         } else if (mode instanceof ShapeMode.UnpackAppend unpackAppend) {
             int numUnpacked = unpackIntoArray(theArray, floatInx+2, vertInx, unpackAppend.unpack);
             appendToArray(theArray, floatInx+2+numUnpacked, unpackAppend.append);
+        } else if (mode instanceof ShapeMode.AppendUnpack appendUnpack) {
+            int numAppended = appendToArray(theArray, floatInx+2, appendUnpack.append);
+            unpackIntoArray(theArray, floatInx+2+numAppended, vertInx, appendUnpack.unpack);
+
         }
     }
 

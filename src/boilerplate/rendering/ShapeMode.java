@@ -46,6 +46,19 @@ public abstract class ShapeMode {
     }
 
     /**
+     * same as UnpackAppend, but reversed
+     */
+    public static class AppendUnpack extends ShapeMode {
+        Unpack unpack;
+        Append append;
+
+        public AppendUnpack(float[] appendVars, List<float[]> unpackVars) {
+            unpack = new Unpack(unpackVars);
+            append = new Append(appendVars);
+        }
+    }
+
+    /**
      * THIS TYPE IS FOR DEMONSTRATION PURPOSES
      * meant for use with the main shader
      */
