@@ -9,66 +9,62 @@ import java.util.ListIterator;
 /**
  * Creates shapes to be passed to a BufferBuilder.
  */
-public class Shape {
-    public static class Quad {
-        public ShapeMode.Type mode = new ShapeMode.Type();
-        public Vec2 a; public Vec2 b;
-        public Vec2 c; public Vec2 d;
-
-        public Quad(Vec2 a, Vec2 b, Vec2 c, Vec2 d) {
-            this.a = a; this.b = b;
-            this.c = c; this.d = d;
-        }
-        public Quad(Vec2 a, Vec2 b, Vec2 c, Vec2 d, ShapeMode.Type mode) {
-            this(a, b, c, d);
-            this.mode = mode;
-        }
-
-        @Override
-        public String toString() {return String.format("Quad(%s, %s, %s, %s)", a, b, c, d);}
-    }
-
+public class Shape2d {
     public static class Poly {
-        public ShapeMode.Type mode = new ShapeMode.Type();
+        public ShapeMode mode = null;
         public List<Vec2> points;
-        public Vec2 pos;
+        public Vec2 pos = new Vec2();
 
-        public Poly(Vec2 pos, Vec2... points) {
+        public Poly(Vec2... points) {
             this.points = List.of(points);
-            this.pos = pos;
         }
-        public Poly(Vec2 pos, ShapeMode.Type mode, Vec2... points) {
-            this(pos, points);
+
+        public Poly(ShapeMode mode, Vec2... points) {
+            this(points);
             this.mode = mode;
+        }
+
+        public Poly addPos(Vec2 newPos) {
+            this.pos = newPos;
+            return this;
+        }
+
+        public List<float[]> toArray() {
+            List<float[]> l = new ArrayList<>(List.of());
+            for (int i = 0; i < points.size(); i++) {
+                l.add(i, new float[] {points.get(i).x, points.get(i).y});
+            }
+            return l;
         }
     }
 
-    public static Quad createRect(Vec2 topLeft, Vec2 size) {
-        return new Quad(
+    public static Poly createRect(Vec2 topLeft, Vec2 size) {
+        return new Poly(
                 topLeft,
                 topLeft.add(0, size.y),
                 topLeft.add(size.x, 0),
                 topLeft.add(size)
         );
     }
-    public static Quad createRect(Vec2 topLeft, Vec2 size, ShapeMode.Type mode) {
-        Quad q = createRect(topLeft, size);
-        q.mode = mode;
-        return q;
+
+    public static Poly createRect(Vec2 topLeft, Vec2 size, ShapeMode mode) {
+        Poly p = createRect(topLeft, size);
+        p.mode = mode;
+        return p;
     }
 
-    public static Quad createLine(Vec2 point1, Vec2 point2, int thickness) {
+    public static Poly createLine(Vec2 point1, Vec2 point2, int thickness) {
         Vec2 normalised = point2.sub(point1).normalized();
         Vec2 perp = normalised.perpendicular().mul(thickness * .5f);
-        return new Quad(
+        return new Poly(
             point1.add(perp), point1.sub(perp),
             point2.add(perp), point2.sub(perp)
         );
     }
-    public static Quad createLine(Vec2 point1, Vec2 point2, int thickness, ShapeMode.Type mode) {
-        Quad q = createLine(point1, point2, thickness);
-        q.mode = mode;
-        return q;
+    public static Poly createLine(Vec2 point1, Vec2 point2, int thickness, ShapeMode mode) {
+        Poly p = createLine(point1, point2, thickness);
+        p.mode = mode;
+        return p;
     }
 
     public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness) {
@@ -79,15 +75,16 @@ public class Shape {
         Vec2 btmRight = topLeft.add(size);
         Vec2 btmLeft = topLeft.add(0, size.y);
 
-        return new Poly(pos,
+        return new Poly(
                 topLeft,  topLeft.add(thickness),
                 topRight, topRight.add(-thickness, thickness),
                 btmRight, btmRight.sub(thickness),
                 btmLeft,  btmLeft.sub(-thickness, thickness),
                 topLeft,  topLeft.add(thickness)
-        );
+        ).addPos(pos);
     }
-    public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness, ShapeMode.Type mode) {
+
+    public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness, ShapeMode mode) {
         Poly p = createRectOutline(topLeft, size, thickness);
         p.mode = mode;
         return p;

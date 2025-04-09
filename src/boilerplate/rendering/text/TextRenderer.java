@@ -1,12 +1,10 @@
 package boilerplate.rendering.text;
 
 import boilerplate.common.BoilerplateConstants;
-import boilerplate.rendering.Shape;
+import boilerplate.rendering.Shape2d;
 import boilerplate.rendering.*;
 import boilerplate.utility.Logging;
 import boilerplate.utility.Vec2;
-import boilerplate.utility.Vec3;
-import boilerplate.utility.Vec4;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -101,14 +99,9 @@ public class TextRenderer {
                     Vec2 size = new Vec2(lineWidth, yAddition);
                     if (!seamlessBgLines) size.y -= ySpacing;
 
-                    Shape.Quad q = Shape.createRect(linePos.sub(bgMargin), size.add(bgMargin.mul(2)));
-                    Vec4 col = new Vec4(bgCol);
-                    bgSb.pushRawSeparatedVertices(new float[] {
-                            q.a.x, q.a.y, -1, -1, col.x, col.y, col.z, col.w,
-                            q.b.x, q.b.y, -1, -1, col.x, col.y, col.z, col.w,
-                            q.c.x, q.c.y, -1, -1, col.x, col.y, col.z, col.w,
-                            q.d.x, q.d.y, -1, -1, col.x, col.y, col.z, col.w
-                    });
+                    Shape2d.Poly p = Shape2d.createRect(linePos.sub(bgMargin), size.add(bgMargin.mul(2)));
+                    p.mode = new ShapeMode.Append(new float[] {-1, -1, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(), bgCol.getAlpha()});
+                    bgSb.pushSeparatedPolygon(p);
                 }
 
                 // all chars in line
@@ -117,21 +110,14 @@ public class TextRenderer {
                     Vec2 size = new Vec2(glyph.width, glyph.height).mul(scale);
                     Vec2 topLeft = new Vec2(linePos.x + accumulatedX, linePos.y);
 
-                    ShapeMode.Type mode = new ShapeMode.Type(FontManager.FONT_TEXTURE_SLOT, glyph.texTopLeft, glyph.texSize);
-                    Shape.Quad q = Shape.createRect(topLeft, size, mode);
-                    Vec3 va = q.mode.getVar(0); Vec3 vb = q.mode.getVar(1);
-                    Vec3 vc = q.mode.getVar(2); Vec3 vd = q.mode.getVar(3);
+                    Shape2d.Poly texturePoints = Shape2d.createRect(glyph.texTopLeft, glyph.texSize);
+                    float[] colorVars = new float[] {textColour.getRed(), textColour.getGreen(), textColour.getBlue(), textColour.getAlpha()};
 
-                    Vec4 col = new Vec4(textColour);
-                    float[] verts = new float[] {
-                            q.a.x, q.a.y, va.x, va.y, col.x, col.y, col.z, col.w,
-                            q.b.x, q.b.y, vb.x, vb.y, col.x, col.y, col.z, col.w,
-                            q.c.x, q.c.y, vc.x, vc.y, col.x, col.y, col.z, col.w,
-                            q.d.x, q.d.y, vd.x, vd.y, col.x, col.y, col.z, col.w
-                    };
-                    if (accumulatedX == 0) sb.pushRawSeparatedVertices(verts);
-                    else sb.pushRawVertices(verts);
+                    ShapeMode.UnpackAppend mode = new ShapeMode.UnpackAppend(texturePoints.toArray(), colorVars);
+                    Shape2d.Poly p = Shape2d.createRect(topLeft, size, mode);
 
+                    if (accumulatedX == 0) sb.pushSeparatedPolygon(p);
+                    else sb.pushPolygon(p);
                     accumulatedX += (int) size.x;
                 }
                 accumulatedY += yAddition;

@@ -5,7 +5,7 @@ import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import org.lwjgl.opengl.GL45;
-import boilerplate.rendering.Shape;
+import boilerplate.rendering.Shape2d;
 import boilerplate.rendering.*;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
@@ -142,14 +142,14 @@ public class ExampleGame extends GameBase {
         vbMain.genId(); vaMain.genId();
 
         builderMain.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
-        builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(50, 50), new Vec2(500, 100), new ShapeMode.Type(1, new Vec2(), new Vec2(1))));
-        builderMain.pushSeparatedQuad(Shape.createRect(new Vec2(200, 200), new Vec2(700, 150), new ShapeMode.Type(2, new Vec2(), new Vec2(1))));
-        builderMain.pushSeparatedQuad(Shape.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new ShapeMode.Type(3)));
-        builderMain.pushSeparatedQuad(new Shape.Quad(new Vec2(510, 100), new Vec2(540, 110), new Vec2(560, 180), new Vec2(580, 150), new ShapeMode.Type(3)));
-        builderMain.pushSeparatedPolygon(Shape.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new ShapeMode.Type(3)));
+        builderMain.pushSeparatedPolygon(Shape2d.createRect(new Vec2(50, 50), new Vec2(500, 100), new ShapeMode.Demonstration(1, new Vec2(), new Vec2(1))));
+        builderMain.pushSeparatedPolygon(Shape2d.createRect(new Vec2(200, 200), new Vec2(700, 150), new ShapeMode.Demonstration(2, new Vec2(), new Vec2(1))));
+        builderMain.pushSeparatedPolygon(Shape2d.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new ShapeMode.Demonstration(3)));
+        builderMain.pushSeparatedPolygon(Shape2d.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new ShapeMode.Demonstration(3)));
 
-        Shape.Poly p2 = new Shape.Poly(new Vec2(100, 250), new ShapeMode.Type(Color.RED), new Vec2(-50, 50), new Vec2(0, -50), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0));
-        Shape.sortPoints(p2);
+        Shape2d.Poly p2 = new Shape2d.Poly(new ShapeMode.Demonstration(Color.RED), new Vec2(-50, 50), new Vec2(0, -50), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0));
+        p2.addPos(new Vec2(100, 250));
+        Shape2d.sortPoints(p2);
         builderMain.pushSeparatedPolygonSorted(p2);
 
         vbMain.bufferSetData(builderMain);
@@ -180,7 +180,7 @@ public class ExampleGame extends GameBase {
 
     /** Must be called after window is visible */
     public void setupShaders() {
-        shMain.useMainShader();
+        shMain.useDemoShader();
         shCircles.useCircleShader();
 
         new Texture("textures/explosion.png").bindToTexArray(2, shMain);

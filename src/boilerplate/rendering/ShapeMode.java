@@ -8,24 +8,53 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class ShapeMode<T> {
-    public abstract T getVar(int inx);
+public abstract class ShapeMode {
+    /**
+     * Appends the given vars to end of each vertex
+     */
+    public static class Append extends ShapeMode {
+        float[] vars;
 
-    public static class CustomInx<T> extends ShapeMode<T> {
-        List<T> vars;
-
-        @Override
-        public T getVar(int inx) {
-            return null;
+        public Append(float[] varsToAppend) {
+            vars = varsToAppend;
         }
     }
 
-    public static class Type extends ShapeMode<Vec3> {
+    /**
+     * Unpacks the given vars to the end of each vertex (wraps)
+     */
+    public static class Unpack extends ShapeMode {
+        List<float[]> unpackVars;
+
+        public Unpack(List<float[]> unpackVars) {
+            this.unpackVars = unpackVars;
+        }
+    }
+
+    /**
+     * Unpacks the unpackVars for each vertex in order (wraps when it reaches the end)
+     * And then appends appendVars for each vertex
+     */
+    public static class UnpackAppend extends ShapeMode {
+        Unpack unpack;
+        Append append;
+
+        public UnpackAppend(List<float[]> unpackVars, float[] appendVars) {
+            unpack = new Unpack(unpackVars);
+            append = new Append(appendVars);
+        }
+    }
+
+    /**
+     * THIS TYPE IS FOR DEMONSTRATION PURPOSES
+     * meant for use with the main shader
+     */
+    public static class Demonstration extends ShapeMode {
         List<Vec3> vars;
         int type;
 
-        public Type() {this(BoilerplateConstants.MODE_NIL);}
-        public Type(int texSlot, Vec2 texTopLeft, Vec2 texSize) {
+        public Demonstration() {this(BoilerplateConstants.MODE_NIL);}
+        public Demonstration(int texSlot, Vec2 texTopLeft, Vec2 texSize) {
             this(BoilerplateConstants.MODE_TEX);
             this.vars = List.of(new Vec3[] {
                     new Vec3(texTopLeft, texSlot),
@@ -34,13 +63,13 @@ public abstract class ShapeMode<T> {
                     new Vec3(texTopLeft.add(texSize), texSlot)
             });
         }
-        public Type(Color col) {
+        public Demonstration(Color col) {
             this(BoilerplateConstants.MODE_COL);
             this.vars = List.of(new Vec3[] {new Vec3(col)});
         }
 
-        public Type(int mode) {this.type = mode;}
-        public Type(int mode, Vec3... modeVars) {
+        public Demonstration(int mode) {this.type = mode;}
+        public Demonstration(int mode, Vec3... modeVars) {
             this(mode);
             this.vars = Arrays.stream(modeVars).toList();
         }

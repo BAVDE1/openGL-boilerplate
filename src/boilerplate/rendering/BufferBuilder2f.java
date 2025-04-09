@@ -95,7 +95,9 @@ public class BufferBuilder2f {
      */
 
     // Adds 2 "invisible" vertices
-    private void pushSeparation(Vec2 v) {pushSeparation(v.x, v.y);}
+    private void pushSeparation(Vec2 v) {
+        pushSeparation(v.x, v.y);
+    }
     private void pushSeparation(float toX, float toY) {
         if (floatCount < 2) return;
         separationsCount++;
@@ -136,62 +138,71 @@ public class BufferBuilder2f {
         vertexCount += fCount / floatCountPerVert;
     }
 
-    public void pushSeparatedQuad(Shape.Quad q) {
-        pushSeparation(q.a);
-        pushQuad(q);
+    private int unpackIntoArray(float[] theArray, int destInx, int vertInx, ShapeMode.Unpack unpack) {
+        int unpackInx = vertInx % unpack.unpackVars.size();
+        float[] unpackVars = unpack.unpackVars.get(unpackInx);
+        System.arraycopy(unpackVars, 0, theArray, destInx, unpackVars.length);
+        return unpackVars.length;
     }
 
-    public void pushQuad(Shape.Quad q) {
-        Vec3 va = q.mode.getVar(0); Vec3 vb = q.mode.getVar(1);
-        Vec3 vc = q.mode.getVar(2); Vec3 vd = q.mode.getVar(3);
-        pushRawVertices(new float[] {
-                q.a.x, q.a.y, q.mode.type, va.x, va.y, va.z,
-                q.b.x, q.b.y, q.mode.type, vb.x, vb.y, vb.z,
-                q.c.x, q.c.y, q.mode.type, vc.x, vc.y, vc.z,
-                q.d.x, q.d.y, q.mode.type, vd.x, vd.y, vd.z
-        });
+    private int appendToArray(float[] theArray, int destInx, ShapeMode.Append append) {
+        System.arraycopy(append.vars, 0, theArray, destInx, append.vars.length);
+        return append.vars.length;
     }
 
-    public void pushSeparatedPolygon(Shape.Poly p) {
+    private void addPointsToArray(float[] theArray, int floatInx, int vertInx, Vec2 point, ShapeMode mode) {
+        theArray[floatInx] = point.x;
+        theArray[floatInx+1] = point.y;
+
+        if (mode instanceof ShapeMode.Demonstration demo) {
+            Vec3 typeVar = demo.getVar(vertInx);
+            theArray[floatInx + 2] = demo.type;
+            theArray[floatInx + 3] = typeVar.x;
+            theArray[floatInx + 4] = typeVar.y;
+            theArray[floatInx + 5] = typeVar.z;
+        } else if (mode instanceof ShapeMode.Unpack unpack) {
+            unpackIntoArray(theArray, floatInx+2, vertInx, unpack);
+        } else if (mode instanceof ShapeMode.Append append) {
+            appendToArray(theArray, floatInx+2, append);
+        } else if (mode instanceof ShapeMode.UnpackAppend unpackAppend) {
+            int numUnpacked = unpackIntoArray(theArray, floatInx+2, vertInx, unpackAppend.unpack);
+            appendToArray(theArray, floatInx+2+numUnpacked, unpackAppend.append);
+        }
+    }
+
+    public void pushSeparatedPolygon(Shape2d.Poly p) {
         pushSeparation(p.points.getFirst().add(p.pos));
         pushPolygon(p);
     }
 
     /** first, second, third, ... */
-    public void pushPolygon(Shape.Poly p) {
+    public void pushPolygon(Shape2d.Poly p) {
         float[] verts = new float[p.points.size() * floatCountPerVert];
-        int i = 0;
-        for (Vec2 point : p.points) {
-            Vec3 mv = p.mode.getVar(i);
+        for (int i = 0; i < p.points.size(); i++) {
             int inx = i * floatCountPerVert;
-            verts[inx] = point.x + p.pos.x; verts[inx+1] = point.y + p.pos.y;
-            verts[inx+2] = p.mode.type;
-            verts[inx+3] = mv.x; verts[inx+4] = mv.y; verts[inx+5] = mv.z;
-            i++;
+            Vec2 point = p.points.get(i);
+            addPointsToArray(verts, inx, i, point.add(p.pos), p.mode);
         }
         pushRawVertices(verts);
     }
 
-    public void pushSeparatedPolygonSorted(Shape.Poly p) {
+    public void pushSeparatedPolygonSorted(Shape2d.Poly p) {
         pushSeparation(p.points.getFirst().add(p.pos));
         pushPolygonSorted(p);
     }
 
     /** first, last, first+1, last-1, ... */
-    public void pushPolygonSorted(Shape.Poly p) {
+    public void pushPolygonSorted(Shape2d.Poly p) {
         float[] verts = new float[p.points.size() * floatCountPerVert];
         for (int i = 0; i < p.points.size(); i++) {
+            int inx = i * floatCountPerVert;
             int offset = (int) (i / 2f);  // floor
 
+            // choose which point to add
             Vec2 point;
             if (i % 2 == 0) point = p.points.get(offset);  // front
             else point = p.points.get(p.points.size()-1 - offset);  // back
-
-            Vec3 mv = p.mode.getVar(i);
-            int inx = i * floatCountPerVert;
-            verts[inx] = point.x + p.pos.x; verts[inx+1] = point.y + p.pos.y;
-            verts[inx+2] = p.mode.type;
-            verts[inx+3] = mv.x; verts[inx+4] = mv.y; verts[inx+5] = mv.z;
+            addPointsToArray(verts, inx, i, point.add(p.pos), p.mode);
         }
         pushRawVertices(verts);
     }
