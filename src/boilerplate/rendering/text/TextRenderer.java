@@ -107,7 +107,7 @@ public class TextRenderer {
                 // all chars in line
                 for (char c : line.toCharArray()) {
                     FontManager.Glyph glyph = font.getGlyph(c);
-                    Vec2 size = glyph.getSize();
+                    Vec2 size = glyph.getSize().mul(scale);
                     Vec2 topLeft = linePos.add(accumulatedX, 0);
 
                     Shape2d.Poly texturePoints = Shape2d.createRect(glyph.texTopLeft, glyph.texSize);
