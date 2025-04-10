@@ -13,7 +13,7 @@ public abstract class ShapeMode {
      * Appends the given vars to end of each vertex
      */
     public static class Append extends ShapeMode {
-        float[] vars;
+        public float[] vars;
 
         public Append(float[] varsToAppend) {
             vars = varsToAppend;

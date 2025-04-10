@@ -90,7 +90,6 @@ public class TextRenderer {
                     continue;
                 }
 
-                int accumulatedX = 0;
                 float lineWidth = font.findLineWidth(line) * scale;
                 Vec2 linePos = new Vec2(alignment == 0 ? pos.x : pos.x - (lineWidth * (1f / alignment)), pos.y + accumulatedY);
 
@@ -104,22 +103,8 @@ public class TextRenderer {
                     bgSb.pushSeparatedPolygon(p);
                 }
 
-                // all chars in line
-                for (char c : line.toCharArray()) {
-                    FontManager.Glyph glyph = font.getGlyph(c);
-                    Vec2 size = glyph.getSize().mul(scale);
-                    Vec2 topLeft = linePos.add(accumulatedX, 0);
-
-                    Shape2d.Poly texturePoints = Shape2d.createRect(glyph.texTopLeft, glyph.texSize);
-                    float[] colorVars = new float[] {textColour.getRed(), textColour.getGreen(), textColour.getBlue(), textColour.getAlpha()};
-
-                    ShapeMode.UnpackAppend mode = new ShapeMode.UnpackAppend(texturePoints.toArray(), colorVars);
-                    Shape2d.Poly p = Shape2d.createRect(topLeft, size, mode);
-
-                    if (accumulatedX == 0) sb.pushSeparatedPolygon(p);
-                    else sb.pushPolygon(p);
-                    accumulatedX += (int) size.x;
-                }
+                float[] colorVars = new float[] {textColour.getRed(), textColour.getGreen(), textColour.getBlue(), textColour.getAlpha()};
+                TextRenderer.pushTextToBuilder(sb, line, font, linePos, colorVars, scale);
                 accumulatedY += yAddition;
             }
 
@@ -288,5 +273,33 @@ public class TextRenderer {
 
     public BufferBuilder2f getBufferBuilder() {
         return sb;
+    }
+
+    public static void pushTextToBuilder(BufferBuilder2f sb, String text, FontManager.LoadedFont font, Vec2 pos, float[] appendFloats) {
+        pushTextToBuilder(sb, text, font, pos, appendFloats, 1);
+    }
+
+    /**
+     * Pushes all chars into the buffer
+     * Assumes that the VA looks like: `posX, posY, texturePosX, texturePosY, ...`
+     */
+    public static void pushTextToBuilder(BufferBuilder2f sb, String text, FontManager.LoadedFont font, Vec2 pos, float[] appendFloats, float scale) {
+        int accumulatedX = 0;
+        boolean initial = true;
+        for (char c : text.toCharArray()) {
+            FontManager.Glyph glyph = font.getGlyph(c);
+            Vec2 size = glyph.getSize().mul(scale);
+            Vec2 topLeft = pos.add(accumulatedX, 0);
+
+            Shape2d.Poly texturePoints = Shape2d.createRect(glyph.texTopLeft, glyph.texSize);
+            ShapeMode.UnpackAppend mode = new ShapeMode.UnpackAppend(texturePoints.toArray(), appendFloats);
+            Shape2d.Poly p = Shape2d.createRect(topLeft, size, mode);
+
+            if (initial) {
+                sb.pushSeparatedPolygon(p);
+                initial = false;
+            } else sb.pushPolygon(p);
+            accumulatedX += (int) size.x;
+        }
     }
 }
