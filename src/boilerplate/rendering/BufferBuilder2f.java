@@ -108,6 +108,18 @@ public class BufferBuilder2f {
         int fCount = verts.length;
         if (fCount == 0) return;
 
+        // perform separation
+        if (separation || shouldNextBeSeparated) {
+            shouldNextBeSeparated = false;
+            if (floatCount >= floatCountPerVert) {
+                separationsCount++;
+                float[] separationVerts = new float[floatCountPerVert * 2];  // pushing 2 vertices (last of current verts and first of new verts)
+                System.arraycopy(vertices, floatCount - floatCountPerVert, separationVerts, 0, floatCountPerVert);
+                System.arraycopy(verts, 0, separationVerts, floatCountPerVert, floatCountPerVert);
+                pushRawVertices(separationVerts, false);  // FALSE!!!
+            }
+        }
+
         if (floatCount + fCount > size) {
             if (!autoResize) {
                 Logging.danger("Cannot add an additional '%s' items to an array at '%s' fullness, with '%s / %s' items already set. Aborting.",
@@ -119,18 +131,6 @@ public class BufferBuilder2f {
             if (autoResizeBuffer(floatCount + fCount) == BoilerplateConstants.ERROR) {
                 Logging.danger("An error occurred attempting to resize this buffer! Aborting.");
                 return;
-            }
-        }
-
-        // perform separation
-        if (separation || shouldNextBeSeparated) {
-            shouldNextBeSeparated = false;
-            if (floatCount >= floatCountPerVert) {
-                separationsCount++;
-                float[] separationVerts = new float[floatCountPerVert * 2];  // pushing 2 vertices (last of current verts and first of new verts)
-                System.arraycopy(vertices, floatCount - floatCountPerVert, separationVerts, 0, floatCountPerVert);
-                System.arraycopy(verts, 0, separationVerts, floatCountPerVert, floatCountPerVert);
-                pushRawVertices(separationVerts, false);  // FALSE!!!
             }
         }
 
@@ -171,7 +171,6 @@ public class BufferBuilder2f {
         } else if (mode instanceof ShapeMode.AppendUnpack appendUnpack) {
             int numAppended = appendToArray(theArray, floatInx+2, appendUnpack.append);
             unpackIntoArray(theArray, floatInx+2+numAppended, vertInx, appendUnpack.unpack);
-
         }
     }
 
