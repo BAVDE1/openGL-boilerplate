@@ -18,10 +18,7 @@ public class BoilerplateConstants {
     public static final int BUFF_SIZE_SMALL    = 1024;
     public static final int BUFF_SIZE_MEDIUM   = BUFF_SIZE_SMALL   * 2;
     public static final int BUFF_SIZE_LARGE    = BUFF_SIZE_MEDIUM  * 2;
-    public static final int BUFF_SIZE_LARGER   = BUFF_SIZE_LARGE   * 2;
-    public static final int BUFF_SIZE_LARGEST  = BUFF_SIZE_LARGER  * 2;
-    public static final int BUFF_SIZE_ENORMOUS = BUFF_SIZE_LARGEST * 2;
-    public static final int BUFF_SIZE_ENORMOUS_PLUS = BUFF_SIZE_ENORMOUS * 2;
+    public static int BUFF_SIZE_MAX            = BUFF_SIZE_LARGE * 16;
 
     public static final int MODE_NIL = 0;
     public static final int MODE_TEX = 1;
@@ -47,16 +44,25 @@ public class BoilerplateConstants {
     public static final boolean V_SYNC = false;
 
     public static int findNextLargestBuffSize(int givenSize) {
-        if (givenSize >= BUFF_SIZE_ENORMOUS_PLUS) {
-            Logging.danger("Maximum buffer size reached! Attempting to find a size greater than the given '%s', which doesn't currently exist.", givenSize);
+        if (givenSize >= BUFF_SIZE_MAX) {
+            Logging.danger("Maximum buffer size reached (max: %s)! Attempting to find a size greater than the given '%s', which doesn't currently exist.\n" +
+                    "Optimise the buffer, or assign a greater maximum size.", BUFF_SIZE_MAX, givenSize);
             return ERROR;
         }
 
-        int[] allSizes = new int[] {BUFF_SIZE_SMALL, BUFF_SIZE_MEDIUM, BUFF_SIZE_LARGE, BUFF_SIZE_LARGER, BUFF_SIZE_LARGEST, BUFF_SIZE_ENORMOUS};
-        for (int size : allSizes) {
+        // use set buffer sizes
+        for (int size : new int[] {BUFF_SIZE_SMALL, BUFF_SIZE_MEDIUM, BUFF_SIZE_LARGE}) {
             if (size > givenSize) return size;
         }
-        return BUFF_SIZE_ENORMOUS_PLUS;
+
+        // calc new size
+        int mul = 2;
+        int newSize;
+        do {
+            newSize = BUFF_SIZE_LARGE * mul;
+            mul++;
+        } while (newSize < givenSize);
+        return newSize;
     }
 
     public static String getJarFolder() {
