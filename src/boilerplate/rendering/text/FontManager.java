@@ -174,8 +174,8 @@ public class FontManager {
     private final static ArrayList<LoadedFont> allLoadedFonts = new ArrayList<>();
     private final static HashMap<String, Integer> loadedFontUids = new HashMap<>();
 
-    private final static VertexArray.Layout textVertexLayout = new VertexArray.Layout();
-    private final static ShaderHelper textShader = new ShaderHelper();
+    private static VertexArray.Layout textVertexLayout = new VertexArray.Layout();
+    private static ShaderHelper textShader = new ShaderHelper();
 
     public static int fullWidth = 0, fullHeight = 0;
     private static Texture finalTexture;
@@ -297,5 +297,18 @@ public class FontManager {
             return 0;
         }
         return loadedFontUids.get(loadedFontName);
+    }
+
+    public static void clearAllFonts() {
+        allLoadedFonts.clear();
+        loadedFontUids.clear();
+
+        textVertexLayout = new VertexArray.Layout();
+        textShader = new ShaderHelper();
+
+        fullWidth = 0;
+        fullHeight = 0;
+        finalTexture = null;
+        initialized = false;
     }
 }

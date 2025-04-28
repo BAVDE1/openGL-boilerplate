@@ -158,4 +158,9 @@ public class Texture {
             Logging.danger("Failed to write given image to file 'src/image.png'\nError message thrown:\n%s", e);
         }
     }
+
+    public static void clearTextures() {
+        unbind();
+        boundSlots.clear();
+    }
 }

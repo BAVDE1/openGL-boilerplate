@@ -23,7 +23,7 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * Manages everything. Contains the main loop.
  */
-public class ExampleGame extends GameBase {
+public class Example2d extends GameBase {
     public Window window = new Window();
 
     public static boolean debugMode = false;
@@ -154,8 +154,10 @@ public class ExampleGame extends GameBase {
         Shape2d.sortPoints(p2);
         builderMain.pushSeparatedPolygonSorted(p2);
 
+        Logging.info("yaya");
         vbMain.bufferSetData(builderMain);
         vaMain.pushBuffer(vbMain, VertexArray.Layout.createDefaultLayout());
+        Logging.info("auauau");
 
         to1 = new TextRenderer.TextObject(1, "", new Vec2(5), Color.CYAN, Color.BLACK);
         to2 = new TextRenderer.TextObject(1, "", new Vec2(5, 50), Color.WHITE, Color.BLACK);
