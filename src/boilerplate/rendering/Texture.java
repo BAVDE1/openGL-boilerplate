@@ -150,6 +150,10 @@ public class Texture {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+    public void delete() {
+        glDeleteTextures(texId);
+    }
+
     /** debug function writes given image to src/image.png */
     public static void writeToFile(BufferedImage img) {
         try {

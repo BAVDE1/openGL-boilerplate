@@ -5,6 +5,8 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL45;
 import boilerplate.utility.Logging;
 
+import static org.lwjgl.opengl.GL45.*;
+
 public class VertexBuffer {
     private final int bufferType = GL45.GL_ARRAY_BUFFER;
     private final int drawMethod = GL15.GL_DYNAMIC_DRAW;
@@ -18,7 +20,7 @@ public class VertexBuffer {
         GL45.glBufferData(bufferType, data, drawMethod);
     }
 
-    public void bufferSetData(BufferBuilder2f bb) {
+    public void bufferData(BufferBuilder2f bb) {
         bufferData(bb.getSetVertices());
     }
 
@@ -42,6 +44,11 @@ public class VertexBuffer {
             return;
         }
         bufferId = GL45.glGenBuffers();
+        System.out.println(bufferId);
+    }
+
+    public void delete() {
+        glDeleteBuffers(bufferId);
     }
 
     public int getId() {return bufferId;}

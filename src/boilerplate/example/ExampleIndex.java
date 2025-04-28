@@ -4,13 +4,12 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
-import boilerplate.rendering.Renderer;
-import boilerplate.rendering.Texture;
+import boilerplate.rendering.*;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
 import boilerplate.utility.Vec2;
-import org.lwjgl.opengl.GL45;
+import static org.lwjgl.opengl.GL45.*;
 
 import java.awt.*;
 
@@ -20,6 +19,7 @@ public class ExampleIndex extends GameBase {
     public boilerplate.common.Window window = new Window();
     Dimension screenSize = new Dimension(500, 200);
     TextRenderer textRenderer = new TextRenderer();
+    VertexBuffer vb;
 
     @Override
     public void start() {
@@ -47,12 +47,10 @@ public class ExampleIndex extends GameBase {
 
         bindEvents();
         setupBuffers();
-
-        Logging.info("the index is open");
     }
 
     public void bindEvents() {
-        GL45.glDebugMessageCallback(Logging.debugCallback(), -1);
+        glDebugMessageCallback(Logging.debugCallback(), -1);
 
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
@@ -66,19 +64,30 @@ public class ExampleIndex extends GameBase {
     }
 
     public void setupBuffers() {
-        TextRenderer.TextObject to1 = new TextRenderer.TextObject(1, "[q]\n\n2d example", new Vec2(120, 50), Color.WHITE, Color.BLACK);
-        TextRenderer.TextObject to2 = new TextRenderer.TextObject(1, "[e]\n\n3d example", new Vec2(screenSize.width-120, 50), Color.GRAY, Color.BLACK);
-        to1.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
-        to2.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
-        textRenderer.setupBufferObjects();
-        textRenderer.pushTextObject(to1, to2);
+//        TextRenderer.TextObject to1 = new TextRenderer.TextObject(1, "[q]\n\n2d example", new Vec2(120, 50), Color.WHITE, Color.BLACK);
+//        TextRenderer.TextObject to2 = new TextRenderer.TextObject(1, "[e]\n\n3d example", new Vec2(screenSize.width-120, 50), Color.GRAY, Color.BLACK);
+//        to1.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
+//        to2.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
+//        textRenderer.setupBufferObjects();
+//        textRenderer.pushTextObject(to1, to2);
+        vb = new VertexBuffer(true);
+        vb.bufferData(new float[] {});
+        vb.bufferData(new float[] {1, 2});
+//        VertexBuffer vb2 = new VertexBuffer(true);
+//        vb2.bufferData(new float[] {});
     }
 
     public void open2dExample() {
+        vb.delete();
         close();
-        Logging.mystical("Opening 2d example...");
+        Logging.mystical("Deleting GL values");
+//        vb.delete();
+        textRenderer.delete();
+        FontManager.deleteShader();
         Texture.clearTextures();
         FontManager.clearAllFonts();
+        Renderer.clearAllRenderingValues();
+        Logging.mystical("Opening 2d example");
         new Example2d().start();
     }
 
@@ -89,7 +98,7 @@ public class ExampleIndex extends GameBase {
     public void render() {
         Renderer.clearScreen();
 
-        Renderer.draw(textRenderer);
+//        Renderer.draw(textRenderer);
 
         // FINISH
         Renderer.finish(window);

@@ -190,6 +190,11 @@ public class ShaderHelper {
     public void unbind() {Renderer.unBindShader();}
     public int getProgram() {return program;}
 
+    public void delete() {
+        for (Shader shader : attachedShaders) glDeleteShader(shader.id);
+        glDeleteProgram(program);
+    }
+
     public int getUniformLocation(String uniform) {
         if (!linked) {
             Logging.danger("Shader has not been linked!");

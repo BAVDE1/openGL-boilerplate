@@ -109,6 +109,10 @@ public class VertexArray {
         arrayId = glGenVertexArrays();
     }
 
+    public void delete() {
+        glDeleteVertexArrays(arrayId);
+    }
+
     public void pushBuffer(VertexBuffer vb, Layout layout) {
         pushBuffer(vb, layout, 0);
     }

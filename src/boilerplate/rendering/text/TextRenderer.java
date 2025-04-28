@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
+import static org.lwjgl.opengl.GL45.*;
 
 /**
  * Renders (multiple) TentRenderer.TextObjects in its own auto-resizing buffer.
@@ -236,8 +236,13 @@ public class TextRenderer {
             sb.pushRawSeparatedVertices(to.buildStrip());
         }
 
-        vb.bufferSetData(sb);
+        vb.bufferData(sb);
         hasBeenModified = false;
+    }
+
+    public void delete() {
+        if (va != null) va.delete();
+        if (vb != null) vb.delete();
     }
 
     public void draw() {

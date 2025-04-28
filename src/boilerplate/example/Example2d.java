@@ -154,10 +154,8 @@ public class Example2d extends GameBase {
         Shape2d.sortPoints(p2);
         builderMain.pushSeparatedPolygonSorted(p2);
 
-        Logging.info("yaya");
-        vbMain.bufferSetData(builderMain);
         vaMain.pushBuffer(vbMain, VertexArray.Layout.createDefaultLayout());
-        Logging.info("auauau");
+        vbMain.bufferData(builderMain);
 
         to1 = new TextRenderer.TextObject(1, "", new Vec2(5), Color.CYAN, Color.BLACK);
         to2 = new TextRenderer.TextObject(1, "", new Vec2(5, 50), Color.WHITE, Color.BLACK);
@@ -178,8 +176,8 @@ public class Example2d extends GameBase {
         instanceLayout.pushFloat(1);  // radius
         instanceLayout.pushFloat(1);  // inner radius
         instanceLayout.pushFloat(3);  // colour
-        vbCircles.bufferSetData(builderCircles);
         vaCircles.pushBuffer(vbCircles, instanceLayout, 1);
+        vbCircles.bufferData(builderCircles);
     }
 
     /** Must be called after window is visible */

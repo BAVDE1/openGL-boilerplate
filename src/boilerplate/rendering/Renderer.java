@@ -1,9 +1,11 @@
 package boilerplate.rendering;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import boilerplate.common.Window;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
+import org.lwjgl.opengl.GLCapabilities;
 
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL45.*;
@@ -88,5 +90,11 @@ public class Renderer {
     public static void unBindShader() {
         boundShader = 0;
         glUseProgram(0);
+    }
+
+    public static void clearAllRenderingValues() {
+        unBindShader();
+        unBindBuffer();
+        unBindArray();
     }
 }
