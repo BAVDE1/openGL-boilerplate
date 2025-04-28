@@ -24,12 +24,16 @@ public class Renderer {
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_TEXTURE_2D);
 
-        // transparency
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        applyDefaultBlend();
 
         glClearColor(.0f, .0f, .0f, .0f);
         Logging.debug("OpenGL capabilities created");
+    }
+
+    /** logically behaving transparency */
+    public static void applyDefaultBlend() {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public static void clearScreen() {

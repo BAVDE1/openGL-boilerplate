@@ -1,8 +1,10 @@
 package boilerplate.rendering.text;
 
 import boilerplate.common.BoilerplateConstants;
-import boilerplate.rendering.Shape2d;
+import boilerplate.rendering.builders.BufferBuilder2f;
+import boilerplate.rendering.builders.Shape2d;
 import boilerplate.rendering.*;
+import boilerplate.rendering.builders.ShapeMode;
 import boilerplate.utility.Logging;
 import boilerplate.utility.Vec2;
 

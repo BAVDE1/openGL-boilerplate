@@ -1,4 +1,4 @@
-package boilerplate.rendering;
+package boilerplate.rendering.builders;
 
 import boilerplate.common.BoilerplateConstants;
 import boilerplate.utility.Vec2;

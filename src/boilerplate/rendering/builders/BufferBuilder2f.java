@@ -1,4 +1,4 @@
-package boilerplate.rendering;
+package boilerplate.rendering.builders;
 
 import boilerplate.common.BoilerplateConstants;
 import boilerplate.utility.Logging;
@@ -96,6 +96,10 @@ public class BufferBuilder2f {
      * PUSHING VERTICES & SHAPES
      */
 
+    public void setFloatsUnsafe(float[] floats, int destInx) {
+        System.arraycopy(floats, 0, vertices, destInx, floats.length);
+    }
+
     public void pushRawSeparatedVertices(float[] verts) {
         pushRawVertices(verts, true);
     }
@@ -108,7 +112,7 @@ public class BufferBuilder2f {
         int fCount = verts.length;
         if (fCount == 0) return;
 
-        // perform separation
+        // perform separation (do before resize)
         if (separation || shouldNextBeSeparated) {
             shouldNextBeSeparated = false;
             if (floatCount >= floatCountPerVert) {
@@ -124,10 +128,11 @@ public class BufferBuilder2f {
             if (!autoResize) {
                 Logging.danger("Cannot add an additional '%s' items to an array at '%s' fullness, with '%s / %s' items already set. Aborting.",
                         fCount, getCurrentFullnessPercent(), floatCount, size);
-                Logging.expensive("Consider setting autoResize to true! (or manually allow more space at the initialization of this StripBuilder)");
+                Logging.expensive("Consider setting autoResize to true! (or manually allow more space at the initialization of this builder)");
                 return;
             }
 
+            // attempt resize
             if (autoResizeBuffer(floatCount + fCount) == BoilerplateConstants.ERROR) {
                 Logging.danger("An error occurred attempting to resize this buffer! Aborting.");
                 return;

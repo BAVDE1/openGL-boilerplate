@@ -1,5 +1,6 @@
 package boilerplate.rendering;
 
+import boilerplate.rendering.builders.BufferBuilder2f;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL45;
 import boilerplate.utility.Logging;
