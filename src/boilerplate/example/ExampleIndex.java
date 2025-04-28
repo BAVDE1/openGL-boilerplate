@@ -9,6 +9,7 @@ import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
 import boilerplate.utility.Vec2;
+
 import static org.lwjgl.opengl.GL45.*;
 
 import java.awt.*;
@@ -64,29 +65,21 @@ public class ExampleIndex extends GameBase {
     }
 
     public void setupBuffers() {
-//        TextRenderer.TextObject to1 = new TextRenderer.TextObject(1, "[q]\n\n2d example", new Vec2(120, 50), Color.WHITE, Color.BLACK);
-//        TextRenderer.TextObject to2 = new TextRenderer.TextObject(1, "[e]\n\n3d example", new Vec2(screenSize.width-120, 50), Color.GRAY, Color.BLACK);
-//        to1.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
-//        to2.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
-//        textRenderer.setupBufferObjects();
-//        textRenderer.pushTextObject(to1, to2);
-        vb = new VertexBuffer(true);
-        vb.bufferData(new float[] {});
-        vb.bufferData(new float[] {1, 2});
-//        VertexBuffer vb2 = new VertexBuffer(true);
-//        vb2.bufferData(new float[] {});
+        TextRenderer.TextObject to1 = new TextRenderer.TextObject(1, "[q]\n\n2d example", new Vec2(120, 50), Color.WHITE, Color.BLACK);
+        TextRenderer.TextObject to2 = new TextRenderer.TextObject(1, "[e]\n\n3d example", new Vec2(screenSize.width-120, 50), Color.GRAY, Color.BLACK);
+        to1.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
+        to2.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
+        textRenderer.setupBufferObjects();
+        textRenderer.pushTextObject(to1, to2);
     }
 
     public void open2dExample() {
-        vb.delete();
         close();
-        Logging.mystical("Deleting GL values");
-//        vb.delete();
+        Logging.mystical("Deleting GL values...");
         textRenderer.delete();
-        FontManager.deleteShader();
-        Texture.clearTextures();
-        FontManager.clearAllFonts();
-        Renderer.clearAllRenderingValues();
+        FontManager.deleteAll();
+        Texture.deleteAll();
+        Renderer.unbindAll();
         Logging.mystical("Opening 2d example");
         new Example2d().start();
     }
@@ -97,10 +90,7 @@ public class ExampleIndex extends GameBase {
 
     public void render() {
         Renderer.clearScreen();
-
-//        Renderer.draw(textRenderer);
-
-        // FINISH
+        Renderer.draw(textRenderer);
         Renderer.finish(window);
     }
 

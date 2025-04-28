@@ -44,7 +44,6 @@ public class VertexBuffer {
             return;
         }
         bufferId = GL45.glGenBuffers();
-        System.out.println(bufferId);
     }
 
     public void delete() {

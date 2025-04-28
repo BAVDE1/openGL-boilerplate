@@ -154,8 +154,8 @@ public class Example2d extends GameBase {
         Shape2d.sortPoints(p2);
         builderMain.pushSeparatedPolygonSorted(p2);
 
-        vaMain.pushBuffer(vbMain, VertexArray.Layout.createDefaultLayout());
         vbMain.bufferData(builderMain);
+        vaMain.pushBuffer(vbMain, VertexArray.Layout.createDefaultLayout());
 
         to1 = new TextRenderer.TextObject(1, "", new Vec2(5), Color.CYAN, Color.BLACK);
         to2 = new TextRenderer.TextObject(1, "", new Vec2(5, 50), Color.WHITE, Color.BLACK);

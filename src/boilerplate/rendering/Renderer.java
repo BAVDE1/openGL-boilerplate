@@ -1,11 +1,9 @@
 package boilerplate.rendering;
 
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import boilerplate.common.Window;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
-import org.lwjgl.opengl.GLCapabilities;
 
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL45.*;
@@ -17,7 +15,7 @@ import static org.lwjgl.opengl.GL45.*;
 public class Renderer {
     private static int boundArray = 0;
     private static int boundBuffer = 0;
-    public static int boundShader = 0;
+    private static int boundShader = 0;
 
     /** Do before anything GL related */
     public static void setupGLContext() {
@@ -78,7 +76,7 @@ public class Renderer {
         glBindBuffer(vb.getBufferType(), id);
     }
     public static void unBindBuffer() {
-        boundArray = 0;
+        boundBuffer = 0;
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -92,7 +90,7 @@ public class Renderer {
         glUseProgram(0);
     }
 
-    public static void clearAllRenderingValues() {
+    public static void unbindAll() {
         unBindShader();
         unBindBuffer();
         unBindArray();

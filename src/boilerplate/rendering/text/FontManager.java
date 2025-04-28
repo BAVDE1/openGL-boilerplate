@@ -14,8 +14,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.lwjgl.opengl.GL45.*;
-
 /**
  * State Machine
  * Loads (default and then given) fonts once to be used by TextRenderers
@@ -301,12 +299,10 @@ public class FontManager {
         return loadedFontUids.get(loadedFontName);
     }
 
-    public static void deleteShader() {
+    public static void deleteAll() {
         finalTexture.delete();
         textShader.delete();
-    }
 
-    public static void clearAllFonts() {
         allLoadedFonts.clear();
         loadedFontUids.clear();
 

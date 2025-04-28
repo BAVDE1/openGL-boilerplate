@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL45.*;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
@@ -33,7 +33,7 @@ public class Texture {
         }
     }
 
-    static final ArrayList<Integer> boundSlots = new ArrayList<>();
+    static final Map<Integer, Integer> boundSlots = new HashMap<>();  // key: slot, value: texId
     /** bytes per pixel */
     static final int BPP = 4;
     /** for debugging, if you wanted to write the texture to file to inspect it */
@@ -131,19 +131,18 @@ public class Texture {
             return;
         }
 
-        if (boundSlots.contains(slot)) {
+        if (boundSlots.containsKey(slot)) {
             Logging.warn("Overriding already set texture slot '%s'", slot);
             boundSlots.remove((Integer) slot);
         }
 
         glBindTextureUnit(slot, texId);
-        boundSlots.add(slot);
-        boundSlots.sort(Comparator.naturalOrder());
+        boundSlots.put(slot, texId);
     }
 
     public void bindToTexArray(int slot, ShaderHelper sh) {
         bind(slot);
-        ShaderHelper.uniform1iv(sh, "textures", boundSlots.stream().mapToInt(i -> i).toArray());
+        ShaderHelper.uniform1iv(sh, "textures", boundSlots.keySet().stream().mapToInt(i -> i).toArray());
     }
 
     public static void unbind() {
@@ -163,8 +162,13 @@ public class Texture {
         }
     }
 
-    public static void clearTextures() {
+    public void deleteTexture() {
+        glDeleteTextures(texId);
+    }
+
+    public static void deleteAll() {
         unbind();
+        for (int id : boundSlots.values()) glDeleteTextures(id);
         boundSlots.clear();
     }
 }
