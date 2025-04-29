@@ -4,25 +4,21 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
-import boilerplate.rendering.*;
+import boilerplate.rendering.Renderer;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
 import boilerplate.utility.Vec2;
 
-import static org.lwjgl.opengl.GL45.*;
-
 import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
-public class ExampleIndex extends GameBase {
+public class Example3d extends GameBase {
     public boilerplate.common.Window window = new Window();
-    final Dimension SCREEN_SIZE = new Dimension(500, 200);
+    final Dimension SCREEN_SIZE = new Dimension(500, 500);
     TextRenderer textRenderer = new TextRenderer();
-
-    boolean open2d = false;
-    boolean open3d = false;
 
     @Override
     public void start() {
@@ -32,7 +28,7 @@ public class ExampleIndex extends GameBase {
     @Override
     public void createCapabilitiesAndOpen() {
         Window.Options winOps = new Window.Options();
-        winOps.title = "the example index";
+        winOps.title = "the 3d example";
         winOps.initWindowSize = SCREEN_SIZE;
         window.setOptions(winOps);
         window.setup();
@@ -51,47 +47,15 @@ public class ExampleIndex extends GameBase {
         glDebugMessageCallback(Logging.debugCallback(), -1);
 
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
-            if (action == GLFW_PRESS) {
-                if (key == GLFW_KEY_ESCAPE) this.window.setToClose();
-                if (key == GLFW_KEY_Q) {
-                    open2d = true;
-                    this.window.setToClose();
-                }
-                if (key == GLFW_KEY_E) {
-                     open3d = true;
-                     this.window.setToClose();
-                }
-            }
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) this.window.setToClose();
         });
     }
 
     public void setupBuffers() {
-        TextRenderer.TextObject to1 = new TextRenderer.TextObject(1, "[q]\n\n2d example", new Vec2(120, 60), Color.YELLOW, Color.BLACK);
-        TextRenderer.TextObject to2 = new TextRenderer.TextObject(1, "[e]\n\n3d example", new Vec2(SCREEN_SIZE.width-120, 60), Color.CYAN, Color.BLACK);
+        TextRenderer.TextObject to1 = new TextRenderer.TextObject(1, "3 dimensions!?!??!", new Vec2(120, 50), Color.RED, Color.BLACK);
         to1.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
-        to2.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
         textRenderer.setupBufferObjects();
-        textRenderer.pushTextObject(to1, to2);
-    }
-
-    private void clearGlContext() {
-        Logging.info("Deleting GL values...");
-        textRenderer.delete();
-        FontManager.deleteAll();
-        Texture.deleteAll();
-        Renderer.unbindAll();
-    }
-
-    public void open2dExample() {
-        clearGlContext();
-        Logging.mystical("Opening 2d example");
-        new Example2d().start();
-    }
-
-    public void open3dExample() {
-        clearGlContext();
-        Logging.mystical("Opening 3d example");
-        new Example3d().start();
+        textRenderer.pushTextObject(to1);
     }
 
     public void render() {
@@ -114,8 +78,5 @@ public class ExampleIndex extends GameBase {
     @Override
     public void close() {
         window.close();
-
-        if (open2d) open2dExample();
-        else if (open3d) open3dExample();
     }
 }

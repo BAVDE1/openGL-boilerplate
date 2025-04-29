@@ -99,13 +99,11 @@ public class Example2d extends GameBase {
 
         // key inputs
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                this.window.setToClose();
-
             if (action == GLFW_PRESS) {
                 heldKeys[key] = 1;
 
                 switch (key) {
+                    case GLFW_KEY_ESCAPE -> this.window.setToClose();
                     case GLFW_KEY_E -> addToViewScale(-scaleAddition, false);
                     case GLFW_KEY_Q -> addToViewScale(scaleAddition, false);
                     case GLFW_KEY_R -> {
