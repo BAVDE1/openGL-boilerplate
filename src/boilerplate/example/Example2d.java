@@ -25,6 +25,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Example2d extends GameBase {
     public Window window = new Window();
+    final Dimension SCREEN_SIZE = new Dimension(900, 400);
+    final float[] PROJECTION_MATRIX = BoilerplateConstants.create2dProjectionMatrix(SCREEN_SIZE);
 
     public static boolean debugMode = false;
 
@@ -67,13 +69,17 @@ public class Example2d extends GameBase {
     }
 
     public void createCapabilitiesAndOpen() {
+        Window.Options winOp = new Window.Options();
+        winOp.title = "the 2d example";
+        winOp.initWindowSize = SCREEN_SIZE;
+        window.setOptions(winOp);
         window.setup();
         Renderer.setupGLContext();
         window.show();
 
         FontManager.init();
         FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 14, true);
-        FontManager.generateAndBindAllFonts();
+        FontManager.generateAndBindAllFonts(SCREEN_SIZE, BoilerplateConstants.create2dProjectionMatrix(SCREEN_SIZE));
 
         bindEvents();
         setupShaders();
@@ -94,7 +100,7 @@ public class Example2d extends GameBase {
         // key inputs
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window, true);
+                this.window.setToClose();
 
             if (action == GLFW_PRESS) {
                 heldKeys[key] = 1;
@@ -188,9 +194,9 @@ public class Example2d extends GameBase {
         new Texture("textures/explosion.png").bindToTexArray(2, shMain);
         new Texture("textures/closed.png").bindToTexArray(3, shMain);
 
-        ShaderHelper.uniformResolutionData(shMain);
+        ShaderHelper.uniformResolutionData(shMain, SCREEN_SIZE, PROJECTION_MATRIX);
         ShaderHelper.uniform1f(shMain, "viewScale", viewScale);
-        ShaderHelper.uniformResolutionData(shCircles);
+        ShaderHelper.uniformResolutionData(shCircles, SCREEN_SIZE, PROJECTION_MATRIX);
         ShaderHelper.uniform1f(shCircles, "viewScale", viewScale);
     }
 
@@ -237,7 +243,7 @@ public class Example2d extends GameBase {
 
     public void addToViewScale(float addition, boolean relativeToMouse) {
         // mouse or middle of screen
-        Vec2 relativeTo = relativeToMouse ? mousePos : Vec2.fromDim(BoilerplateConstants.SCREEN_SIZE).mul(.5f);
+        Vec2 relativeTo = relativeToMouse ? mousePos : Vec2.fromDim(SCREEN_SIZE).mul(.5f);
         viewPos.addSelf(relativeTo.mul(viewScale).sub(relativeTo.mul(viewScale+addition)));
 
         viewScale += addition;
@@ -278,7 +284,7 @@ public class Example2d extends GameBase {
     public void render() {
         Renderer.clearScreen();
 
-        // shape examples
+        // shape examples & textures
         shMain.bind();
         ShaderHelper.uniform1f(shMain, "time", (float) glfwGetTime());
         Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, vaMain, builderMain.getVertexCount());

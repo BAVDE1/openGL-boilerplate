@@ -1,8 +1,6 @@
 package boilerplate.common;
 
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWImage;
-import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryStack;
@@ -10,7 +8,6 @@ import boilerplate.utility.Logging;
 
 import java.awt.*;
 import java.nio.IntBuffer;
-import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -22,13 +19,13 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  */
 public class Window {
     public static class Options {
-        public String title = "ARGG IT HURTS";
+        public String title = "window title lol";
         public boolean initVisible = false;
         public boolean resizable = false;
-        public boolean initCenterWindow = true;
+        public boolean initCenterWindow = true;  // doesn't work with wayland
 
-        public boolean vSync = BoilerplateConstants.V_SYNC;
-        public Dimension initWindowSize = BoilerplateConstants.SCREEN_SIZE;
+        public boolean vSync = false;
+        public Dimension initWindowSize = BoilerplateConstants.DEFAULT_SCREEN_SIZE;
 
         public int glfw_version_major = BoilerplateConstants.GLFW_VERSION_MAJOR;
         public int glfw_version_minor = BoilerplateConstants.GLFW_VERSION_MINOR;
@@ -112,12 +109,16 @@ public class Window {
         glfwShowWindow(handle);
     }
 
+    public void setToClose() {
+        glfwSetWindowShouldClose(handle, true);
+    }
+
     public void close() {
-        Logging.info("Closing safely");
+        Logging.info("Closing window safely");
         glfwFreeCallbacks(handle);
         glfwDestroyWindow(handle);
         glfwTerminate();
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
+        glfwSetErrorCallback(null);
     }
 
     public void setVSync(boolean vSync) {

@@ -66,9 +66,9 @@ public abstract class ShapeMode {
         List<Vec3> vars;
         int type;
 
-        public Demonstration() {this(BoilerplateConstants.MODE_NIL);}
+        public Demonstration() {this(BoilerplateConstants.DEMO_MODE_NIL);}
         public Demonstration(int texSlot, Vec2 texTopLeft, Vec2 texSize) {
-            this(BoilerplateConstants.MODE_TEX);
+            this(BoilerplateConstants.DEMO_MODE_TEX);
             this.vars = List.of(new Vec3[] {
                     new Vec3(texTopLeft, texSlot),
                     new Vec3(texTopLeft.add(0, texSize.y), texSlot),
@@ -77,7 +77,7 @@ public abstract class ShapeMode {
             });
         }
         public Demonstration(Color col) {
-            this(BoilerplateConstants.MODE_COL);
+            this(BoilerplateConstants.DEMO_MODE_COL);
             this.vars = List.of(new Vec3[] {new Vec3(col)});
         }
 

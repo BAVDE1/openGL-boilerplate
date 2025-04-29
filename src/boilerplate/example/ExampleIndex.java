@@ -20,7 +20,9 @@ public class ExampleIndex extends GameBase {
     public boilerplate.common.Window window = new Window();
     Dimension screenSize = new Dimension(500, 200);
     TextRenderer textRenderer = new TextRenderer();
-    VertexBuffer vb;
+
+    boolean open2d = false;
+    boolean open3d = false;
 
     @Override
     public void start() {
@@ -39,12 +41,7 @@ public class ExampleIndex extends GameBase {
 
         FontManager.init();
         FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 20, true);
-        FontManager.generateAndBindAllFonts(screenSize, new float[] {
-                2f/screenSize.width,  0,                       0,  -1,
-                0,                    2f/-screenSize.height,   0,   1,
-                0,                    0,                      -1,   0,
-                0,                    0,                       0,   1
-        });
+        FontManager.generateAndBindAllFonts(screenSize, BoilerplateConstants.create2dProjectionMatrix(screenSize));
 
         bindEvents();
         setupBuffers();
@@ -54,12 +51,19 @@ public class ExampleIndex extends GameBase {
         glDebugMessageCallback(Logging.debugCallback(), -1);
 
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window, true);
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) this.window.setToClose();
 
             if (action == GLFW_PRESS) {
-                if (key == GLFW_KEY_Q) open2dExample();
-                if (key == GLFW_KEY_E) open3dExample();
+                if (key == GLFW_KEY_Q) {
+                    open2d = true;
+                    this.window.setToClose();
+                }
+                if (key == GLFW_KEY_E) {
+                    Logging.warn("3d example doesn't exist rn");
+                    // todo: this
+                    // open3d = true;
+                    // this.window.setToClose();
+                }
             }
         });
     }
@@ -73,19 +77,22 @@ public class ExampleIndex extends GameBase {
         textRenderer.pushTextObject(to1, to2);
     }
 
-    public void open2dExample() {
-        close();
-        Logging.mystical("Deleting GL values...");
+    private void clearGlContext() {
+        Logging.info("Deleting GL values...");
         textRenderer.delete();
         FontManager.deleteAll();
         Texture.deleteAll();
         Renderer.unbindAll();
+    }
+
+    public void open2dExample() {
+        clearGlContext();
         Logging.mystical("Opening 2d example");
         new Example2d().start();
     }
 
     public void open3dExample() {
-        Logging.warn("3d example doesn't exist rn");
+        // todo: this
     }
 
     public void render() {
@@ -108,5 +115,8 @@ public class ExampleIndex extends GameBase {
     @Override
     public void close() {
         window.close();
+
+        if (open2d) open2dExample();
+        else if (open3d) open3dExample();
     }
 }

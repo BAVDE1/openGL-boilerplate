@@ -177,10 +177,6 @@ public class ShaderHelper {
         };
     }
 
-    public static void uniformResolutionData(ShaderHelper sh) {
-        uniformResolutionData(sh, BoilerplateConstants.SCREEN_SIZE, BoilerplateConstants.PROJECTION_MATRIX);
-    }
-
     public static void uniformResolutionData(ShaderHelper sh, Dimension screenSize, float[] projectionMatrix) {
         ShaderHelper.uniform2f(sh, "resolution", screenSize.width, screenSize.height);
         ShaderHelper.uniformMatrix4f(sh, "projectionMatrix", projectionMatrix);

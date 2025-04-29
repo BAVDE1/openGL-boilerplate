@@ -20,9 +20,9 @@ public class BoilerplateConstants {
     public static final int BUFF_SIZE_LARGE    = BUFF_SIZE_MEDIUM  * 2;
     public static int BUFF_SIZE_MAX            = BUFF_SIZE_LARGE * 16;
 
-    public static final int MODE_NIL = 0;
-    public static final int MODE_TEX = 1;
-    public static final int MODE_COL = 2;
+    public static final int DEMO_MODE_NIL = 0;
+    public static final int DEMO_MODE_TEX = 1;
+    public static final int DEMO_MODE_COL = 2;
 
     public static final int ERROR = -1;
     public static final double EPSILON = 0.0001;
@@ -31,17 +31,19 @@ public class BoilerplateConstants {
     public static final int FPS = 60;
     public static final double DT = 1 / (double) FPS;
 
-    public static final Dimension SCREEN_SIZE = new Dimension(900, 400);
-    // https://en.wikipedia.org/wiki/Orthographic_projection
-    public static final float[] PROJECTION_MATRIX = new float[] {
-            2f/SCREEN_SIZE.width, 0,                       0,  -1,
-            0,                    2f/-SCREEN_SIZE.height,  0,   1,
-            0,                    0,                      -1,   0,
-            0,                    0,                       0,   1
-    };
+    public static final Dimension DEFAULT_SCREEN_SIZE = new Dimension(500, 500);
 
     public static final boolean OPTIMIZE_TIME_STEPPER = true;
-    public static final boolean V_SYNC = false;
+
+    /** <a href="https://en.wikipedia.org/wiki/Orthographic_projection">projection matrix source</a> */
+    public static float[] create2dProjectionMatrix(Dimension dimension) {
+        return new float[] {
+                2f/dimension.width, 0,                    0,  -1,
+                0,                  2f/-dimension.height, 0,   1,
+                0,                  0,                   -1,   0,
+                0,                  0,                    0,   1
+        };
+    }
 
     public static int findNextLargestBuffSize(int givenSize) {
         if (givenSize >= BUFF_SIZE_MAX) {

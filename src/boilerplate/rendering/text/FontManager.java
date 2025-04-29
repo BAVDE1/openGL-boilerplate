@@ -233,10 +233,6 @@ public class FontManager {
     }
 
     /** generate all font images onto one universal image atlas at their y offsets */
-    public static void generateAndBindAllFonts() {
-        generateAndBindAllFonts(BoilerplateConstants.SCREEN_SIZE, BoilerplateConstants.PROJECTION_MATRIX);
-    }
-
     public static void generateAndBindAllFonts(Dimension screenSize, float[] projectionMatrix) {
         BufferedImage fullImage = new BufferedImage(fullWidth, fullHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = fullImage.createGraphics();
@@ -256,10 +252,6 @@ public class FontManager {
         setupTextLayout();
 
         if (writeFontsToFile) Texture.writeToFile(fullImage);
-    }
-
-    private static void setupTextShader() {
-        setupTextShader(BoilerplateConstants.SCREEN_SIZE, BoilerplateConstants.PROJECTION_MATRIX);
     }
 
     private static void setupTextShader(Dimension screenSize, float[] projectionMatrix) {
