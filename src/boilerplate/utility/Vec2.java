@@ -100,7 +100,7 @@ public class Vec2 {
     }
 
     public void clampSelf(float min, float max) {
-        clampSelf(new Vec2(min, min), new Vec2(max, max));
+        clampSelf(new Vec2(min), new Vec2(max));
     }
 
     public void clampSelf(Vec2 min, Vec2 max) {
@@ -168,8 +168,8 @@ public class Vec2 {
         return new Vec2(vec.x + f, vec.y + f);
     }
 
-    public static Vec2 add(Vec2 vec1, Vec2 vec2) {
-        return new Vec2(vec1.x + vec2.x, vec1.y + vec2.y);
+    public static Vec2 add(Vec2 vecA, Vec2 vecB) {
+        return new Vec2(vecA.x + vecB.x, vecA.y + vecB.y);
     }
 
     public void subSelf(float f) {
@@ -198,8 +198,8 @@ public class Vec2 {
         return new Vec2(vec.x - f, vec.y - f);
     }
 
-    public static Vec2 sub(Vec2 vec1, Vec2 vec2) {
-        return new Vec2(vec1.x - vec2.x, vec1.y - vec2.y);
+    public static Vec2 sub(Vec2 vecA, Vec2 vecB) {
+        return new Vec2(vecA.x - vecB.x, vecA.y - vecB.y);
     }
 
     public void divSelf(float f) {
@@ -224,8 +224,8 @@ public class Vec2 {
         return new Vec2(vec.x / f, vec.y / f);
     }
 
-    public static Vec2 div(Vec2 vec1, Vec2 vec2) {
-        return new Vec2(vec1.x / vec2.x, vec1.y / vec2.y);
+    public static Vec2 div(Vec2 vecA, Vec2 vecB) {
+        return new Vec2(vecA.x / vecB.x, vecA.y / vecB.y);
     }
 
     public void mulSelf(float f) {
@@ -250,8 +250,8 @@ public class Vec2 {
         return new Vec2(vec.x * f, vec.y * f);
     }
 
-    public static Vec2 mul(Vec2 vec1, Vec2 vec2) {
-        return new Vec2(vec1.x * vec2.x, vec1.y * vec2.y);
+    public static Vec2 mul(Vec2 vecA, Vec2 vecB) {
+        return new Vec2(vecA.x * vecB.x, vecA.y * vecB.y);
     }
 
     public Vec2 perpendicular() {
@@ -264,6 +264,6 @@ public class Vec2 {
 
     @Override
     public String toString() {
-        return String.format("Vec2(%.2f, %.2f)", x, y);
+        return String.format("Vec2(%s, %s)", x, y);
     }
 }
