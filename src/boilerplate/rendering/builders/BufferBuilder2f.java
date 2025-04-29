@@ -74,6 +74,19 @@ public class BufferBuilder2f {
         return v;
     }
 
+    /** Returns a slice of the current floats in the buffer */
+    public float[] getFloatsSlice(int startInx, int length) {
+        float[] slice = new float[length];
+        System.arraycopy(vertices, startInx, slice, 0, length);
+        return slice;
+    }
+
+    /** Returns the last N vertices in the buffer */
+    public float[] getLastVertices(int vertexCount) {
+        int length = vertexCount * floatCountPerVert;
+        return getFloatsSlice(floatCount - length, length);
+    }
+
     public float getCurrentFullnessPercent() {
         return (float) getSetVertices().length / size;
     }
