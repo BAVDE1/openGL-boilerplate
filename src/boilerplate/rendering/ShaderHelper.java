@@ -54,13 +54,13 @@ public class ShaderHelper {
     public void attachShaderMulti(String resourcePath) {
         int currentShaderType = -1;
 
-        InputStream is = ClassLoader.getSystemResourceAsStream(resourcePath);
-        if (is == null) {
+        InputStream shaderFileStream = ClassLoader.getSystemResourceAsStream(resourcePath);
+        if (shaderFileStream == null) {
             Logging.danger("'%s' could not be read. Aborting", resourcePath);
             return;
         }
 
-        Scanner scanner = new Scanner(is);
+        Scanner scanner = new Scanner(shaderFileStream);
         StringBuilder charSequence = new StringBuilder();
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
