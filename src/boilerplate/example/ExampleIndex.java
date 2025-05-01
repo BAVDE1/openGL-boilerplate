@@ -75,7 +75,7 @@ public class ExampleIndex extends GameBase {
     }
 
     private void clearGlContext() {
-        Logging.info("Deleting GL values...");
+        Logging.debug("Deleting GL values...");
         textRenderer.delete();
         FontManager.deleteAll();
         Texture.deleteAll();

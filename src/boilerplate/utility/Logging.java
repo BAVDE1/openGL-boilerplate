@@ -1,13 +1,10 @@
 package boilerplate.utility;
 
-import boilerplate.ExampleMain;
 import boilerplate.common.BoilerplateConstants;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GLDebugMessageCallbackI;
 
-import javax.print.URIException;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
