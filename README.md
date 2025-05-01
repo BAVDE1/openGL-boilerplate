@@ -1,13 +1,13 @@
-# some 2d openGL "boilerplate"
+# OpenGL "boilerplate"
 
-abstraction and demonstration of openGl and glfw (from the lwjgl module).
+abstraction and demonstration of openGL and glfw in java (from the lwjgl module).
 
 ---
 
 lwjgl: https://www.lwjgl.org/ \
 openGL: https://docs.gl/
 
-Also please see: References.md
+Also see: References.md
 
 ---
 
@@ -15,7 +15,7 @@ Also please see: References.md
 
 A window with glfw.
 
-`setup` creates openGl context.
+`setup` creates openGL context.
 
 Options for a window can be configured with a `Window.Options` instance. Its strongly recommenced to pass your customized options (with `window.setOptions()`) before calling `setup`.
 
