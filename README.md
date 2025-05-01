@@ -11,15 +11,69 @@ Also please see: References.md
 
 ---
 
-### some information
+### Window
+
+A window with glfw.
+
+`setup` creates openGl context.
+
+Options for a window can be configured with a `Window.Options` instance. Its strongly recommenced to pass your customized options (with `window.setOptions()`) before calling `setup`.
+
+Options that are available:
+* title
+* initVisible  (is window visible in initialisation)
+* resizable
+* initCenterWindow  (center the window on open, doesn't work with wayland windows)
+* vSync
+* initWindowSize
+* `glfw_version_major` & `glfw_version_minor` & `glfw_opengl_profile`
+
+The window itself also has some "live" functions (that can be used while the window is open):
+* setWindowSize
+* setWindowAspectRatio & unsetWindowAspectRatio
+* setWindowTitle
+* setVSync
+* setWindowIcon
+* setWindowAttrib  (for generically setting any window value, use with caution)
+
+Call `window.setToClose` to easily flag that the window is ready to close, which can then be checked with `glfwWindowShouldClose(window.handle)`.
+
+The window needs to be showed and closed manually with `Window.show` and `window.close`.
+
+### GameBase
+
+Abstract class containing some functions to kick-start a program:
+* start
+* createCapabilitiesAndOpen
+* mainLoop
+* shouldClose
+* close
+
+For the GameBase lifecycle, see `TimeStepper`.
+
+### TimeStepper
+
+`TimeStepper.startTimeStepper` can be used in `GameBase.start` to start it up.
+
+> `GameBase.start` is the only `GameBase` function that needs to be manually called.
+
+---
+
+On start, the TimeStepper calls `GameBase.createCapabilitiesAndOpen` and then immediately starts running its loop.
+
+Once looping, the time stepper runs at the pace of the given delta time (deterministically with accumulation), calling `GameBase.mainLoop` at every frame.
+
+The TimeStepper continues running until `GameBase.shouldClose` is true.
+
+Once the loop is existed, it will call `GameBase.close` to finalize.
+
+---
+
+### VAO & VBO
 
 VBO has its own `VertexBuffer`, VAO has `VertexArray`, layouts for `VertexArray` can be created with `VertexArray.Layout`.
 
 To pass data onto the `VertexBuffer` use a `BufferBuilder`.
-
-### Layout
-
-Create a `VertexArray`'s layout with `VertexArray.Layout`.
 
 An optional static default layout can be set and used to quickly create that layout wherever.
 
@@ -101,7 +155,7 @@ Some `TextObject` values that can be set include:
 * bg margin
 * are bg lines seamless (for if line y spacing is greater than 0)
 
-**Note:** there is 1 default font thats loaded (at font id 0) before anything else (also italicised fonts are kinda broken atm)
+> There is 1 default font thats loaded (at font id 0) before anything else (also italicised fonts are kinda broken atm)
 
 ### Shader Helper
 
@@ -125,15 +179,19 @@ It can also be used do "draw" buffers, instanced buffers, and `TextRenderers`. (
 
 Use texture slots that are > 1.
 
-**Note:** Texture slot 1 is reserved by the `FontManager` so don't use that.
+> Texture slot 1 is reserved by the `FontManager` so don't use that.
 
 ### Circles
 
-in this project, they need their own VAO/VBO cause they're special and are instanced.
+In this project, they need their own VAO/VBO cause they're special and are instanced.
 
 ### Logger
 
-theres a logger cause why not. also it has some pretty colours :)
+Theres a logger cause why not. also it has some pretty colours :)
+
+It can be silenced if you want.
+
+And can log to a file, but will only do so when in `.jar` state.
 
 ---
 
