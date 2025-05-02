@@ -18,6 +18,7 @@ public class BoilerplateConstants {
     public static final int BUFF_SIZE_MEDIUM   = BUFF_SIZE_SMALL   * 2;
     public static final int BUFF_SIZE_LARGE    = BUFF_SIZE_MEDIUM  * 2;
     public static int BUFF_SIZE_MAX            = BUFF_SIZE_LARGE * 16;
+    public static int BUFF_SIZE_DEFAULT        = BUFF_SIZE_SMALL;
 
     public static final int DEMO_MODE_NIL = 0;
     public static final int DEMO_MODE_TEX = 1;

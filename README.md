@@ -11,7 +11,7 @@ Also see: References.md
 
 ---
 
-### Window
+## Window
 
 A window with glfw.
 
@@ -40,7 +40,7 @@ Call `window.setToClose` to easily flag that the window is ready to close, which
 
 The window needs to be showed and closed manually with `Window.show` and `window.close`.
 
-### GameBase
+## GameBase
 
 Abstract class containing some functions to kick-start a program:
 * start
@@ -51,7 +51,7 @@ Abstract class containing some functions to kick-start a program:
 
 For the GameBase lifecycle, see `TimeStepper`.
 
-### TimeStepper
+## TimeStepper
 
 `TimeStepper.startTimeStepper` can be used in `GameBase.start` to start it up.
 
@@ -69,7 +69,7 @@ Once the loop is existed, it will call `GameBase.close` to finalize.
 
 ---
 
-### VAO & VBO
+## VAO & VBO
 
 VBO has its own `VertexBuffer`, VAO has `VertexArray`, layouts for `VertexArray` can be created with `VertexArray.Layout`.
 
@@ -77,20 +77,33 @@ To pass data onto the `VertexBuffer` use a `BufferBuilder`.
 
 An optional static default layout can be set and used to quickly create that layout wherever.
 
-### BufferBuilder2f
+## BufferBuilder
 
 Used for batching things & abstraction of float arrays.
 
 Can be initialized with a set buffer size (amount of floats it can hold) or can auto-resize itself.
 
-The 2f signifies that it assumes every vertex starts with 2 vertices at location 0 (for x and y position)
-To allow for any VAO layout, call `BufferBuilder2f.setAdditionalVertFloats(n)` where n is the number of floats in the vertex's `Layout` minus 2 (again, as x and y are assumed).
+To allow for any VAO layout, call `BufferBuilder2f.setAdditionalVertFloats(n)` where n is the number of floats in the vertex's `Layout`.
 
-> Separations can be used for batching collections of "disconnected" vertices into one buffer.
-> 
-> A separation between a new collection of vertices and the existing vertices in the buffer is simply 2 extra in-between vertices: the last vertex on the buffer and the first vertex of the collection being added.
-> 
-> For an example, each letter represents a unique vertex. current buffer: `abc`, vertices to be added: `def`. after adding the new `def` vertices with a separation, the buffer will look like: `abccddef`. The separation is the `cd` located between the first `c` and the last `d`.
+---
+
+#### BufferBuilder2f+
+The 2f signifies that it assumes every vertex starts with 2 vertices at location 0 (for x and y position)
+
+The buffers' additionalVertFloats must be n floats in layout minus 2 (as, as x and y are assumed).
+
+The same applies to BufferBuilder3f but with 3 instead of 2.
+
+---
+
+#### Separations
+Separations can be used for batching collections of "disconnected" vertices into one buffer.
+
+A separation between a new collection of vertices and the existing vertices in the buffer is simply 2 extra in-between vertices: the last vertex on the buffer and the first vertex of the collection being added.
+
+For an example, each letter represents a unique vertex. current buffer: `abc`, vertices to be added: `def`. after adding the new `def` vertices with a separation, the buffer will look like: `abccddef`. The separation is the `cd` located between the first `c` and the last `d`.
+
+---
 
 `BufferBuildsr` also keeps track of some useful stats like:
 * float count
@@ -108,7 +121,7 @@ And some other lower level functions:
 * `resizeBufferAndKeepElements` & `resizeBufferAndWipe`
 * `appendBuffer` & `prependBuffer`
 
-### Shape2d
+## Shape2d
 
 Easy creation of a few 2d shapes:
 * Rect
@@ -133,7 +146,7 @@ ShapeModes:
 * AppendUnpack  (appends and then unpacks)
 * UnpackAppend  (unpacks and then appends)
 
-### Text Rendering
+## Text Rendering
 
 `FontManager` manages the currently loaded fonts that can be used in any `TextRenderer`.
 the `FontManager`'s fonts should be loaded at runtime before any text rendering is attempted. use `init()` before loading any font, and `generateAndBindAllFonts()` to complete the loading.
@@ -157,7 +170,7 @@ Some `TextObject` values that can be set include:
 
 > There is 1 default font thats loaded (at font id 0) before anything else (also italicised fonts are kinda broken atm)
 
-### Shader Helper
+## Shader Helper
 
 `ShaderHelper` instance loads, compiles & links shaders from any directory or file. Recommended minimum of 1 vertex and 1 fragment shader.
 
@@ -167,13 +180,13 @@ Supported shader types are `VERT`, `TESC`, `TECE`, `GEOM`, `FRAG`.
 
 Can also be used to send uniforms to its attached shaders.
 
-### Renderer
+## Renderer
 
 `Renderer` is just a state machine that handles currently bound `VertexBuffers`, `VertexArrays` and `ShaderHelpers`
 
 It can also be used do "draw" buffers, instanced buffers, and `TextRenderers`. (stats from a related BufferBuilder can be used to provide values for rendering)
 
-### Texture
+## Texture
 
 `Texture` loads an image from a file path or a `BufferedImage` that can be bound and used.
 
@@ -181,11 +194,11 @@ Use texture slots that are > 1.
 
 > Texture slot 1 is reserved by the `FontManager` so don't use that.
 
-### Circles
+## Circles
 
 In this project, they need their own VAO/VBO cause they're special and are instanced.
 
-### Logger
+## Logger
 
 Theres a logger cause why not. also it has some pretty colours :)
 
