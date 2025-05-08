@@ -76,15 +76,17 @@ public class Example3d extends GameBase {
         va.pushLayout(l);
 
         vb.bufferData(new float[] {
+                // front quad
                 -.5f,  .5f, -5,    1, 1, 1,  // tl
                  .5f,  .5f, -5,    1, 0, 0,  // tr
-                 .5f, -.5f, -5,    0, 1, 1,  // br
-                -.5f, -.5f, -5,    1, 1, 0,  // bl
+                 .5f, -.5f, -5,    0, 1, 0,  // br
+                -.5f, -.5f, -5,    0, 0, 1,  // bl
 
-                -.5f,  .5f, -6f,   1, 0, 0,
-                 .5f,  .5f, -6f,   0, 1, 1,
-                 .5f, -.5f, -6f,   1, 1, 0,
-                -.5f, -.5f, -6f,   1, 1, 1
+                // back quad
+                -.5f,  .5f, -6,   1, 0, 0,
+                 .5f,  .5f, -6,   0, 1, 0,
+                 .5f, -.5f, -6,   0, 0, 1,
+                -.5f, -.5f, -6,   1, 1, 1
         });
         veb.bufferData(new int[] {
                 0, 1, 2,  // front
@@ -118,21 +120,24 @@ public class Example3d extends GameBase {
         float mul = 1;
         if (heldKeys[GLFW_KEY_LEFT_SHIFT] == 1) mul = 5;
 
-        float amnt = (float) (5 * dt) * mul;
-        if (heldKeys[GLFW_KEY_D] == 1) camPos.x += amnt;
-        if (heldKeys[GLFW_KEY_A] == 1) camPos.x -= amnt;
+        // rotation
+        float rAdd = .01f;
+        if (heldKeys[GLFW_KEY_UP] == 1) camRot.x += rAdd;
+        if (heldKeys[GLFW_KEY_DOWN] == 1) camRot.x -= rAdd;
 
-        if (heldKeys[GLFW_KEY_E] == 1) camPos.y += amnt;
-        if (heldKeys[GLFW_KEY_Q] == 1) camPos.y -= amnt;
+        if (heldKeys[GLFW_KEY_LEFT] == 1) camRot.y += rAdd;
+        if (heldKeys[GLFW_KEY_RIGHT] == 1) camRot.y -= rAdd;
 
-        if (heldKeys[GLFW_KEY_S] == 1) camPos.z += amnt;
-        if (heldKeys[GLFW_KEY_W] == 1) camPos.z -= amnt;
+        // position
+        float pAdd = (float) (5 * dt) * mul;
+        if (heldKeys[GLFW_KEY_D] == 1) camPos.x += pAdd;
+        if (heldKeys[GLFW_KEY_A] == 1) camPos.x -= pAdd;
 
-        if (heldKeys[GLFW_KEY_UP] == 1) camRot.x += .01f;
-        if (heldKeys[GLFW_KEY_DOWN] == 1) camRot.x -= .01f;
+        if (heldKeys[GLFW_KEY_E] == 1) camPos.y += pAdd;
+        if (heldKeys[GLFW_KEY_Q] == 1) camPos.y -= pAdd;
 
-        if (heldKeys[GLFW_KEY_LEFT] == 1) camRot.y += .01f;
-        if (heldKeys[GLFW_KEY_RIGHT] == 1) camRot.y -= .01f;
+        if (heldKeys[GLFW_KEY_S] == 1) camPos.z += pAdd;
+        if (heldKeys[GLFW_KEY_W] == 1) camPos.z -= pAdd;
     }
 
     @Override

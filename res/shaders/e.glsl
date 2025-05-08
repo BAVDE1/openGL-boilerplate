@@ -11,6 +11,7 @@ uniform vec3 camRot;
 out vec3 v_col;
 
 void main() {
+    // https://en.wikipedia.org/wiki/3D_projection
     vec3 s = sin(camRot);
     vec3 c = cos(camRot);
     float x = pos.x - camPos.x;
