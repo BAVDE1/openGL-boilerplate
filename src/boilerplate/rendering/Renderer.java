@@ -50,7 +50,7 @@ public class Renderer {
         glDrawArraysInstanced(mode, 0, vertsPerInstance, instanceCount);
     }
 
-    public static void drawElements(int mode, VertexArray va, int vertexCount, VertexElementBuffer veb) {
+    public static void drawElements(int mode, VertexArray va, VertexElementBuffer veb, int vertexCount) {
         bindArray(va);
         glDrawElements(mode, vertexCount, veb.getElementType(), 0);
     }

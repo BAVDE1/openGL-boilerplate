@@ -58,26 +58,27 @@ public class Example3d extends GameBase {
         sh.uniformResolutionData(SCREEN_SIZE, BoilerplateConstants.create2dProjectionMatrix(SCREEN_SIZE));
 
         VertexArray.Layout l = new VertexArray.Layout();
-        l.pushFloat(2);
+        l.pushFloat(3);
+        l.pushFloat(3);
         va.bindBuffers(vb, veb);
         va.pushLayout(l);
 
         vb.bufferData(new float[] {
-                10, 10,
-                10, 100,
-                100, 100,
-                100, 10
+                -.5f,  .5f, 0,     1, 1, 1,
+                 .5f,  .5f, 0,     1, 0, 0,
+                 .5f, -.5f, 0,     0, 1, 1,
+                -.5f, -.5f, 0,     1, 1, 0
         });
         veb.bufferData(new int[] {
                 0, 1, 2,
-                0, 3, 2
+                0, 3, 2,
         });
     }
 
     public void render() {
         Renderer.clearScreen();
         sh.bind();
-        Renderer.drawElements(GL_TRIANGLES, va, 6, veb);
+        Renderer.drawElements(GL_TRIANGLES, va, veb, 6);
         Renderer.finish(window);
     }
 
