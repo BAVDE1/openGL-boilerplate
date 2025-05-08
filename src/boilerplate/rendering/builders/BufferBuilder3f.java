@@ -6,7 +6,7 @@ public class BufferBuilder3f extends BufferBuilder {
     public BufferBuilder3f(boolean autoResize) {this(DEFAULT_SIZE, autoResize, 0);}
     public BufferBuilder3f(boolean autoResize, int additionalVertFloats) {this(DEFAULT_SIZE, autoResize, additionalVertFloats);}
     public BufferBuilder3f(int size, boolean autoResize, int additionalVertFloats){
-        vertices = new float[size];
+        floats = new float[size];
         this.size = size;
         this.autoResize = autoResize;
         setAdditionalVertFloats(additionalVertFloats);

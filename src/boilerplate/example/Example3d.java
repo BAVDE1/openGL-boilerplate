@@ -60,7 +60,7 @@ public class Example3d extends GameBase {
 
     public void render() {
         Renderer.clearScreen();
-        Renderer.draw(textRenderer);
+        Renderer.drawText(textRenderer);
         Renderer.finish(window);
     }
 

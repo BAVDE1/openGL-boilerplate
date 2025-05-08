@@ -13,7 +13,7 @@ import java.awt.*;
 public class BufferBuilder {
     protected static final int DEFAULT_SIZE = BoilerplateConstants.BUFF_SIZE_DEFAULT;
 
-    protected float[] vertices;
+    protected float[] floats;
     protected int size;
     protected boolean autoResize;
 
@@ -32,7 +32,7 @@ public class BufferBuilder {
     public BufferBuilder(boolean autoResize) {this(DEFAULT_SIZE, autoResize, 0);}
     public BufferBuilder(boolean autoResize, int additionalVertFloats) {this(DEFAULT_SIZE, autoResize, additionalVertFloats);}
     public BufferBuilder(int size, boolean autoResize, int additionalVertFloats){
-        vertices = new float[size];
+        floats = new float[size];
         this.size = size;
         this.autoResize = autoResize;
         setAdditionalVertFloats(additionalVertFloats);
@@ -47,7 +47,7 @@ public class BufferBuilder {
     }
 
     public void clear() {
-        vertices = new float[size];
+        floats = new float[size];
         floatCount = 0;
         vertexCount = 0;
         separationsCount = 0;
@@ -56,12 +56,12 @@ public class BufferBuilder {
     /** Resize buffer and copy already set elements across (if there are any) */
     public void resizeBufferAndKeepElements(int newSize) {
         // store temporarily
-        float[] temp = getSetVertices();
+        float[] temp = getFloats();
         resizeBufferAndWipe(newSize);
 
         // place back verts
         if (temp.length > newSize) System.arraycopy(temp, 0, temp, 0, newSize-1);
-        pushRawVertices(temp);
+        pushRawFloats(temp);
     }
 
     public void resizeBufferAndWipe(int newSize) {
@@ -76,16 +76,16 @@ public class BufferBuilder {
         floatCountPerVert = getPosFloatCount() + num;
     }
 
-    public float[] getSetVertices() {
+    public float[] getFloats() {
         float[] v = new float[floatCount];
-        System.arraycopy(vertices, 0, v, 0, floatCount);
+        System.arraycopy(floats, 0, v, 0, floatCount);
         return v;
     }
 
     /** Returns a slice of the current floats in the buffer */
     public float[] getFloatsSlice(int startInx, int length) {
         float[] slice = new float[length];
-        System.arraycopy(vertices, startInx, slice, 0, length);
+        System.arraycopy(floats, startInx, slice, 0, length);
         return slice;
     }
 
@@ -96,7 +96,7 @@ public class BufferBuilder {
     }
 
     public float getCurrentFullnessPercent() {
-        return (float) getSetVertices().length / size;
+        return (float) getFloats().length / size;
     }
 
     public int getBufferSize() {return size;}
@@ -118,28 +118,28 @@ public class BufferBuilder {
      */
 
     public void setFloatsUnsafe(float[] floats, int destInx) {
-        System.arraycopy(floats, 0, vertices, destInx, floats.length);
+        System.arraycopy(floats, 0, this.floats, destInx, floats.length);
     }
 
-    public void pushRawSeparatedVertices(float[] verts) {
-        pushRawVertices(verts, true);
+    public void pushRawSeparatedFloats(float[] newFloats) {
+        pushRawFloats(newFloats, true);
     }
 
-    public void pushRawVertices(float[] verts) {
-        pushRawVertices(verts, false);
+    public void pushRawFloats(float[] newFloats) {
+        pushRawFloats(newFloats, false);
     }
 
-    public void pushRawVertices(float[] verts, boolean separation) {
-        int fCount = verts.length;
+    public void pushRawFloats(float[] newFloats, boolean separation) {
+        int fCount = newFloats.length;
         if (fCount == 0) return;
 
         // do before resize
-        if (separation || shouldNextBeSeparated) performSeparation(verts);
+        if (separation || shouldNextBeSeparated) performSeparation(newFloats);
         if (floatCount + fCount > size) {
             if (attemptResize(fCount) == BoilerplateConstants.ERROR) return;
         }
 
-        System.arraycopy(verts, 0, vertices, floatCount, fCount);
+        System.arraycopy(newFloats, 0, floats, floatCount, fCount);
         floatCount += fCount;
         vertexCount += fCount / floatCountPerVert;
     }
@@ -150,9 +150,9 @@ public class BufferBuilder {
         if (floatCount >= floatCountPerVert) {
             separationsCount++;
             float[] separationVerts = new float[floatCountPerVert * 2];
-            System.arraycopy(vertices, floatCount - floatCountPerVert, separationVerts, 0, floatCountPerVert);
+            System.arraycopy(floats, floatCount - floatCountPerVert, separationVerts, 0, floatCountPerVert);
             System.arraycopy(verts, 0, separationVerts, floatCountPerVert, floatCountPerVert);
-            pushRawVertices(separationVerts, false);  // FALSE!!!
+            pushRawFloats(separationVerts, false);  // FALSE!!!
         }
     }
 
@@ -220,7 +220,7 @@ public class BufferBuilder {
             Vec2 point = p.points.get(i);
             addPointsToArray(verts, inx, i, point.add(p.pos), p.mode);
         }
-        pushRawVertices(verts);
+        pushRawFloats(verts);
     }
 
     public void pushSeparatedPolygonSorted(Shape2d.Poly p) {
@@ -241,7 +241,7 @@ public class BufferBuilder {
             else point = p.points.get(p.points.size()-1 - offset);  // back
             addPointsToArray(verts, inx, i, point.add(p.pos), p.mode);
         }
-        pushRawVertices(verts);
+        pushRawFloats(verts);
     }
 
     /** Circles should be rendered as instanced GL_TRIANGLES */
@@ -251,7 +251,7 @@ public class BufferBuilder {
 
     /** Circles should be rendered as instanced GL_TRIANGLES */
     public void pushCircle(Vec2 pos, float radius, float outline, Color col) {
-        pushRawVertices(new float[] {
+        pushRawFloats(new float[] {
                 pos.x, pos.y, radius, outline, col.getRed(), col.getGreen(), col.getBlue()
         });
     }
@@ -260,18 +260,18 @@ public class BufferBuilder {
     public void appendBuffer(BufferBuilder builder, boolean useSeparation) {
         if (builder.getVertexCount() == 0) return;
 
-        if (useSeparation) pushRawSeparatedVertices(builder.getSetVertices());
-        else pushRawVertices(builder.getSetVertices());
+        if (useSeparation) pushRawSeparatedFloats(builder.getFloats());
+        else pushRawFloats(builder.getFloats());
     }
 
     public void prependBuffer(BufferBuilder builder) {prependBuffer(builder, false);}
     public void prependBuffer(BufferBuilder builder, boolean useSeparation) {
         if (builder.getVertexCount() == 0) return;
 
-        float[] temp = getSetVertices();
+        float[] temp = getFloats();
         clear();
-        pushRawVertices(builder.getSetVertices());
-        if (useSeparation) pushRawSeparatedVertices(temp);
-        else pushRawVertices(temp);
+        pushRawFloats(builder.getFloats());
+        if (useSeparation) pushRawSeparatedFloats(temp);
+        else pushRawFloats(temp);
     }
 }

@@ -40,18 +40,23 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public static void draw(int mode, VertexArray va, int vertexCount) {
-        Renderer.bindArray(va);
+    public static void drawArrays(int mode, VertexArray va, int vertexCount) {
+        bindArray(va);
         glDrawArrays(mode, 0, vertexCount);
     }
 
-    public static void draw(TextRenderer tr) {
-        tr.draw();
+    public static void drawInstanced(int mode, VertexArray va, int vertsPerInstance, int instanceCount) {
+        bindArray(va);
+        glDrawArraysInstanced(mode, 0, vertsPerInstance, instanceCount);
     }
 
-    public static void drawInstanced(int mode, VertexArray va, int vertsPerInstance, int instanceCount) {
-        Renderer.bindArray(va);
-        glDrawArraysInstanced(mode, 0, vertsPerInstance, instanceCount);
+    public static void drawElements(int mode, VertexArray va, int vertexCount, VertexElementBuffer veb) {
+        bindArray(va);
+        glDrawElements(mode, vertexCount, veb.getElementType(), 0);
+    }
+
+    public static void drawText(TextRenderer tr) {
+        tr.draw();
     }
 
     public static void finish(Window window) {

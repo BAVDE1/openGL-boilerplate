@@ -94,7 +94,6 @@ public class VertexArray {
         }
     }
 
-    public Layout layout;
     private Integer arrayId;
     public int attribCount = 0;
 
@@ -113,17 +112,17 @@ public class VertexArray {
         glDeleteVertexArrays(arrayId);
     }
 
-    public void pushBuffer(VertexBuffer vb, Layout layout) {
-        pushBuffer(vb, layout, 0);
-    }
-
-    /** Pushing multiple layouts adds onto last layout that was pushed */
-    public void pushBuffer(VertexBuffer vb, Layout layout, int divisor) {
-        this.layout = layout;
-
+    public void bindBuffer(VertexBuffer vb) {
         Renderer.bindArray(this);
         Renderer.bindBuffer(vb);
+    }
 
+    public void pushLayout(Layout layout) {
+        pushLayout(layout, 0);
+    }
+
+    /** Pushing multiple layouts adds onto last layout that was bound */
+    public void pushLayout(Layout layout, int divisor) {
         int offset = 0;
         ArrayList<Element> allElements = layout.getElements();
         for (int i = 0; i < allElements.size(); i++) {

@@ -159,7 +159,8 @@ public class Example2d extends GameBase {
         builderMain.pushSeparatedPolygonSorted(p2);
 
         vbMain.bufferData(builderMain);
-        vaMain.pushBuffer(vbMain, VertexArray.Layout.createDefaultLayout());
+        vaMain.bindBuffer(vbMain);
+        vaMain.pushLayout(VertexArray.Layout.createDefaultLayout());
 
         to1 = new TextRenderer.TextObject(1, "", new Vec2(5), Color.CYAN, Color.BLACK);
         to2 = new TextRenderer.TextObject(1, "", new Vec2(5, 50), Color.WHITE, Color.BLACK);
@@ -180,7 +181,8 @@ public class Example2d extends GameBase {
         instanceLayout.pushFloat(1);  // radius
         instanceLayout.pushFloat(1);  // inner radius
         instanceLayout.pushFloat(3);  // colour
-        vaCircles.pushBuffer(vbCircles, instanceLayout, 1);
+        vaCircles.bindBuffer(vbCircles);
+        vaCircles.pushLayout(instanceLayout, 1);
         vbCircles.bufferData(builderCircles);
     }
 
@@ -285,12 +287,12 @@ public class Example2d extends GameBase {
         // shape examples & textures
         shMain.bind();
         ShaderHelper.uniform1f(shMain, "time", (float) glfwGetTime());
-        Renderer.draw(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, vaMain, builderMain.getVertexCount());
+        Renderer.drawArrays(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, vaMain, builderMain.getVertexCount());
 
         shCircles.bind();
         Renderer.drawInstanced(GL_TRIANGLES, vaCircles, 3, builderCircles.getVertexCount());
 
-        Renderer.draw(textRenderer);
+        Renderer.drawText(textRenderer);
 
         // FINISH
         Renderer.finish(window);

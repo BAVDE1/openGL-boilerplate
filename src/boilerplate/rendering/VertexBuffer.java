@@ -8,12 +8,16 @@ import boilerplate.utility.Logging;
 import static org.lwjgl.opengl.GL45.*;
 
 public class VertexBuffer {
-    private final int bufferType = GL45.GL_ARRAY_BUFFER;
-    private final int drawMethod = GL15.GL_DYNAMIC_DRAW;
+    protected int bufferType = GL45.GL_ARRAY_BUFFER;
+    protected int drawMethod = GL15.GL_DYNAMIC_DRAW;
     private Integer bufferId;
 
     public VertexBuffer(){}
     public VertexBuffer(boolean genId) {if (genId) genId();}
+
+    public void setDrawMethod(int newDrawMethod) {
+        this.drawMethod = newDrawMethod;
+    }
 
     public void bufferData(float[] data) {
         Renderer.bindBuffer(this);
@@ -21,7 +25,7 @@ public class VertexBuffer {
     }
 
     public void bufferData(BufferBuilder2f bb) {
-        bufferData(bb.getSetVertices());
+        bufferData(bb.getFloats());
     }
 
     public void bufferSize(int size) {
@@ -35,7 +39,7 @@ public class VertexBuffer {
 
     public void bufferSubData(int bytesOffset, float[] data) {
         Renderer.bindBuffer(this);
-        GL45.glBufferSubData(GL15.GL_ARRAY_BUFFER, bytesOffset, data);
+        GL45.glBufferSubData(bufferType, bytesOffset, data);
     }
 
     public void genId() {

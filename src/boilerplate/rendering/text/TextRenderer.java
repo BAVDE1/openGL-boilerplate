@@ -74,7 +74,7 @@ public class TextRenderer {
         }
 
         private float[] buildStrip() {
-            if (!hasChanged) return sb.getSetVertices();  // don't even bother re-building
+            if (!hasChanged) return sb.getFloats();  // don't even bother re-building
 
             sb.clear();
             bgSb.clear();
@@ -113,7 +113,7 @@ public class TextRenderer {
             hasChanged = false;
 
             sb.prependBuffer(bgSb, true);
-            return sb.getSetVertices();
+            return sb.getFloats();
         }
 
         public String getString() {return string;}
@@ -225,7 +225,8 @@ public class TextRenderer {
         vb = new VertexBuffer(true);
         sb = new BufferBuilder2f(true, FontManager.textLayoutAdditionalVerts());
 
-        va.pushBuffer(vb, FontManager.getTextVertexLayout());
+        va.bindBuffer(vb);
+        va.pushLayout(FontManager.getTextVertexLayout());
     }
 
     private void buildBuffer() {
@@ -233,7 +234,7 @@ public class TextRenderer {
 
         for (TextObject to : textObjects) {
             if (to.string.isEmpty() || to.scale < BoilerplateConstants.EPSILON) continue;
-            sb.pushRawSeparatedVertices(to.buildStrip());
+            sb.pushRawSeparatedFloats(to.buildStrip());
         }
 
         vb.bufferData(sb);
@@ -250,7 +251,7 @@ public class TextRenderer {
 
         if (sb.getFloatCount() > 0) {
             FontManager.bindTextShader();
-            Renderer.draw(GL_TRIANGLE_STRIP, va, sb.getVertexCount());
+            Renderer.drawArrays(GL_TRIANGLE_STRIP, va, sb.getVertexCount());
         }
     }
 
