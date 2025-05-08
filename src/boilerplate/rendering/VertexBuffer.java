@@ -24,6 +24,11 @@ public class VertexBuffer {
         GL45.glBufferData(bufferType, data, drawMethod);
     }
 
+    public void bufferData(int[] data) {
+        Renderer.bindBuffer(this);
+        GL45.glBufferData(bufferType, data, drawMethod);
+    }
+
     public void bufferData(BufferBuilder2f bb) {
         bufferData(bb.getFloats());
     }

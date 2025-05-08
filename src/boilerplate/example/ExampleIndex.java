@@ -34,10 +34,7 @@ public class ExampleIndex extends GameBase {
         Window.Options winOps = new Window.Options();
         winOps.title = "the example index";
         winOps.initWindowSize = SCREEN_SIZE;
-        window.setOptions(winOps);
-        window.setup();
-        Renderer.setupGLContext();
-        window.show();
+        window.quickSetupAndShow(winOps);
 
         FontManager.init();
         FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 20, true);

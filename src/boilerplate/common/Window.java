@@ -1,5 +1,6 @@
 package boilerplate.common;
 
+import boilerplate.rendering.Renderer;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL45;
@@ -50,6 +51,14 @@ public class Window {
             return;
         }
         this.options = options;
+    }
+
+    /** cause im lazy lol */
+    public void quickSetupAndShow(Options options) {
+        setOptions(options);
+        setup();
+        Renderer.setupGLContext();
+        show();
     }
 
     public void setup() {

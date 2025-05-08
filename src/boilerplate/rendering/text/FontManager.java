@@ -256,8 +256,8 @@ public class FontManager {
 
     private static void setupTextShader(Dimension screenSize, float[] projectionMatrix) {
         textShader.useTextShader();
-        ShaderHelper.uniformResolutionData(textShader, screenSize, projectionMatrix);
-        ShaderHelper.uniform1i(textShader, "fontTexture", FONT_TEXTURE_SLOT);
+        textShader.uniformResolutionData(screenSize, projectionMatrix);
+        textShader.uniform1i("fontTexture", FONT_TEXTURE_SLOT);
     }
 
     private static void setupTextLayout() {

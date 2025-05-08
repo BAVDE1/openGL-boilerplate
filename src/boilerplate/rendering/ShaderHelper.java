@@ -177,9 +177,9 @@ public class ShaderHelper {
         };
     }
 
-    public static void uniformResolutionData(ShaderHelper sh, Dimension screenSize, float[] projectionMatrix) {
-        ShaderHelper.uniform2f(sh, "resolution", screenSize.width, screenSize.height);
-        ShaderHelper.uniformMatrix4f(sh, "projectionMatrix", projectionMatrix);
+    public void uniformResolutionData(Dimension screenSize, float[] projectionMatrix) {
+        uniform2f("resolution", screenSize.width, screenSize.height);
+        uniformMatrix4f("projectionMatrix", projectionMatrix);
     }
 
     public void bind() {Renderer.bindShader(this);}
@@ -204,24 +204,24 @@ public class ShaderHelper {
         return uniformCache.get(uniform);
     }
 
-    public static void uniform1i(ShaderHelper sh, String uniform, int i) {
-        glUniform1i(sh.getUniformLocation(uniform), i);
+    public void uniform1i(String uniform, int i) {
+        glUniform1i(getUniformLocation(uniform), i);
     }
-    public static void uniform1iv(ShaderHelper sh, String uniform, int[] intArray) {
-        glUniform1iv(sh.getUniformLocation(uniform), intArray);
+    public void uniform1iv(String uniform, int[] intArray) {
+        glUniform1iv(getUniformLocation(uniform), intArray);
     }
-    public static void uniform1f(ShaderHelper sh, String uniform, float f) {
-        glUniform1f(sh.getUniformLocation(uniform), f);
+    public void uniform1f(String uniform, float f) {
+        glUniform1f(getUniformLocation(uniform), f);
     }
-    public static void uniform2f(ShaderHelper sh, String uniform, float f1, float f2) {
-        glUniform2f(sh.getUniformLocation(uniform), f1, f2);
+    public void uniform2f(String uniform, float f1, float f2) {
+        glUniform2f(getUniformLocation(uniform), f1, f2);
     }
-    public static void uniformMatrix4f(ShaderHelper sh, String uniform, float[] matrix4f) {
+    public void uniformMatrix4f(String uniform, float[] matrix4f) {
         if (matrix4f.length != 4*4) {
             Logging.danger("matrix4 given does not have exactly %s items", 4*4);
             return;
         }
-        glUniformMatrix4fv(sh.getUniformLocation(uniform), false, matrix4f);
+        glUniformMatrix4fv(getUniformLocation(uniform), false, matrix4f);
     }
 
     public void useDemoShader() {

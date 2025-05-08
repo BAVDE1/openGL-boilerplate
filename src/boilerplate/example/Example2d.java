@@ -69,13 +69,10 @@ public class Example2d extends GameBase {
     }
 
     public void createCapabilitiesAndOpen() {
-        Window.Options winOp = new Window.Options();
-        winOp.title = "the 2d example";
-        winOp.initWindowSize = SCREEN_SIZE;
-        window.setOptions(winOp);
-        window.setup();
-        Renderer.setupGLContext();
-        window.show();
+        Window.Options winOps = new Window.Options();
+        winOps.title = "the 2d example";
+        winOps.initWindowSize = SCREEN_SIZE;
+        window.quickSetupAndShow(winOps);
 
         FontManager.init();
         FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 14, true);
@@ -194,10 +191,10 @@ public class Example2d extends GameBase {
         new Texture("textures/explosion.png").bindToTexArray(2, shMain);
         new Texture("textures/closed.png").bindToTexArray(3, shMain);
 
-        ShaderHelper.uniformResolutionData(shMain, SCREEN_SIZE, PROJECTION_MATRIX);
-        ShaderHelper.uniform1f(shMain, "viewScale", viewScale);
-        ShaderHelper.uniformResolutionData(shCircles, SCREEN_SIZE, PROJECTION_MATRIX);
-        ShaderHelper.uniform1f(shCircles, "viewScale", viewScale);
+        shMain.uniformResolutionData(SCREEN_SIZE, PROJECTION_MATRIX);
+        shMain.uniform1f("viewScale", viewScale);
+        shCircles.uniformResolutionData(SCREEN_SIZE, PROJECTION_MATRIX);
+        shCircles.uniform1f("viewScale", viewScale);
     }
 
     public void updateFpsAndDebugText() {
@@ -266,19 +263,19 @@ public class Example2d extends GameBase {
 
         if (forceUpdateView || !addition.equals(new Vec2())) {
             viewPos.addSelf(addition);
-            ShaderHelper.uniform2f(shMain, "viewPos", viewPos.x, viewPos.y);
-            ShaderHelper.uniform1f(shMain, "viewScale", viewScale);
+            shMain.uniform2f("viewPos", viewPos.x, viewPos.y);
+            shMain.uniform1f("viewScale", viewScale);
 
-            ShaderHelper.uniform2f(shCircles, "viewPos", viewPos.x, viewPos.y);
-            ShaderHelper.uniform1f(shCircles, "viewScale", viewScale);
+            shCircles.uniform2f("viewPos", viewPos.x, viewPos.y);
+            shCircles.uniform1f("viewScale", viewScale);
             forceUpdateView = false;
         }
     }
 
     public void toggleDebug() {
         debugMode = !debugMode;
-        ShaderHelper.uniform1i(shMain, "debugMode", debugMode ? 1:0);
-        ShaderHelper.uniform1i(shCircles, "debugMode", debugMode ? 1:0);
+        shMain.uniform1i("debugMode", debugMode ? 1:0);
+        shCircles.uniform1i("debugMode", debugMode ? 1:0);
     }
 
     public void render() {
@@ -286,7 +283,7 @@ public class Example2d extends GameBase {
 
         // shape examples & textures
         shMain.bind();
-        ShaderHelper.uniform1f(shMain, "time", (float) glfwGetTime());
+        shMain.uniform1f("time", (float) glfwGetTime());
         Renderer.drawArrays(debugMode ? GL_LINE_STRIP : GL_TRIANGLE_STRIP, vaMain, builderMain.getVertexCount());
 
         shCircles.bind();

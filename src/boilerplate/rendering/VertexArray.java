@@ -117,12 +117,20 @@ public class VertexArray {
         Renderer.bindBuffer(vb);
     }
 
+    public void bindBuffers(VertexBuffer vb, VertexElementBuffer veb) {
+        Renderer.bindArray(this);
+        Renderer.bindBuffer(vb);
+        Renderer.bindBuffer(veb);
+    }
+
     public void pushLayout(Layout layout) {
         pushLayout(layout, 0);
     }
 
     /** Pushing multiple layouts adds onto last layout that was bound */
     public void pushLayout(Layout layout, int divisor) {
+        Renderer.bindArray(this);
+
         int offset = 0;
         ArrayList<Element> allElements = layout.getElements();
         for (int i = 0; i < allElements.size(); i++) {

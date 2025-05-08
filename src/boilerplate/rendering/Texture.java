@@ -142,7 +142,7 @@ public class Texture {
 
     public void bindToTexArray(int slot, ShaderHelper sh) {
         bind(slot);
-        ShaderHelper.uniform1iv(sh, "textures", boundSlots.keySet().stream().mapToInt(i -> i).toArray());
+        sh.uniform1iv("textures", boundSlots.keySet().stream().mapToInt(i -> i).toArray());
     }
 
     public static void unbind() {

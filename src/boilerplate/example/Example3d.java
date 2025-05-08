@@ -4,7 +4,7 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
-import boilerplate.rendering.Renderer;
+import boilerplate.rendering.*;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
@@ -13,12 +13,17 @@ import boilerplate.utility.Vec2;
 import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
 public class Example3d extends GameBase {
     public boilerplate.common.Window window = new Window();
     final Dimension SCREEN_SIZE = new Dimension(500, 500);
-    TextRenderer textRenderer = new TextRenderer();
+
+    ShaderHelper sh = new ShaderHelper();
+    VertexArray va = new VertexArray();
+    VertexBuffer vb = new VertexBuffer();
+    VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.TYPE_INT);
 
     @Override
     public void start() {
@@ -30,14 +35,7 @@ public class Example3d extends GameBase {
         Window.Options winOps = new Window.Options();
         winOps.title = "the 3d example";
         winOps.initWindowSize = SCREEN_SIZE;
-        window.setOptions(winOps);
-        window.setup();
-        Renderer.setupGLContext();
-        window.show();
-
-        FontManager.init();
-        FontManager.loadFont(Font.MONOSPACED, Font.BOLD, 20, true);
-        FontManager.generateAndBindAllFonts(SCREEN_SIZE, BoilerplateConstants.create2dProjectionMatrix(SCREEN_SIZE));
+        window.quickSetupAndShow(winOps);
 
         bindEvents();
         setupBuffers();
@@ -52,15 +50,34 @@ public class Example3d extends GameBase {
     }
 
     public void setupBuffers() {
-        TextRenderer.TextObject to1 = new TextRenderer.TextObject(1, "3 dimensions!?!??!", new Vec2(120, 50), Color.RED, Color.BLACK);
-        to1.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
-        textRenderer.setupBufferObjects();
-        textRenderer.pushTextObject(to1);
+        va.genId();
+        vb.genId();
+        veb.genId();
+
+        sh.autoInitializeShadersMulti("shaders/e.glsl");
+        sh.uniformResolutionData(SCREEN_SIZE, BoilerplateConstants.create2dProjectionMatrix(SCREEN_SIZE));
+
+        VertexArray.Layout l = new VertexArray.Layout();
+        l.pushFloat(2);
+        va.bindBuffers(vb, veb);
+        va.pushLayout(l);
+
+        vb.bufferData(new float[] {
+                10, 10,
+                10, 100,
+                100, 100,
+                100, 10
+        });
+        veb.bufferData(new int[] {
+                0, 1, 2,
+                0, 3, 2
+        });
     }
 
     public void render() {
         Renderer.clearScreen();
-        Renderer.drawText(textRenderer);
+        sh.bind();
+        Renderer.drawElements(GL_TRIANGLES, va, 6, veb);
         Renderer.finish(window);
     }
 
