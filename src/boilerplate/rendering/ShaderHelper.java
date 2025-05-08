@@ -216,6 +216,9 @@ public class ShaderHelper {
     public void uniform2f(String uniform, float f1, float f2) {
         glUniform2f(getUniformLocation(uniform), f1, f2);
     }
+    public void uniform3f(String uniform, float f1, float f2, float f3) {
+        glUniform3f(getUniformLocation(uniform), f1, f2, f3);
+    }
     public void uniformMatrix4f(String uniform, float[] matrix4f) {
         if (matrix4f.length != 4*4) {
             Logging.danger("matrix4 given does not have exactly %s items", 4*4);
