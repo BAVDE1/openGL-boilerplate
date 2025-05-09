@@ -20,7 +20,9 @@ shaders: https://shader-tutorial.dev/ \
 https://learnopengl.com/Getting-started/Shaders \
 https://docs.tizen.org/application/native/guides/graphics/vertex-shader/, https://www.khronos.org/opengl/wiki/Shader
 
-good video series: https://www.youtube.com/playlist?list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2
+good intro & good advanced concepts: https://learnopengl.com/
+
+good intro video series: https://www.youtube.com/playlist?list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2
 
 ---
 
