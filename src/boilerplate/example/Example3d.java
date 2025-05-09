@@ -121,7 +121,7 @@ public class Example3d extends GameBase {
         if (heldKeys[GLFW_KEY_LEFT_SHIFT] == 1) mul = 5;
 
         // rotation
-        float rAdd = .01f;
+        float rAdd = .01f * mul;
         if (heldKeys[GLFW_KEY_UP] == 1) camRot.x += rAdd;
         if (heldKeys[GLFW_KEY_DOWN] == 1) camRot.x -= rAdd;
 
@@ -130,14 +130,16 @@ public class Example3d extends GameBase {
 
         // position
         float pAdd = (float) (5 * dt) * mul;
-        if (heldKeys[GLFW_KEY_D] == 1) camPos.x += pAdd;
-        if (heldKeys[GLFW_KEY_A] == 1) camPos.x -= pAdd;
+        Vec3 vel = new Vec3();
+        if (heldKeys[GLFW_KEY_D] == 1) vel.x += pAdd;
+        if (heldKeys[GLFW_KEY_A] == 1) vel.x -= pAdd;
 
-        if (heldKeys[GLFW_KEY_E] == 1) camPos.y += pAdd;
-        if (heldKeys[GLFW_KEY_Q] == 1) camPos.y -= pAdd;
+        if (heldKeys[GLFW_KEY_E] == 1) vel.y += pAdd;
+        if (heldKeys[GLFW_KEY_Q] == 1) vel.y -= pAdd;
 
-        if (heldKeys[GLFW_KEY_S] == 1) camPos.z += pAdd;
-        if (heldKeys[GLFW_KEY_W] == 1) camPos.z -= pAdd;
+        if (heldKeys[GLFW_KEY_S] == 1) vel.z += pAdd;
+        if (heldKeys[GLFW_KEY_W] == 1) vel.z -= pAdd;
+        camPos.addSelf(vel);
     }
 
     @Override

@@ -60,6 +60,18 @@ public class Vec3 {
         return new Vec2(x, y);
     }
 
+    public float roll() {
+        return z;
+    }
+
+    public float pitch() {
+        return y;
+    }
+
+    public float yaw() {
+        return x;
+    }
+
     /**
      * =======
      * ADV USE

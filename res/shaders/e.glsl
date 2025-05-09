@@ -35,6 +35,9 @@ void main() {
     );
     gl_Position = vec4(b, 0, 1);
     v_col = col;
+
+    // lower e.x, higher fov
+    // also higher w, higher fov as well?
 }
 
 //--- FRAG
