@@ -118,15 +118,19 @@ public class Example3d extends GameBase {
 
     public void updateCameraPos(double dt) {
         float mul = 1;
-        if (heldKeys[GLFW_KEY_LEFT_SHIFT] == 1) mul = 5;
+        if (heldKeys[GLFW_KEY_LEFT_SHIFT] == 1) mul = 3;
 
         // rotation
-        float rAdd = .01f * mul;
+        float rAdd = .02f * mul;
         if (heldKeys[GLFW_KEY_UP] == 1) camRot.x += rAdd;
         if (heldKeys[GLFW_KEY_DOWN] == 1) camRot.x -= rAdd;
+        camRot.x = (float) Math.clamp(camRot.x, -Math.PI * .5, Math.PI * .5);
 
         if (heldKeys[GLFW_KEY_LEFT] == 1) camRot.y += rAdd;
         if (heldKeys[GLFW_KEY_RIGHT] == 1) camRot.y -= rAdd;
+
+        if (heldKeys[GLFW_KEY_O] == 1) camRot.z += rAdd;
+        if (heldKeys[GLFW_KEY_P] == 1) camRot.z -= rAdd;
 
         // position
         float pAdd = (float) (5 * dt) * mul;

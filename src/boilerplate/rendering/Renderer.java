@@ -21,6 +21,7 @@ public class Renderer {
     public static void setupGLContext() {
         GL.createCapabilities();
 
+        glEnable(GL_DEPTH_TEST);
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_TEXTURE_2D);
 
@@ -38,6 +39,15 @@ public class Renderer {
 
     public static void clearScreen() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    public static void setWindingOrder(int order) {
+        glFrontFace(order);
+    }
+
+    public static void enableFaceCulling(int face) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(face);
     }
 
     public static void drawArrays(int mode, VertexArray va, int vertexCount) {
