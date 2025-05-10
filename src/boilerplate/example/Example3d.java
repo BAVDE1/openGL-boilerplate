@@ -8,6 +8,7 @@ import boilerplate.rendering.*;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
+import boilerplate.utility.MathUtils;
 import boilerplate.utility.Vec2;
 import boilerplate.utility.Vec3;
 
@@ -21,9 +22,14 @@ public class Example3d extends GameBase {
     public boilerplate.common.Window window = new Window();
     final Dimension SCREEN_SIZE = new Dimension(800, 800);
 
-    int[] heldKeys = new int[350];
+    boolean[] heldKeys = new boolean[350];
+
+    Vec3 worldUp = new Vec3(0, 1, 0);
     Vec3 camPos = new Vec3();
     Vec3 camRot = new Vec3();
+    Vec3 front = new Vec3();
+    Vec3 right = new Vec3();
+    Vec3 up = new Vec3();
 
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
@@ -51,12 +57,12 @@ public class Example3d extends GameBase {
 
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (action == GLFW_PRESS) {
-                heldKeys[key] = 1;
+                heldKeys[key] = true;
                 if (key == GLFW_KEY_ESCAPE) this.window.setToClose();
             }
 
             if (action == GLFW_RELEASE) {
-                heldKeys[key] = 0;
+                heldKeys[key] = false;
             }
         });
     }
@@ -90,27 +96,28 @@ public class Example3d extends GameBase {
         });
         veb.bufferData(new int[] {
                 0, 1, 2,  // front
-                0, 3, 2,
+                0, 2, 3,
 
                 4, 5, 1,  // top
-                4, 0, 1,
+                4, 1, 0,
 
                 4, 0, 3,  // left
-                4, 7, 3,
+                4, 3, 7,
 
                 1, 5, 6,  // right
-                1, 2, 6,
+                1, 6, 2,
 
                 3, 2, 6,  // bottom
-                3, 7, 6,
+                3, 6, 7,
 
-                4, 5, 6,  // back
-                4, 7, 6,
+                6, 5, 4,  // back
+                6, 4, 7,
         });
     }
 
     public void render() {
         Renderer.clearScreen();
+//        glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
         sh.bind();
         Renderer.drawElements(GL_TRIANGLES, va, veb, 36);
         Renderer.finish(window);
@@ -118,31 +125,42 @@ public class Example3d extends GameBase {
 
     public void updateCameraPos(double dt) {
         float mul = 1;
-        if (heldKeys[GLFW_KEY_LEFT_SHIFT] == 1) mul = 3;
+        if (heldKeys[GLFW_KEY_LEFT_SHIFT]) mul = 3;
 
         // rotation
-        float rAdd = .02f * mul;
-        if (heldKeys[GLFW_KEY_UP] == 1) camRot.x += rAdd;
-        if (heldKeys[GLFW_KEY_DOWN] == 1) camRot.x -= rAdd;
-        camRot.x = (float) Math.clamp(camRot.x, -Math.PI * .5, Math.PI * .5);
+        float rAdd = .02f * mul;  // radians
+        if (heldKeys[GLFW_KEY_DOWN]) camRot.y += rAdd;
+        if (heldKeys[GLFW_KEY_UP]) camRot.y -= rAdd;
+        camRot.y = (float) Math.clamp(camRot.y, -Math.PI * .5, Math.PI * .5);
 
-        if (heldKeys[GLFW_KEY_LEFT] == 1) camRot.y += rAdd;
-        if (heldKeys[GLFW_KEY_RIGHT] == 1) camRot.y -= rAdd;
+        if (heldKeys[GLFW_KEY_RIGHT]) camRot.x += rAdd;
+        if (heldKeys[GLFW_KEY_LEFT]) camRot.x -= rAdd;
 
-        if (heldKeys[GLFW_KEY_O] == 1) camRot.z += rAdd;
-        if (heldKeys[GLFW_KEY_P] == 1) camRot.z -= rAdd;
+        if (heldKeys[GLFW_KEY_O]) camRot.z += rAdd;
+        if (heldKeys[GLFW_KEY_P]) camRot.z -= rAdd;
+
+        front.set(
+                (float) (Math.cos(camRot.yaw()) * Math.cos(camRot.pitch())),
+                (float) Math.sin(camRot.pitch()),
+                (float) (Math.sin(camRot.yaw()) * Math.cos(camRot.pitch()))
+        );
+        right = front.cross(worldUp);
+        up = right.cross(front);
+        front.normaliseSelf();
+        right.normaliseSelf();
+        up.normaliseSelf();
 
         // position
         float pAdd = (float) (5 * dt) * mul;
         Vec3 vel = new Vec3();
-        if (heldKeys[GLFW_KEY_D] == 1) vel.x += pAdd;
-        if (heldKeys[GLFW_KEY_A] == 1) vel.x -= pAdd;
+        if (heldKeys[GLFW_KEY_D]) vel.addSelf(right.mul(pAdd));
+        if (heldKeys[GLFW_KEY_A]) vel.subSelf(right.mul(pAdd));
 
-        if (heldKeys[GLFW_KEY_E] == 1) vel.y += pAdd;
-        if (heldKeys[GLFW_KEY_Q] == 1) vel.y -= pAdd;
-
-        if (heldKeys[GLFW_KEY_S] == 1) vel.z += pAdd;
-        if (heldKeys[GLFW_KEY_W] == 1) vel.z -= pAdd;
+//        if (heldKeys[GLFW_KEY_E]) vel.y += pAdd;
+//        if (heldKeys[GLFW_KEY_Q]) vel.y -= pAdd;
+//
+//        if (heldKeys[GLFW_KEY_S]) vel.addSelf(front.mul(pAdd));
+//        if (heldKeys[GLFW_KEY_W]) vel.subSelf(front.mul(pAdd));
         camPos.addSelf(vel);
     }
 
@@ -150,6 +168,7 @@ public class Example3d extends GameBase {
     public void mainLoop(double staticDt) {
         sh.uniform3f("camPos", camPos.x, camPos.y, camPos.z);
         sh.uniform3f("camRot", camRot.x, camRot.y, camRot.z);
+        sh.uniform1f("time", (float) glfwGetTime());
         glfwPollEvents();
         updateCameraPos(staticDt);
         render();

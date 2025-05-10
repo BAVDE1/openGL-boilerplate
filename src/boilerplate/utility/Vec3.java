@@ -127,9 +127,9 @@ public class Vec3 {
 
     public Vec3 cross(Vec3 vec) {
         return new Vec3(
-                (y * vec.z) - (z * vec.y),
-                (z * vec.x) - (x * vec.z),
-                (x * vec.y) - (y * vec.x)
+                Math.fma(y, vec.z, -z * vec.y),
+                Math.fma(z, vec.x, -x * vec.z),
+                Math.fma(x, vec.y, -y * vec.x)
         );
     }
 

@@ -2,6 +2,7 @@ package boilerplate;
 
 import boilerplate.common.BoilerplateConstants;
 
+import boilerplate.example.Example2d;
 import boilerplate.example.Example3d;
 import boilerplate.example.ExampleIndex;
 import boilerplate.utility.Logging;

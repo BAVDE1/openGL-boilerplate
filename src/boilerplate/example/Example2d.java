@@ -18,7 +18,7 @@ import boilerplate.utility.Vec2;
 import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL45.*;
 
 /**
  * Manages everything. Contains the main loop.

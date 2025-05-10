@@ -40,7 +40,7 @@ public class BoilerplateConstants {
         return new float[] {
                 2f/dimension.width, 0,                    0,  -1,
                 0,                  2f/-dimension.height, 0,   1,
-                0,                  0,                   -1,   0,
+                0,                  0,                    1,   0,
                 0,                  0,                    0,   1
         };
     }
