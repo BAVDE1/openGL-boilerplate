@@ -97,10 +97,10 @@ public class Example3d extends GameBase {
                 -.5f, -.5f, .5f,    0, 1,  // bl
 
                 // back quad
-                -.5f,  .5f, -.5f,   0, 0,
-                 .5f,  .5f, -.5f,   1, 0,
-                 .5f, -.5f, -.5f,   1, 1,
-                -.5f, -.5f, -.5f,   0, 1
+                -.5f,  .5f, -.5f,   1, 1,
+                 .5f,  .5f, -.5f,   0, 1,
+                 .5f, -.5f, -.5f,   0, 0,
+                -.5f, -.5f, -.5f,   1, 0
         });
         veb.bufferData(new int[] {
                 0, 1, 2,  // front
