@@ -41,9 +41,9 @@ public class Shape2d {
     public static Poly createRect(Vector2f topLeft, Vector2f size) {
         return new Poly(
                 topLeft,
-                topLeft.add(0, size.y),
-                topLeft.add(size.x, 0),
-                topLeft.add(size)
+                topLeft.add(0, size.y, new Vector2f()),
+                topLeft.add(size.x, 0, new Vector2f()),
+                topLeft.add(size, new Vector2f())
         );
     }
 
@@ -54,11 +54,12 @@ public class Shape2d {
     }
 
     public static Poly createLine(Vector2f point1, Vector2f point2, int thickness) {
-        Vector2f normalised = point2.sub(point1).normalize();
-        Vector2f perp = normalised.perpendicular().mul(thickness * .5f);
+        Vector2f perp = new Vector2f();
+        point2.sub(point1, perp).normalize();
+        perp.perpendicular().mul(thickness * .5f);
         return new Poly(
-            point1.add(perp), point1.sub(perp),
-            point2.add(perp), point2.sub(perp)
+            point1.add(perp, new Vector2f()), point1.sub(perp, new Vector2f()),
+            point2.add(perp, new Vector2f()), point2.sub(perp, new Vector2f())
         );
     }
     public static Poly createLine(Vector2f point1, Vector2f point2, int thickness, ShapeMode mode) {

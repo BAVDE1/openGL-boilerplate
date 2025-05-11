@@ -6,6 +6,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.awt.*;
+import java.util.Arrays;
 
 /**
  * Some abstracted functions for building a buffer.
@@ -220,6 +221,7 @@ public class BufferBuilder {
             Vector2f point = p.points.get(i);
             addPointsToArray(verts, inx, i, point.add(p.pos), p.mode);
         }
+        System.out.println(Arrays.toString(verts));
         pushRawFloats(verts);
     }
 

@@ -22,7 +22,7 @@ voxel example: https://github.com/LWJGL/lwjgl3-demos/blob/main/src/org/lwjgl/dem
 
 ### Other resources
 
-openGl mathematics (GLM) for java: https://github.com/JOML-CI/JOML/tree/main
+java openGL math library (included in lib): https://github.com/JOML-CI/JOML/wiki
 
 glfw: https://www.glfw.org/docs/latest/window_guide.html
 
