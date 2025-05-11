@@ -50,6 +50,9 @@ public class Example3d extends GameBase {
         winOps.initWindowSize = SCREEN_SIZE;
         window.quickSetupAndShow(winOps);
 
+        Renderer.enableDepthTest();
+        Renderer.enableFaceCullingDefault();
+
         bindEvents();
         setupBuffers();
     }
@@ -120,7 +123,6 @@ public class Example3d extends GameBase {
     public void render() {
         Renderer.clearScreen();
 
-        glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
         Matrix4f model = new Matrix4f().identity();
         model.rotation((float) (glfwGetTime() * Math.toRadians(200)), .5f, 1, 0);
 //        model.rotation((float) Math.toRadians(-55), 1, 0, 0);

@@ -21,18 +21,29 @@ public class Renderer {
     public static void setupGLContext() {
         GL.createCapabilities();
 
-//        glEnable(GL_DEPTH_TEST);
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_TEXTURE_2D);
-
-//        glEnable(GL_CULL_FACE);
-//        glCullFace(GL_BACK);
-//        glFrontFace(GL_CW);
 
         applyDefaultBlend();
 
         glClearColor(.0f, .0f, .0f, .0f);
         Logging.debug("OpenGL capabilities created");
+    }
+
+    public static void enableDepthTest() {
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    public static void enableFaceCulling(int windingOrder, int faceToCull) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(faceToCull);
+        glFrontFace(windingOrder);
+    }
+
+    public static void enableFaceCullingDefault() {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CW);
     }
 
     /** logically behaving transparency */
