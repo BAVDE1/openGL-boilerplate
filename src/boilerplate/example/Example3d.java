@@ -122,7 +122,7 @@ public class Example3d extends GameBase {
                 6, 4, 7,
         });
 
-        new Texture("textures/closed.png").bind();
+        new Texture("textures/breaking.png").bind();
     }
 
     public void render() {
