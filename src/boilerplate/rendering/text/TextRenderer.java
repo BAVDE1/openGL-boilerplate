@@ -6,7 +6,7 @@ import boilerplate.rendering.builders.Shape2d;
 import boilerplate.rendering.*;
 import boilerplate.rendering.builders.ShapeMode;
 import boilerplate.utility.Logging;
-import boilerplate.utility.Vec2;
+import org.joml.Vector2f;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -32,29 +32,29 @@ public class TextRenderer {
 
         private int loadedFontId;
         private String string;
-        private Vec2 pos;
+        private Vector2f pos;
 
         private final BufferBuilder2f sb = new BufferBuilder2f(true, FontManager.textLayoutAdditionalVerts());
         private final BufferBuilder2f bgSb = new BufferBuilder2f(true, FontManager.textLayoutAdditionalVerts());
         private boolean hasChanged = true;
 
         private Color bgCol = new Color(0, 0, 0, 0);
-        private final Vec2 bgMargin = new Vec2();
+        private final Vector2f bgMargin = new Vector2f();
         private boolean seamlessBgLines = false;
 
-        public TextObject(int loadedFontId, String string, Vec2 pos, float scale, int ySpacing) {
+        public TextObject(int loadedFontId, String string, Vector2f pos, float scale, int ySpacing) {
             this(loadedFontId, string, pos);
             setScale(scale);
             setYSpacing(ySpacing);
         }
 
-        public TextObject(int loadedFontId, String string, Vec2 pos, Color textColour, Color bgCol) {
+        public TextObject(int loadedFontId, String string, Vector2f pos, Color textColour, Color bgCol) {
             this(loadedFontId, string, pos);
             setTextColour(textColour);
             setBgCol(bgCol);
         }
 
-        public TextObject(int loadedFontId, String string, Vec2 pos) {
+        public TextObject(int loadedFontId, String string, Vector2f pos) {
             setLoadedFontId(loadedFontId);
             setString(string);
             setPos(pos);
@@ -93,11 +93,11 @@ public class TextRenderer {
                 }
 
                 float lineWidth = font.findLineWidth(line) * scale;
-                Vec2 linePos = new Vec2(alignment == 0 ? pos.x : pos.x - (lineWidth * (1f / alignment)), pos.y + accumulatedY);
+                Vector2f linePos = new Vector2f(alignment == 0 ? pos.x : pos.x - (lineWidth * (1f / alignment)), pos.y + accumulatedY);
 
                 // line background
                 if (bgCol.getAlpha() > BoilerplateConstants.EPSILON) {
-                    Vec2 size = new Vec2(lineWidth, yAddition);
+                    Vector2f size = new Vector2f(lineWidth, yAddition);
                     if (!seamlessBgLines) size.y -= ySpacing;
 
                     float[] color = new float[] {-1, -1, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(), bgCol.getAlpha()};
@@ -128,8 +128,8 @@ public class TextRenderer {
             }
         }
 
-        public Vec2 getPos() {return pos.getClone();}
-        public void setPos(Vec2 newPos) {
+        public Vector2f getPos() {return new Vector2f(pos);}
+        public void setPos(Vector2f newPos) {
             if (newPos != pos) {
                 pos = newPos;
                 setHasChanged();
@@ -197,8 +197,8 @@ public class TextRenderer {
             }
         }
 
-        public Vec2 getBgMargin() {return bgMargin;}
-        public void setBgMargin(Vec2 newBgMargin) {
+        public Vector2f getBgMargin() {return bgMargin;}
+        public void setBgMargin(Vector2f newBgMargin) {
             if (!newBgMargin.equals(bgMargin)) {
                 bgMargin.set(newBgMargin);
                 setHasChanged();
@@ -283,7 +283,7 @@ public class TextRenderer {
         return sb;
     }
 
-    public static void pushTextToBuilder(BufferBuilder2f sb, String text, FontManager.LoadedFont font, Vec2 pos, float[] appendFloats) {
+    public static void pushTextToBuilder(BufferBuilder2f sb, String text, FontManager.LoadedFont font, Vector2f pos, float[] appendFloats) {
         pushTextToBuilder(sb, text, font, pos, appendFloats, 1);
     }
 
@@ -291,13 +291,13 @@ public class TextRenderer {
      * Pushes all chars into the buffer
      * Assumes that the VA looks like: `posX, posY, texturePosX, texturePosY, ...`
      */
-    public static void pushTextToBuilder(BufferBuilder2f sb, String text, FontManager.LoadedFont font, Vec2 pos, float[] appendFloats, float scale) {
+    public static void pushTextToBuilder(BufferBuilder2f sb, String text, FontManager.LoadedFont font, Vector2f pos, float[] appendFloats, float scale) {
         int accumulatedX = 0;
         boolean initial = true;
         for (char c : text.toCharArray()) {
             FontManager.Glyph glyph = font.getGlyph(c);
-            Vec2 size = glyph.getSize().mul(scale);
-            Vec2 topLeft = pos.add(accumulatedX, 0);
+            Vector2f size = glyph.getSize().mul(scale);
+            Vector2f topLeft = pos.add(accumulatedX, 0);
 
             Shape2d.Poly texturePoints = Shape2d.createRect(glyph.texTopLeft, glyph.texSize);
             ShapeMode.UnpackAppend mode = new ShapeMode.UnpackAppend(texturePoints.toArray(), appendFloats);

@@ -1,6 +1,6 @@
 package boilerplate.rendering.builders;
 
-import boilerplate.utility.Vec2;
+import org.joml.Vector2f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,19 +12,19 @@ import java.util.ListIterator;
 public class Shape2d {
     public static class Poly {
         public ShapeMode mode = null;
-        public List<Vec2> points;
-        public Vec2 pos = new Vec2();
+        public List<Vector2f> points;
+        public Vector2f pos = new Vector2f();
 
-        public Poly(Vec2... points) {
+        public Poly(Vector2f... points) {
             this.points = List.of(points);
         }
 
-        public Poly(ShapeMode mode, Vec2... points) {
+        public Poly(ShapeMode mode, Vector2f... points) {
             this(points);
             this.mode = mode;
         }
 
-        public Poly addPos(Vec2 newPos) {
+        public Poly addPos(Vector2f newPos) {
             this.pos = newPos;
             return this;
         }
@@ -38,7 +38,7 @@ public class Shape2d {
         }
     }
 
-    public static Poly createRect(Vec2 topLeft, Vec2 size) {
+    public static Poly createRect(Vector2f topLeft, Vector2f size) {
         return new Poly(
                 topLeft,
                 topLeft.add(0, size.y),
@@ -47,56 +47,56 @@ public class Shape2d {
         );
     }
 
-    public static Poly createRect(Vec2 topLeft, Vec2 size, ShapeMode mode) {
+    public static Poly createRect(Vector2f topLeft, Vector2f size, ShapeMode mode) {
         Poly p = createRect(topLeft, size);
         p.mode = mode;
         return p;
     }
 
-    public static Poly createLine(Vec2 point1, Vec2 point2, int thickness) {
-        Vec2 normalised = point2.sub(point1).normalized();
-        Vec2 perp = normalised.perpendicular().mul(thickness * .5f);
+    public static Poly createLine(Vector2f point1, Vector2f point2, int thickness) {
+        Vector2f normalised = point2.sub(point1).normalize();
+        Vector2f perp = normalised.perpendicular().mul(thickness * .5f);
         return new Poly(
             point1.add(perp), point1.sub(perp),
             point2.add(perp), point2.sub(perp)
         );
     }
-    public static Poly createLine(Vec2 point1, Vec2 point2, int thickness, ShapeMode mode) {
+    public static Poly createLine(Vector2f point1, Vector2f point2, int thickness, ShapeMode mode) {
         Poly p = createLine(point1, point2, thickness);
         p.mode = mode;
         return p;
     }
 
-    public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness) {
-        Vec2 pos = topLeft.add(size.div(2));
+    public static Poly createRectOutline(Vector2f topLeft, Vector2f size, int thickness) {
+        Vector2f pos = topLeft.add(size.div(2));
 
         topLeft = topLeft.sub(pos);
-        Vec2 topRight = topLeft.add(size.x, 0);
-        Vec2 btmRight = topLeft.add(size);
-        Vec2 btmLeft = topLeft.add(0, size.y);
+        Vector2f topRight = topLeft.add(size.x, 0);
+        Vector2f btmRight = topLeft.add(size);
+        Vector2f btmLeft = topLeft.add(0, size.y);
 
         return new Poly(
-                topLeft,  topLeft.add(thickness),
+                topLeft,  topLeft.add(thickness, thickness),
                 topRight, topRight.add(-thickness, thickness),
-                btmRight, btmRight.sub(thickness),
+                btmRight, btmRight.sub(thickness, thickness),
                 btmLeft,  btmLeft.sub(-thickness, thickness),
-                topLeft,  topLeft.add(thickness)
+                topLeft,  topLeft.add(thickness, thickness)
         ).addPos(pos);
     }
 
-    public static Poly createRectOutline(Vec2 topLeft, Vec2 size, int thickness, ShapeMode mode) {
+    public static Poly createRectOutline(Vector2f topLeft, Vector2f size, int thickness, ShapeMode mode) {
         Poly p = createRectOutline(topLeft, size, thickness);
         p.mode = mode;
         return p;
     }
 
     public static void sortPoints(Poly p) {
-        sortPoints(p, new Vec2(1));
+        sortPoints(p, new Vector2f(1));
     }
 
     /** Sort points of a polygon so they are all listed in a clockwise direction */
-    public static void sortPoints(Poly p, Vec2 center) {
-        if (center.equals(0)) center = new Vec2(1);
+    public static void sortPoints(Poly p, Vector2f center) {
+        if (center.equals(0)) center = new Vector2f(1);
         final int fidelity = 2;
 
         // functions
@@ -118,9 +118,9 @@ public class Shape2d {
         int[] indexOrder = new int[p.points.size()];
         String[] comparableItems = new String[p.points.size()];
         for(int i = 0; i < p.points.size(); i++) {
-            Vec2 point = p.points.get(i);
+            Vector2f point = p.points.get(i);
             float onSide = (point.x * center.y) - (point.y * center.x);
-            float dot = point.sub(center).normalized().dot(center.normalized());
+            float dot = point.sub(center).normalize().dot(center.normalize());
             dot = onSide > 0 ? dot+3 : (-dot)+1;
 
             indexOrder[i] = i;
@@ -152,7 +152,7 @@ public class Shape2d {
 
             // finish
             if (fidelity - on_digit < 0) {
-                Vec2[] newPoints = new Vec2[p.points.size()];
+                Vector2f[] newPoints = new Vector2f[p.points.size()];
                 for (int j = 0; j < p.points.size(); j++) {
                     newPoints[j] = p.points.get(indexOrder[j]);
                 }
@@ -163,11 +163,11 @@ public class Shape2d {
     }
 
     /** Finds average of all points */
-    public static Vec2 findCenter(List<Vec2> points) {
-        ListIterator<Vec2> iterator = points.listIterator();
-        Vec2 avg = iterator.next().getClone();
+    public static Vector2f findCenter(List<Vector2f> points) {
+        ListIterator<Vector2f> iterator = points.listIterator();
+        Vector2f avg = new Vector2f(iterator.next());
         while(iterator.hasNext()) {
-            avg.addSelf(iterator.next());
+            avg.add(iterator.next());
         }
         return avg.div(points.size());
     }

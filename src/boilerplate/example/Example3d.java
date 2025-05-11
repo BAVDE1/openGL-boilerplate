@@ -7,12 +7,14 @@ import boilerplate.common.Window;
 import boilerplate.rendering.*;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
-import boilerplate.utility.Logging;
-import boilerplate.utility.MathUtils;
-import boilerplate.utility.Vec2;
-import boilerplate.utility.Vec3;
+import boilerplate.utility.*;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 
 import java.awt.*;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -24,12 +26,12 @@ public class Example3d extends GameBase {
 
     boolean[] heldKeys = new boolean[350];
 
-    Vec3 worldUp = new Vec3(0, 1, 0);
-    Vec3 camPos = new Vec3();
-    Vec3 camRot = new Vec3();
-    Vec3 front = new Vec3();
-    Vec3 right = new Vec3();
-    Vec3 up = new Vec3();
+    Vector3f worldUp = new Vector3f(0, 1, 0);
+    Vector3f camPos = new Vector3f();
+    Vector3f camRot = new Vector3f();
+    Vector3f front = new Vector3f();
+    Vector3f right = new Vector3f();
+    Vector3f up = new Vector3f();
 
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
@@ -83,16 +85,16 @@ public class Example3d extends GameBase {
 
         vb.bufferData(new float[] {
                 // front quad
-                -.5f,  .5f, -5,    1, 1, 1,  // tl
-                 .5f,  .5f, -5,    1, 0, 0,  // tr
-                 .5f, -.5f, -5,    0, 1, 0,  // br
-                -.5f, -.5f, -5,    0, 0, 1,  // bl
+                -.5f,  .5f, .5f,    1, 1, 1,  // tl
+                 .5f,  .5f, .5f,    1, 0, 0,  // tr
+                 .5f, -.5f, .5f,    0, 1, 0,  // br
+                -.5f, -.5f, .5f,    0, 0, 1,  // bl
 
                 // back quad
-                -.5f,  .5f, -6,   1, 0, 0,
-                 .5f,  .5f, -6,   0, 1, 0,
-                 .5f, -.5f, -6,   0, 0, 1,
-                -.5f, -.5f, -6,   1, 1, 1
+                -.5f,  .5f, -.5f,   1, 0, 0,
+                 .5f,  .5f, -.5f,   0, 1, 0,
+                 .5f, -.5f, -.5f,   0, 0, 1,
+                -.5f, -.5f, -.5f,   1, 1, 1
         });
         veb.bufferData(new int[] {
                 0, 1, 2,  // front
@@ -117,58 +119,28 @@ public class Example3d extends GameBase {
 
     public void render() {
         Renderer.clearScreen();
-//        glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
+
+        Matrix4f model = new Matrix4f().identity();
+//        model.rotation((float) glfwGetTime() * MathUtils.degToRad(200), .5f, 1, 0);
+        model.rotation((float) Math.toRadians(-55), 1, 0, 0);
+        Matrix4f view = new Matrix4f().identity();
+        view.translate(0, 0, -3f);
+        Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(45), (float) SCREEN_SIZE.width / SCREEN_SIZE.height, .1f, 1000);
+
+        sh.uniformMatrix4f("model", model);
+        sh.uniformMatrix4f("view", view);
+        sh.uniformMatrix4f("projection", proj);
+
         sh.bind();
         Renderer.drawElements(GL_TRIANGLES, va, veb, 36);
         Renderer.finish(window);
     }
 
     public void updateCameraPos(double dt) {
-        float mul = 1;
-        if (heldKeys[GLFW_KEY_LEFT_SHIFT]) mul = 3;
-
-        // rotation
-        float rAdd = .02f * mul;  // radians
-        if (heldKeys[GLFW_KEY_DOWN]) camRot.y += rAdd;
-        if (heldKeys[GLFW_KEY_UP]) camRot.y -= rAdd;
-        camRot.y = (float) Math.clamp(camRot.y, -Math.PI * .5, Math.PI * .5);
-
-        if (heldKeys[GLFW_KEY_RIGHT]) camRot.x += rAdd;
-        if (heldKeys[GLFW_KEY_LEFT]) camRot.x -= rAdd;
-
-        if (heldKeys[GLFW_KEY_O]) camRot.z += rAdd;
-        if (heldKeys[GLFW_KEY_P]) camRot.z -= rAdd;
-
-        front.set(
-                (float) (Math.cos(camRot.yaw()) * Math.cos(camRot.pitch())),
-                (float) Math.sin(camRot.pitch()),
-                (float) (Math.sin(camRot.yaw()) * Math.cos(camRot.pitch()))
-        );
-        right = front.cross(worldUp);
-        up = right.cross(front);
-        front.normaliseSelf();
-        right.normaliseSelf();
-        up.normaliseSelf();
-
-        // position
-        float pAdd = (float) (5 * dt) * mul;
-        Vec3 vel = new Vec3();
-        if (heldKeys[GLFW_KEY_D]) vel.addSelf(right.mul(pAdd));
-        if (heldKeys[GLFW_KEY_A]) vel.subSelf(right.mul(pAdd));
-
-//        if (heldKeys[GLFW_KEY_E]) vel.y += pAdd;
-//        if (heldKeys[GLFW_KEY_Q]) vel.y -= pAdd;
-//
-//        if (heldKeys[GLFW_KEY_S]) vel.addSelf(front.mul(pAdd));
-//        if (heldKeys[GLFW_KEY_W]) vel.subSelf(front.mul(pAdd));
-        camPos.addSelf(vel);
     }
 
     @Override
     public void mainLoop(double staticDt) {
-        sh.uniform3f("camPos", camPos.x, camPos.y, camPos.z);
-        sh.uniform3f("camRot", camRot.x, camRot.y, camRot.z);
-        sh.uniform1f("time", (float) glfwGetTime());
         glfwPollEvents();
         updateCameraPos(staticDt);
         render();

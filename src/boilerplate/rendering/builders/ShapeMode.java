@@ -1,8 +1,8 @@
 package boilerplate.rendering.builders;
 
 import boilerplate.common.BoilerplateConstants;
-import boilerplate.utility.Vec2;
-import boilerplate.utility.Vec3;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -63,33 +63,33 @@ public abstract class ShapeMode {
      * meant for use with the main shader
      */
     public static class Demonstration extends ShapeMode {
-        List<Vec3> vars;
+        List<Vector3f> vars;
         int type;
 
         public Demonstration() {this(BoilerplateConstants.DEMO_MODE_NIL);}
-        public Demonstration(int texSlot, Vec2 texTopLeft, Vec2 texSize) {
+        public Demonstration(int texSlot, Vector2f texTopLeft, Vector2f texSize) {
             this(BoilerplateConstants.DEMO_MODE_TEX);
-            this.vars = List.of(new Vec3[] {
-                    new Vec3(texTopLeft, texSlot),
-                    new Vec3(texTopLeft.add(0, texSize.y), texSlot),
-                    new Vec3(texTopLeft.add(texSize.x, 0), texSlot),
-                    new Vec3(texTopLeft.add(texSize), texSlot)
+            this.vars = List.of(new Vector3f[] {
+                    new Vector3f(texTopLeft, texSlot),
+                    new Vector3f(texTopLeft.add(0, texSize.y), texSlot),
+                    new Vector3f(texTopLeft.add(texSize.x, 0), texSlot),
+                    new Vector3f(texTopLeft.add(texSize), texSlot)
             });
         }
         public Demonstration(Color col) {
             this(BoilerplateConstants.DEMO_MODE_COL);
-            this.vars = List.of(new Vec3[] {new Vec3(col)});
+            this.vars = List.of(new Vector3f[] {new Vector3f(col.getRed(), col.getGreen(), col.getBlue())});
         }
 
         public Demonstration(int mode) {this.type = mode;}
-        public Demonstration(int mode, Vec3... modeVars) {
+        public Demonstration(int mode, Vector3f... modeVars) {
             this(mode);
             this.vars = Arrays.stream(modeVars).toList();
         }
 
-        /** Get vec3 at inx, or last (or empty vec3 if no vars exist) */
-        public Vec3 getVar(int inx) {
-            if (vars == null || vars.isEmpty()) return new Vec3();
+        /** Get Vector3f at inx, or last (or empty Vector3f if no vars exist) */
+        public Vector3f getVar(int inx) {
+            if (vars == null || vars.isEmpty()) return new Vector3f();
             if (inx >= vars.size()) return vars.getLast();
             return vars.get(inx);
         }

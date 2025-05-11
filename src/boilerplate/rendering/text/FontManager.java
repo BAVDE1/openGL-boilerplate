@@ -5,7 +5,7 @@ import boilerplate.rendering.ShaderHelper;
 import boilerplate.rendering.Texture;
 import boilerplate.rendering.VertexArray;
 import boilerplate.utility.Logging;
-import boilerplate.utility.Vec2;
+import org.joml.Vector2f;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -24,25 +24,25 @@ public class FontManager {
         public final int x, y;
 
         // texture coordinates
-        public final Vec2 texTopLeft;
-        public final Vec2 texSize;
+        public final Vector2f texTopLeft;
+        public final Vector2f texSize;
 
         public Glyph(int x, int y, int width, int height) {
             this.width = width; this.height = height;
             this.x = x; this.y = y;
 
-            this.texTopLeft = new Vec2(
+            this.texTopLeft = new Vector2f(
                     (float) x / fullWidth,
                     (float) y / fullHeight
             );
-            this.texSize = new Vec2(
+            this.texSize = new Vector2f(
                     (float) width / fullWidth,
                     (float) height / fullHeight
             );
         }
 
-        public Vec2 getSize() {
-            return new Vec2(width, height);
+        public Vector2f getSize() {
+            return new Vector2f(width, height);
         }
 
         @Override

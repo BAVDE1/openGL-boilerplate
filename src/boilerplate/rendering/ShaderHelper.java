@@ -2,9 +2,14 @@ package boilerplate.rendering;
 
 import boilerplate.common.BoilerplateConstants;
 import boilerplate.utility.Logging;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.FloatBuffer;
 import java.util.*;
 
 import static org.lwjgl.opengl.GL45.*;
@@ -213,18 +218,28 @@ public class ShaderHelper {
     public void uniform1f(String uniform, float f) {
         glUniform1f(getUniformLocation(uniform), f);
     }
+    public void uniform2f(String uniform, Vector2f v) {
+        uniform2f(uniform, v.x, v.y);
+    }
     public void uniform2f(String uniform, float f1, float f2) {
         glUniform2f(getUniformLocation(uniform), f1, f2);
+    }
+    public void uniform3f(String uniform, Vector3f v) {
+        uniform3f(uniform, v.x, v.y, v.z);
     }
     public void uniform3f(String uniform, float f1, float f2, float f3) {
         glUniform3f(getUniformLocation(uniform), f1, f2, f3);
     }
-    public void uniformMatrix4f(String uniform, float[] matrix4f) {
-        if (matrix4f.length != 4*4) {
-            Logging.danger("matrix4 given does not have exactly %s items", 4*4);
-            return;
-        }
-        glUniformMatrix4fv(getUniformLocation(uniform), false, matrix4f);
+    public void uniformMatrix4f(String uniform, Matrix4f m) {
+        FloatBuffer fb = BufferUtils.createFloatBuffer(4*4);
+        m.get(fb);
+        uniformMatrix4f(uniform, fb);
+    }
+    public void uniformMatrix4f(String uniform, FloatBuffer buffer) {
+        glUniformMatrix4fv(getUniformLocation(uniform), false, buffer);
+    }
+    public void uniformMatrix4f(String uniform, float[] matFloats) {
+        glUniformMatrix4fv(getUniformLocation(uniform), false, matFloats);
     }
 
     public void useDemoShader() {

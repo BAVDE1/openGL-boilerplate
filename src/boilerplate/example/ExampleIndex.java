@@ -8,7 +8,7 @@ import boilerplate.rendering.*;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
-import boilerplate.utility.Vec2;
+import org.joml.Vector2f;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -63,8 +63,8 @@ public class ExampleIndex extends GameBase {
     }
 
     public void setupBuffers() {
-        TextRenderer.TextObject to1 = new TextRenderer.TextObject(1, "[q]\n\n2d example", new Vec2(120, 60), Color.YELLOW, Color.BLACK);
-        TextRenderer.TextObject to2 = new TextRenderer.TextObject(1, "[e]\n\n3d example", new Vec2(SCREEN_SIZE.width-120, 60), Color.CYAN, Color.BLACK);
+        TextRenderer.TextObject to1 = new TextRenderer.TextObject(1, "[q]\n\n2d example", new Vector2f(120, 60), Color.YELLOW, Color.BLACK);
+        TextRenderer.TextObject to2 = new TextRenderer.TextObject(1, "[e]\n\n3d example", new Vector2f(SCREEN_SIZE.width-120, 60), Color.CYAN, Color.BLACK);
         to1.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
         to2.setAlignment(TextRenderer.TextObject.ALIGN_MIDDLE);
         textRenderer.setupBufferObjects();

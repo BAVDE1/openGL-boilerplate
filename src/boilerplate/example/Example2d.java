@@ -6,6 +6,7 @@ import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import boilerplate.rendering.builders.BufferBuilder2f;
 import boilerplate.rendering.builders.ShapeMode;
+import org.joml.Vector2f;
 import org.lwjgl.opengl.GL45;
 import boilerplate.rendering.builders.Shape2d;
 import boilerplate.rendering.*;
@@ -13,7 +14,6 @@ import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
 import boilerplate.utility.MathUtils;
-import boilerplate.utility.Vec2;
 
 import java.awt.*;
 
@@ -47,10 +47,10 @@ public class Example2d extends GameBase {
     TextRenderer.TextObject to2;
     TextRenderer textRenderer = new TextRenderer();
 
-    Vec2 mousePos = new Vec2();
-    Vec2 mousePosOnClick = new Vec2();
+    Vector2f mousePos = new Vector2f();
+    Vector2f mousePosOnClick = new Vector2f();
 
-    Vec2 viewPos = new Vec2();
+    Vector2f viewPos = new Vector2f();
     float viewScale = 1f;
     float scaleAddition = .1f;
     boolean forceUpdateView = false;
@@ -145,13 +145,13 @@ public class Example2d extends GameBase {
         vbMain.genId(); vaMain.genId();
 
         builderMain.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
-        builderMain.pushSeparatedPolygon(Shape2d.createRect(new Vec2(50, 50), new Vec2(500, 100), new ShapeMode.Demonstration(1, new Vec2(), new Vec2(1))));
-        builderMain.pushSeparatedPolygon(Shape2d.createRect(new Vec2(200, 200), new Vec2(700, 150), new ShapeMode.Demonstration(2, new Vec2(), new Vec2(1))));
-        builderMain.pushSeparatedPolygon(Shape2d.createLine(new Vec2(70, 20), new Vec2(150, 150), 20, new ShapeMode.Demonstration(3)));
-        builderMain.pushSeparatedPolygon(Shape2d.createRectOutline(new Vec2(700, 100), new Vec2(100, 50), 15, new ShapeMode.Demonstration(3)));
+        builderMain.pushSeparatedPolygon(Shape2d.createRect(new Vector2f(50, 50), new Vector2f(500, 100), new ShapeMode.Demonstration(1, new Vector2f(), new Vector2f(1))));
+        builderMain.pushSeparatedPolygon(Shape2d.createRect(new Vector2f(200, 200), new Vector2f(700, 150), new ShapeMode.Demonstration(2, new Vector2f(), new Vector2f(1))));
+        builderMain.pushSeparatedPolygon(Shape2d.createLine(new Vector2f(70, 20), new Vector2f(150, 150), 20, new ShapeMode.Demonstration(3)));
+        builderMain.pushSeparatedPolygon(Shape2d.createRectOutline(new Vector2f(700, 100), new Vector2f(100, 50), 15, new ShapeMode.Demonstration(3)));
 
-        Shape2d.Poly p2 = new Shape2d.Poly(new ShapeMode.Demonstration(Color.RED), new Vec2(-50, 50), new Vec2(0, -50), new Vec2(50, 50), new Vec2(-50, 0), new Vec2(50, 0));
-        p2.addPos(new Vec2(100, 250));
+        Shape2d.Poly p2 = new Shape2d.Poly(new ShapeMode.Demonstration(Color.RED), new Vector2f(-50, 50), new Vector2f(0, -50), new Vector2f(50, 50), new Vector2f(-50, 0), new Vector2f(50, 0));
+        p2.addPos(new Vector2f(100, 250));
         Shape2d.sortPoints(p2);
         builderMain.pushSeparatedPolygonSorted(p2);
 
@@ -159,10 +159,10 @@ public class Example2d extends GameBase {
         vaMain.bindBuffer(vbMain);
         vaMain.pushLayout(VertexArray.Layout.createDefaultLayout());
 
-        to1 = new TextRenderer.TextObject(1, "", new Vec2(5), Color.CYAN, Color.BLACK);
-        to2 = new TextRenderer.TextObject(1, "", new Vec2(5, 50), Color.WHITE, Color.BLACK);
-        to1.setBgMargin(new Vec2(5));
-        to2.setBgMargin(new Vec2(5));
+        to1 = new TextRenderer.TextObject(1, "", new Vector2f(5), Color.CYAN, Color.BLACK);
+        to2 = new TextRenderer.TextObject(1, "", new Vector2f(5, 50), Color.WHITE, Color.BLACK);
+        to1.setBgMargin(new Vector2f(5));
+        to2.setBgMargin(new Vector2f(5));
         textRenderer.setupBufferObjects();
         textRenderer.pushTextObject(to1, to2);
 
@@ -170,8 +170,8 @@ public class Example2d extends GameBase {
         vbCircles.genId(); vaCircles.genId();
 
         builderCircles.setAdditionalVertFloats(5);
-        builderCircles.pushCircle(new Vec2(200), 50, Color.BLUE);
-        builderCircles.pushCircle(new Vec2(300), 34, 10, Color.GREEN);
+        builderCircles.pushCircle(new Vector2f(200), 50, Color.BLUE);
+        builderCircles.pushCircle(new Vector2f(300), 34, 10, Color.GREEN);
 
         VertexArray.Layout instanceLayout = new VertexArray.Layout();
         instanceLayout.pushFloat(2);  // circle pos
@@ -240,29 +240,29 @@ public class Example2d extends GameBase {
 
     public void addToViewScale(float addition, boolean relativeToMouse) {
         // mouse or middle of screen
-        Vec2 relativeTo = relativeToMouse ? mousePos : Vec2.fromDim(SCREEN_SIZE).mul(.5f);
-        viewPos.addSelf(relativeTo.mul(viewScale).sub(relativeTo.mul(viewScale+addition)));
+        Vector2f relativeTo = relativeToMouse ? mousePos : new Vector2f(SCREEN_SIZE.width, SCREEN_SIZE.height).mul(.5f);
+        viewPos.add(relativeTo.mul(viewScale).sub(relativeTo.mul(viewScale+addition)));
 
         viewScale += addition;
         forceUpdateView = true;
     }
 
     public void updateViewPos(double dt) {
-        Vec2 addition = new Vec2();
+        Vector2f addition = new Vector2f();
 
         // mouse prioritised over keys
         if (heldMouseKeys[GLFW_MOUSE_BUTTON_1] == 1) {
             addition = mousePos.sub(mousePosOnClick).negate();
-            addition.subSelf(viewPos);
+            addition.sub(viewPos);
         } else {
             float amnt = (float) (200 * dt);
             addition.x += (-amnt * heldKeys[GLFW_KEY_A]) + (amnt * heldKeys[GLFW_KEY_D]);
             addition.y += (-amnt * heldKeys[GLFW_KEY_W]) + (amnt * heldKeys[GLFW_KEY_S]);
-            addition.mulSelf(heldKeys[GLFW_KEY_LEFT_SHIFT] == 1 ? 2 : 1);
+            addition.mul(heldKeys[GLFW_KEY_LEFT_SHIFT] == 1 ? 2 : 1);
         }
 
-        if (forceUpdateView || !addition.equals(new Vec2())) {
-            viewPos.addSelf(addition);
+        if (forceUpdateView || !addition.equals(new Vector2f())) {
+            viewPos.add(addition);
             shMain.uniform2f("viewPos", viewPos.x, viewPos.y);
             shMain.uniform1f("viewScale", viewScale);
 

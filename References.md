@@ -22,6 +22,8 @@ voxel example: https://github.com/LWJGL/lwjgl3-demos/blob/main/src/org/lwjgl/dem
 
 ### Other resources
 
+openGl mathematics (GLM) for java: https://github.com/JOML-CI/JOML/tree/main
+
 glfw: https://www.glfw.org/docs/latest/window_guide.html
 
 good intro video series: https://www.youtube.com/playlist?list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2

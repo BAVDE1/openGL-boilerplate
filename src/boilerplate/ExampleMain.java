@@ -11,6 +11,6 @@ public class ExampleMain {
     public static void main(String[] args) {
         Logging.setupFileLogging(BoilerplateConstants.LOGGING_FILE_NAME);
         Logging.mystical("Starting program (opengl-boilerplate)");
-        new Example3d().start();
+        new ExampleIndex().start();
     }
 }

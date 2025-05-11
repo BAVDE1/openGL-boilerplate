@@ -2,8 +2,8 @@ package boilerplate.rendering.builders;
 
 import boilerplate.common.BoilerplateConstants;
 import boilerplate.utility.Logging;
-import boilerplate.utility.Vec2;
-import boilerplate.utility.Vec3;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.awt.*;
 
@@ -184,12 +184,12 @@ public class BufferBuilder {
         return append.vars.length;
     }
 
-    private void addPointsToArray(float[] theArray, int floatInx, int vertInx, Vec2 point, ShapeMode mode) {
+    private void addPointsToArray(float[] theArray, int floatInx, int vertInx, Vector2f point, ShapeMode mode) {
         theArray[floatInx] = point.x;
         theArray[floatInx+1] = point.y;
 
         if (mode instanceof ShapeMode.Demonstration demo) {
-            Vec3 typeVar = demo.getVar(vertInx);
+            Vector3f typeVar = demo.getVar(vertInx);
             theArray[floatInx + 2] = demo.type;
             theArray[floatInx + 3] = typeVar.x;
             theArray[floatInx + 4] = typeVar.y;
@@ -217,7 +217,7 @@ public class BufferBuilder {
         float[] verts = new float[p.points.size() * floatCountPerVert];
         for (int i = 0; i < p.points.size(); i++) {
             int inx = i * floatCountPerVert;
-            Vec2 point = p.points.get(i);
+            Vector2f point = p.points.get(i);
             addPointsToArray(verts, inx, i, point.add(p.pos), p.mode);
         }
         pushRawFloats(verts);
@@ -236,7 +236,7 @@ public class BufferBuilder {
             int offset = (int) (i / 2f);  // floor
 
             // choose which point to add
-            Vec2 point;
+            Vector2f point;
             if (i % 2 == 0) point = p.points.get(offset);  // front
             else point = p.points.get(p.points.size()-1 - offset);  // back
             addPointsToArray(verts, inx, i, point.add(p.pos), p.mode);
@@ -245,12 +245,12 @@ public class BufferBuilder {
     }
 
     /** Circles should be rendered as instanced GL_TRIANGLES */
-    public void pushCircle(Vec2 pos, float radius, Color col) {
+    public void pushCircle(Vector2f pos, float radius, Color col) {
         pushCircle(pos, radius, 0, col);
     }
 
     /** Circles should be rendered as instanced GL_TRIANGLES */
-    public void pushCircle(Vec2 pos, float radius, float outline, Color col) {
+    public void pushCircle(Vector2f pos, float radius, float outline, Color col) {
         pushRawFloats(new float[] {
                 pos.x, pos.y, radius, outline, col.getRed(), col.getGreen(), col.getBlue()
         });
