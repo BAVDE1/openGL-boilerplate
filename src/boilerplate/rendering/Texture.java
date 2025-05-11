@@ -33,6 +33,7 @@ public class Texture {
         }
     }
 
+    static int currentlyBoundTextureId = -1;
     static final Map<Integer, Integer> boundSlots = new HashMap<>();  // key: slot, value: texId
     /** bytes per pixel */
     static final int BPP = 4;
@@ -88,7 +89,8 @@ public class Texture {
 
         texId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, texId);
-        setupTextureDefaults();
+        setDefaultInterpolation();
+        setDefaultWrap();
 
         // internalFormat: format to be stored in
         // format: format of supplied image
@@ -99,14 +101,28 @@ public class Texture {
         Logging.debug("Texture created, texId: %s", texId);
     }
 
-    private void setupTextureDefaults() {
-        // pixel interpolation when scaling up or down
+    public void setDefaultInterpolation() {
+        bind();
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
 
-        // no wrap
+    public void setInterpolation(int interpolation) {
+        bind();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, interpolation);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, interpolation);
+    }
+
+    public void setDefaultWrap() {
+        bind();
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+
+    public void setWrap(int wrap) {
+        bind();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
     }
 
     public static Image loadImageFromFilePath(String resourcePath) {
@@ -125,9 +141,16 @@ public class Texture {
         }
     }
 
-    public void bind(int slot) {
+    public void bind() {
+        if (currentlyBoundTextureId == texId) return;
+        currentlyBoundTextureId = texId;
+        glBindTexture(GL_TEXTURE_2D, texId);
+    }
+
+    /** meant for use with a texture array */
+    public void bindToSlot(int slot) {
         if (slot == 0) {
-            Logging.danger("cannot bind texture to slot 0, use anything > 0");
+            Logging.danger("cannot bind texture to slot 0, use anything > 0.");
             return;
         }
 
@@ -136,20 +159,22 @@ public class Texture {
             boundSlots.remove((Integer) slot);
         }
 
-        glBindTextureUnit(slot, texId);
+        glBindTextureUnit(GL_TEXTURE_2D, texId);
         boundSlots.put(slot, texId);
     }
 
     public void bindToTexArray(int slot, ShaderHelper sh) {
-        bind(slot);
+        bindToSlot(slot);
         sh.uniform1iv("textures", boundSlots.keySet().stream().mapToInt(i -> i).toArray());
     }
 
     public static void unbind() {
+        currentlyBoundTextureId = -1;
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public void delete() {
+        if (currentlyBoundTextureId == texId) unbind();
         glDeleteTextures(texId);
     }
 
@@ -160,10 +185,6 @@ public class Texture {
         } catch (IOException e) {
             Logging.danger("Failed to write given image to file 'src/image.png'\nError message thrown:\n%s", e);
         }
-    }
-
-    public void deleteTexture() {
-        glDeleteTextures(texId);
     }
 
     public static void deleteAll() {

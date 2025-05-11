@@ -25,6 +25,7 @@ public class Example3d extends GameBase {
     final Dimension SCREEN_SIZE = new Dimension(800, 800);
 
     boolean[] heldKeys = new boolean[350];
+    boolean wireFrame = false;
 
     Vector3f worldUp = new Vector3f(0, 1, 0);
     Vector3f camPos = new Vector3f();
@@ -52,6 +53,7 @@ public class Example3d extends GameBase {
 
         Renderer.enableDepthTest();
         Renderer.enableFaceCullingDefault();
+        glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
 
         bindEvents();
         setupBuffers();
@@ -64,6 +66,7 @@ public class Example3d extends GameBase {
             if (action == GLFW_PRESS) {
                 heldKeys[key] = true;
                 if (key == GLFW_KEY_ESCAPE) this.window.setToClose();
+                if (key == GLFW_KEY_TAB) wireFrame = !wireFrame;
             }
 
             if (action == GLFW_RELEASE) {
@@ -82,22 +85,22 @@ public class Example3d extends GameBase {
 
         VertexArray.Layout l = new VertexArray.Layout();
         l.pushFloat(3);
-        l.pushFloat(3);
+        l.pushFloat(2);
         va.bindBuffers(vb, veb);
         va.pushLayout(l);
 
         vb.bufferData(new float[] {
                 // front quad
-                -.5f,  .5f, .5f,    1, 1, 1,  // tl
-                 .5f,  .5f, .5f,    1, 0, 0,  // tr
-                 .5f, -.5f, .5f,    0, 1, 0,  // br
-                -.5f, -.5f, .5f,    0, 0, 1,  // bl
+                -.5f,  .5f, .5f,    0, 0,  // tl
+                 .5f,  .5f, .5f,    1, 0,  // tr
+                 .5f, -.5f, .5f,    1, 1,  // br
+                -.5f, -.5f, .5f,    0, 1,  // bl
 
                 // back quad
-                -.5f,  .5f, -.5f,   1, 0, 0,
-                 .5f,  .5f, -.5f,   0, 1, 0,
-                 .5f, -.5f, -.5f,   0, 0, 1,
-                -.5f, -.5f, -.5f,   1, 1, 1
+                -.5f,  .5f, -.5f,   0, 0,
+                 .5f,  .5f, -.5f,   1, 0,
+                 .5f, -.5f, -.5f,   1, 1,
+                -.5f, -.5f, -.5f,   0, 1
         });
         veb.bufferData(new int[] {
                 0, 1, 2,  // front
@@ -118,24 +121,28 @@ public class Example3d extends GameBase {
                 6, 5, 4,  // back
                 6, 4, 7,
         });
+
+        new Texture("textures/closed.png").bind();
     }
 
     public void render() {
         Renderer.clearScreen();
 
         Matrix4f model = new Matrix4f().identity();
-        model.rotation((float) (glfwGetTime() * Math.toRadians(200)), .5f, 1, 0);
-//        model.rotation((float) Math.toRadians(-55), 1, 0, 0);
         Matrix4f view = new Matrix4f().identity();
-        view.translate(0, 0, -3f);
-        Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(45), (float) SCREEN_SIZE.width / SCREEN_SIZE.height, .1f, 1000);
+        Matrix4f projection = new Matrix4f().identity();
+
+        model.rotateX((float) (glfwGetTime() * Math.toRadians(100)) * .5f);
+        model.rotateY((float) (glfwGetTime() * Math.toRadians(100)));
+        view.translate(0, 0, -2f);
+        projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 100);
 
         sh.uniformMatrix4f("model", model);
         sh.uniformMatrix4f("view", view);
-        sh.uniformMatrix4f("projection", proj);
+        sh.uniformMatrix4f("projection", projection);
 
         sh.bind();
-        Renderer.drawElements(GL_TRIANGLES, va, veb, 36);
+        Renderer.drawElements(wireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
         Renderer.finish(window);
     }
 

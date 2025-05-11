@@ -2,26 +2,28 @@
 #version 450 core
 
 layout(location = 0) in vec3 pos;
-layout(location = 1) in vec3 col;
+layout(location = 1) in vec2 texPos;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-out vec3 v_col;
+out vec2 v_texPos;
 
 void main() {
     gl_Position = projection * view * model * vec4(pos, 1);
-    v_col = col;
+    v_texPos = texPos;
 }
 
 //--- FRAG
 #version 450 core
 
-in vec3 v_col;
+uniform sampler2D theTexture;
+
+in vec2 v_texPos;
 
 out vec4 colour;
 
 void main() {
-    colour = vec4(v_col, 1);
+    colour = texture(theTexture, v_texPos);
 }
