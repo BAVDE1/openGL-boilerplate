@@ -71,9 +71,9 @@ public abstract class ShapeMode {
             this(BoilerplateConstants.DEMO_MODE_TEX);
             this.vars = List.of(new Vector3f[] {
                     new Vector3f(texTopLeft, texSlot),
-                    new Vector3f(texTopLeft.add(0, texSize.y), texSlot),
-                    new Vector3f(texTopLeft.add(texSize.x, 0), texSlot),
-                    new Vector3f(texTopLeft.add(texSize), texSlot)
+                    new Vector3f(texTopLeft.add(0, texSize.y, new Vector2f()), texSlot),
+                    new Vector3f(texTopLeft.add(texSize.x, 0, new Vector2f()), texSlot),
+                    new Vector3f(texTopLeft.add(texSize, new Vector2f()), texSlot)
             });
         }
         public Demonstration(Color col) {

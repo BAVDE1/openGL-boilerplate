@@ -69,19 +69,19 @@ public class Shape2d {
     }
 
     public static Poly createRectOutline(Vector2f topLeft, Vector2f size, int thickness) {
-        Vector2f pos = topLeft.add(size.div(2));
+        Vector2f pos = topLeft.add(size.div(2, new Vector2f()), new Vector2f());
 
-        topLeft = topLeft.sub(pos);
-        Vector2f topRight = topLeft.add(size.x, 0);
-        Vector2f btmRight = topLeft.add(size);
-        Vector2f btmLeft = topLeft.add(0, size.y);
+        topLeft = topLeft.sub(pos, new Vector2f());
+        Vector2f topRight = topLeft.add(size.x, 0, new Vector2f());
+        Vector2f btmRight = topLeft.add(size, new Vector2f());
+        Vector2f btmLeft = topLeft.add(0, size.y, new Vector2f());
 
         return new Poly(
-                topLeft,  topLeft.add(thickness, thickness),
-                topRight, topRight.add(-thickness, thickness),
-                btmRight, btmRight.sub(thickness, thickness),
-                btmLeft,  btmLeft.sub(-thickness, thickness),
-                topLeft,  topLeft.add(thickness, thickness)
+                topLeft,  topLeft.add(thickness, thickness, new Vector2f()),
+                topRight, topRight.add(-thickness, thickness, new Vector2f()),
+                btmRight, btmRight.sub(thickness, thickness, new Vector2f()),
+                btmLeft,  btmLeft.sub(-thickness, thickness, new Vector2f()),
+                topLeft,  topLeft.add(thickness, thickness, new Vector2f())
         ).addPos(pos);
     }
 
@@ -97,7 +97,7 @@ public class Shape2d {
 
     /** Sort points of a polygon so they are all listed in a clockwise direction */
     public static void sortPoints(Poly p, Vector2f center) {
-        if (center.equals(0)) center = new Vector2f(1);
+        if (center.x == 0 && center.y == 0) center = new Vector2f(1);
         final int fidelity = 2;
 
         // functions
@@ -121,7 +121,7 @@ public class Shape2d {
         for(int i = 0; i < p.points.size(); i++) {
             Vector2f point = p.points.get(i);
             float onSide = (point.x * center.y) - (point.y * center.x);
-            float dot = point.sub(center).normalize().dot(center.normalize());
+            float dot = point.sub(center, new Vector2f()).normalize().dot(center.normalize());
             dot = onSide > 0 ? dot+3 : (-dot)+1;
 
             indexOrder[i] = i;

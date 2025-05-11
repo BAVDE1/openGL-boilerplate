@@ -21,7 +21,7 @@ public class Renderer {
     public static void setupGLContext() {
         GL.createCapabilities();
 
-        glEnable(GL_DEPTH_TEST);
+//        glEnable(GL_DEPTH_TEST);
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_TEXTURE_2D);
 

@@ -219,9 +219,8 @@ public class BufferBuilder {
         for (int i = 0; i < p.points.size(); i++) {
             int inx = i * floatCountPerVert;
             Vector2f point = p.points.get(i);
-            addPointsToArray(verts, inx, i, point.add(p.pos), p.mode);
+            addPointsToArray(verts, inx, i, point.add(p.pos, new Vector2f()), p.mode);
         }
-        System.out.println(Arrays.toString(verts));
         pushRawFloats(verts);
     }
 
@@ -241,7 +240,7 @@ public class BufferBuilder {
             Vector2f point;
             if (i % 2 == 0) point = p.points.get(offset);  // front
             else point = p.points.get(p.points.size()-1 - offset);  // back
-            addPointsToArray(verts, inx, i, point.add(p.pos), p.mode);
+            addPointsToArray(verts, inx, i, point.add(p.pos, new Vector2f()), p.mode);
         }
         pushRawFloats(verts);
     }
