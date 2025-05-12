@@ -1,5 +1,6 @@
 package boilerplate.rendering;
 
+import boilerplate.utility.Logging;
 import org.lwjgl.opengl.GL45;
 
 import static org.lwjgl.opengl.GL45.glDeleteBuffers;
@@ -23,5 +24,10 @@ public class VertexElementBuffer extends VertexBuffer {
 
     public int getElementType() {
         return elementType;
+    }
+
+    @Override
+    public void setBufferType(int bufferType) {
+        Logging.danger("Cannot set buffer type on this object. Use a VertexBuffer instead.");
     }
 }

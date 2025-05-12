@@ -15,6 +15,10 @@ public class VertexBuffer {
     public VertexBuffer(){}
     public VertexBuffer(boolean genId) {if (genId) genId();}
 
+    public void setBufferType(int bufferType) {
+        this.bufferType = bufferType;
+    }
+
     public void setDrawMethod(int newDrawMethod) {
         this.drawMethod = newDrawMethod;
     }

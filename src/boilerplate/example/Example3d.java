@@ -21,6 +21,8 @@ public class Example3d extends GameBase {
     boolean[] heldKeys = new boolean[350];
     boolean renderWireFrame = false;
 
+    Camera3d camera = new Camera3d();
+
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
     VertexBuffer vb = new VertexBuffer();
@@ -51,13 +53,13 @@ public class Example3d extends GameBase {
 
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (action == GLFW_PRESS) {
-                heldKeys[key] = true;
+                if (key > 0 && key < heldKeys.length) heldKeys[key] = true;
                 if (key == GLFW_KEY_ESCAPE) this.window.setToClose();
                 if (key == GLFW_KEY_TAB) renderWireFrame = !renderWireFrame;
             }
 
             if (action == GLFW_RELEASE) {
-                heldKeys[key] = false;
+                if (key > 0 && key < heldKeys.length) heldKeys[key] = false;
             }
         });
     }
@@ -113,15 +115,13 @@ public class Example3d extends GameBase {
     }
 
     public void render() {
+        float time = (float) glfwGetTime();
+
         Renderer.clearScreen();
 
         Matrix4f model = new Matrix4f().identity();
-        Matrix4f view = new Matrix4f().identity();
+        Matrix4f view = camera.generateViewMatrix();
         Matrix4f projection = new Matrix4f().identity();
-
-        model.rotateX((float) (glfwGetTime() * Math.toRadians(100)) * .5f);
-        model.rotateY((float) (glfwGetTime() * Math.toRadians(100)));
-        view.translate(0, 0, -2f);
         projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 100);
 
         sh.uniformMatrix4f("model", model);
@@ -129,6 +129,14 @@ public class Example3d extends GameBase {
         sh.uniformMatrix4f("projection", projection);
 
         sh.bind();
+        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
+
+        model = new Matrix4f().identity();
+        model.translate(1.2f, 0, 0);
+        model.rotateX(time * (float) Math.toRadians(120));
+        model.rotateY(time * (float) Math.toRadians(70));
+        model.scale(.8f, .5f, .5f);
+        sh.uniformMatrix4f("model", model);
         Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
         Renderer.finish(window);
     }
