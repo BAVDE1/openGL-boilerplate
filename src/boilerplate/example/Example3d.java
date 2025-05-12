@@ -5,16 +5,10 @@ import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import boilerplate.rendering.*;
-import boilerplate.rendering.text.FontManager;
-import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.*;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 
 import java.awt.*;
-import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -25,19 +19,12 @@ public class Example3d extends GameBase {
     final Dimension SCREEN_SIZE = new Dimension(800, 800);
 
     boolean[] heldKeys = new boolean[350];
-    boolean wireFrame = false;
-
-    Vector3f worldUp = new Vector3f(0, 1, 0);
-    Vector3f camPos = new Vector3f();
-    Vector3f camRot = new Vector3f();
-    Vector3f front = new Vector3f();
-    Vector3f right = new Vector3f();
-    Vector3f up = new Vector3f();
+    boolean renderWireFrame = false;
 
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
     VertexBuffer vb = new VertexBuffer();
-    VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.TYPE_INT);
+    VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
 
     @Override
     public void start() {
@@ -66,7 +53,7 @@ public class Example3d extends GameBase {
             if (action == GLFW_PRESS) {
                 heldKeys[key] = true;
                 if (key == GLFW_KEY_ESCAPE) this.window.setToClose();
-                if (key == GLFW_KEY_TAB) wireFrame = !wireFrame;
+                if (key == GLFW_KEY_TAB) renderWireFrame = !renderWireFrame;
             }
 
             if (action == GLFW_RELEASE) {
@@ -142,7 +129,7 @@ public class Example3d extends GameBase {
         sh.uniformMatrix4f("projection", projection);
 
         sh.bind();
-        Renderer.drawElements(wireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
+        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
         Renderer.finish(window);
     }
 

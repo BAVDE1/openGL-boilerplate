@@ -159,7 +159,7 @@ public class Texture {
             boundSlots.remove((Integer) slot);
         }
 
-        glBindTextureUnit(GL_TEXTURE_2D, texId);
+        glBindTextureUnit(slot, texId);
         boundSlots.put(slot, texId);
     }
 

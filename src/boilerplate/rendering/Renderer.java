@@ -5,6 +5,7 @@ import boilerplate.common.Window;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
 
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL45.*;
 
@@ -26,7 +27,7 @@ public class Renderer {
 
         applyDefaultBlend();
 
-        glClearColor(.0f, .0f, .0f, .0f);
+        setClearColour(0, 0, 0, 0);
         Logging.debug("OpenGL capabilities created");
     }
 
@@ -50,6 +51,10 @@ public class Renderer {
     public static void applyDefaultBlend() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    public static void setClearColour(float r, float g, float b, float a) {
+        glClearColor(r, g, b, a);
     }
 
     public static void clearScreen() {
@@ -76,8 +81,12 @@ public class Renderer {
     }
 
     public static void drawElements(int mode, VertexArray va, VertexElementBuffer veb, int vertexCount) {
+        drawElements(mode, va, veb.getElementType(), vertexCount);
+    }
+
+    public static void drawElements(int mode, VertexArray va, int elementType, int vertexCount) {
         bindArray(va);
-        glDrawElements(mode, vertexCount, veb.getElementType(), 0);
+        glDrawElements(mode, vertexCount, elementType, 0);
     }
 
     public static void drawText(TextRenderer tr) {
@@ -90,7 +99,6 @@ public class Renderer {
 
     public static void bindArray(VertexArray va) {
         int id = va.getId();
-        if (id == boundArray) return;
         boundArray = id;
         glBindVertexArray(id);
     }
@@ -101,7 +109,6 @@ public class Renderer {
 
     public static void bindBuffer(VertexBuffer vb) {
         int id = vb.getId();
-        if (id == boundBuffer) return;
         boundBuffer = id;
         glBindBuffer(vb.getBufferType(), id);
     }
