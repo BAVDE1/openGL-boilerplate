@@ -21,7 +21,7 @@ public class Example3d extends GameBase {
     boolean[] heldKeys = new boolean[350];
     boolean renderWireFrame = false;
 
-    Camera3d camera = new Camera3d();
+    Camera3d camera = new Camera3d(Camera3d.MODE_TARGET);
 
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
@@ -120,7 +120,7 @@ public class Example3d extends GameBase {
         Renderer.clearScreen();
 
         Matrix4f model = new Matrix4f().identity();
-        Matrix4f view = camera.generateTargetedViewMatrix();
+        Matrix4f view = camera.generateViewMatrix();
         Matrix4f projection = new Matrix4f().identity();
         projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 100);
 

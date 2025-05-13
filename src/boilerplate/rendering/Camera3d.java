@@ -1,11 +1,17 @@
 package boilerplate.rendering;
 
+import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 public class Camera3d {
+    public static final int MODE_FLY = 0;
+    public static final int MODE_TARGET = 1;
+
+    protected int mode;
+
     public Vector3f pos = new Vector3f();
     public Vector3f target = new Vector3f();
     public Vector3f direction = new Vector3f();
@@ -15,18 +21,20 @@ public class Camera3d {
     public float roll = 0;
 
     public Vector3f worldUp = new Vector3f(0, 1, 0);
-    private Vector3f front = new Vector3f();
-    private Vector3f right = new Vector3f();
-    private Vector3f up = new Vector3f();
+    protected Vector3f front = new Vector3f();
+    protected Vector3f right = new Vector3f();
+    protected Vector3f up = new Vector3f();
 
-    public Camera3d() {}
+    public Camera3d(int mode) {
+        this.mode = mode;
+    }
 
-    public Camera3d(Vector3f initialPos) {
+    public Camera3d(int mode, Vector3f initialPos) {
+        this(mode);
         pos = new Vector3f(initialPos);
     }
 
-    @Deprecated
-    public Matrix4f generateTargetedViewMatrix() {
+    private Matrix4f generateTargetViewMatrix() {
         calculateDirections();
         float radius = 5;
         float camX = (float) Math.sin(glfwGetTime()) * radius;
@@ -35,14 +43,28 @@ public class Camera3d {
         return view;
     }
 
+    private Matrix4f generateFlyViewMatrix() {
+        return new Matrix4f();
+    }
+
     public Matrix4f generateViewMatrix() {
-        Matrix4f view = new Matrix4f();
-        return view;
+        return switch (mode) {
+            case MODE_FLY -> generateFlyViewMatrix();
+            case MODE_TARGET -> generateTargetViewMatrix();
+            default -> {
+                Logging.danger("This camera's mode is invalid! current mode: (%s)", mode);
+                yield new Matrix4f().identity();
+            }
+        };
     }
 
     private void calculateDirections() {
         direction = pos.sub(target, new Vector3f()).normalize();
         right = worldUp.cross(direction, new Vector3f()).normalize();
         up = direction.cross(right, new Vector3f());
+    }
+
+    public void setMode(int newMode) {
+        mode = newMode;
     }
 }

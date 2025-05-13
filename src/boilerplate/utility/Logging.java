@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GLDebugMessageCallbackI;
 
 import java.io.*;
+import java.lang.reflect.AnnotatedArrayType;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -52,36 +53,61 @@ public class Logging {
         );
     }
 
+    public static void debug(Object... args) {
+        debug(buildStringForArgs(args), args);
+    }
+
     public static void debug(String msg, Object... args) {
         if (logDebug) log(grey, msg, "DEBUG", args);
+    }
+
+    public static void info(Object... args) {
+        info(buildStringForArgs(args), args);
     }
 
     public static void info(String msg, Object... args) {
         log(white, msg, "INFO", args);
     }
 
+    public static void warn(Object... args) {
+        warn(buildStringForArgs(args), args);
+    }
+
     public static void warn(String msg, Object... args) {
         log(yellow, msg, "WARN", args);
+    }
+
+    public static void danger(Object... args) {
+        danger(buildStringForArgs(args), args);
     }
 
     public static void danger(String msg, Object... args) {
         log(red, msg, "DANGER", args);
     }
 
-    public static void puke(String msg, Object... args) {
-        log(green, msg, "PUKE", args);
+    public static void mystical(Object... args) {
+        mystical(buildStringForArgs(args), args);
     }
 
     public static void mystical(String msg, Object... args) {
         log(blue, msg, "MYSTICAL", args);
     }
 
-    public static void expensive(String msg, Object... args) {
+    public static void purple(Object... args) {
+        purple(buildStringForArgs(args), args);
+    }
+
+    public static void purple(String msg, Object... args) {
         log(purple, msg, "EXPENSIVE", args);
     }
 
-    public static void drag(String msg, Object... args) {
-        log(pink, msg, "DRAG", args);
+    private static String buildStringForArgs(Object... args) {
+        StringBuilder s = new StringBuilder();
+        for (Object arg : args) {
+            if (!s.isEmpty()) s.append(", ");
+            s.append("%s");
+        }
+        return s.toString();
     }
 
     public static void setupFileLogging(String fileName) {

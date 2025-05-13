@@ -6,7 +6,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.awt.*;
-import java.util.Arrays;
 
 /**
  * Some abstracted functions for building a buffer.
@@ -161,7 +160,7 @@ public class BufferBuilder {
         if (!autoResize) {
             Logging.danger("Cannot add an additional '%s' items to an array at '%s' fullness, with '%s / %s' items already set. Aborting.",
                     newFloatCount, getCurrentFullnessPercent(), floatCount, size);
-            Logging.expensive("Consider setting autoResize to true! (or manually allow more space at the initialization of this builder)");
+            Logging.purple("Consider setting autoResize to true! (or manually allow more space at the initialization of this builder)");
             return BoilerplateConstants.ERROR;
         }
 
