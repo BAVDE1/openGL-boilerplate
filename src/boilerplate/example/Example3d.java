@@ -18,10 +18,9 @@ public class Example3d extends GameBase {
     public boilerplate.common.Window window = new Window();
     final Dimension SCREEN_SIZE = new Dimension(800, 800);
 
-    boolean[] heldKeys = new boolean[350];
     boolean renderWireFrame = false;
 
-    Camera3d camera = new Camera3d(Camera3d.MODE_TARGET);
+    Camera3d camera = new Camera3d(Camera3d.MODE_FLY);
 
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
@@ -53,13 +52,8 @@ public class Example3d extends GameBase {
 
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (action == GLFW_PRESS) {
-                if (key > 0 && key < heldKeys.length) heldKeys[key] = true;
                 if (key == GLFW_KEY_ESCAPE) this.window.setToClose();
                 if (key == GLFW_KEY_TAB) renderWireFrame = !renderWireFrame;
-            }
-
-            if (action == GLFW_RELEASE) {
-                if (key > 0 && key < heldKeys.length) heldKeys[key] = false;
             }
         });
     }
@@ -132,22 +126,19 @@ public class Example3d extends GameBase {
         Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
 
         model = new Matrix4f().identity();
-        model.translate(1.2f, 0, 0);
         model.rotateX(time * (float) Math.toRadians(120));
         model.rotateY(time * (float) Math.toRadians(70));
+        model.translate(1.2f, 0, 0);
         model.scale(.8f, .5f, .5f);
         sh.uniformMatrix4f("model", model);
         Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
         Renderer.finish(window);
     }
 
-    public void updateCameraPos(double dt) {
-    }
-
     @Override
     public void mainLoop(double staticDt) {
         glfwPollEvents();
-        updateCameraPos(staticDt);
+        camera.processInput(window, staticDt);
         render();
     }
 

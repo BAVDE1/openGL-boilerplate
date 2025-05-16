@@ -157,4 +157,12 @@ public class Window {
     public void setWindowAttrib(int attrib, int value) {
         glfwSetWindowAttrib(handle, attrib, value);
     }
+
+    public boolean isKeyPressed(int key) {
+        return glfwGetKey(handle, key) == GLFW_PRESS;
+    }
+
+    public boolean isMouseButtonPressed(int button) {
+        return glfwGetMouseButton(handle, button) == GLFW_PRESS;
+    }
 }
