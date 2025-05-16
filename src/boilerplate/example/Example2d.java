@@ -6,7 +6,6 @@ import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import boilerplate.rendering.builders.BufferBuilder2f;
 import boilerplate.rendering.builders.ShapeMode;
-import org.joml.Options;
 import org.joml.Vector2f;
 import org.lwjgl.opengl.GL45;
 import boilerplate.rendering.builders.Shape2d;
@@ -17,7 +16,6 @@ import boilerplate.utility.Logging;
 import boilerplate.utility.MathUtils;
 
 import java.awt.*;
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL45.*;
@@ -152,7 +150,7 @@ public class Example2d extends GameBase {
         builderMain.pushSeparatedPolygon(Shape2d.createLine(new Vector2f(70, 20), new Vector2f(150, 150), 20, new ShapeMode.Demonstration(3)));
         builderMain.pushSeparatedPolygon(Shape2d.createRectOutline(new Vector2f(700, 100), new Vector2f(100, 50), 15, new ShapeMode.Demonstration(3)));
 
-        Shape2d.Poly p2 = new Shape2d.Poly(new ShapeMode.Demonstration(Color.RED), new Vector2f(-50, 50), new Vector2f(0, -50), new Vector2f(50, 50), new Vector2f(-50, 0), new Vector2f(50, 0));
+        Shape2d.Poly2d p2 = new Shape2d.Poly2d(new ShapeMode.Demonstration(Color.RED), new Vector2f(-50, 50), new Vector2f(0, -50), new Vector2f(50, 50), new Vector2f(-50, 0), new Vector2f(50, 0));
         p2.addPos(new Vector2f(100, 250));
         Shape2d.sortPoints(p2);
         builderMain.pushSeparatedPolygonSorted(p2);

@@ -207,13 +207,13 @@ public class BufferBuilder {
         }
     }
 
-    public void pushSeparatedPolygon(Shape2d.Poly p) {
+    public void pushSeparatedPolygon(Shape2d.Poly2d p) {
         shouldNextBeSeparated = true;
         pushPolygon(p);
     }
 
     /** first, second, third, ... */
-    public void pushPolygon(Shape2d.Poly p) {
+    public void pushPolygon(Shape2d.Poly2d p) {
         float[] verts = new float[p.points.size() * floatCountPerVert];
         for (int i = 0; i < p.points.size(); i++) {
             int inx = i * floatCountPerVert;
@@ -223,13 +223,13 @@ public class BufferBuilder {
         pushRawFloats(verts);
     }
 
-    public void pushSeparatedPolygonSorted(Shape2d.Poly p) {
+    public void pushSeparatedPolygonSorted(Shape2d.Poly2d p) {
         shouldNextBeSeparated = true;
         pushPolygonSorted(p);
     }
 
     /** first, last, first+1, last-1, ... */
-    public void pushPolygonSorted(Shape2d.Poly p) {
+    public void pushPolygonSorted(Shape2d.Poly2d p) {
         float[] verts = new float[p.points.size() * floatCountPerVert];
         for (int i = 0; i < p.points.size(); i++) {
             int inx = i * floatCountPerVert;

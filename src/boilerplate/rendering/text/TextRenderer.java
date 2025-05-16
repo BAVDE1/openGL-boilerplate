@@ -101,7 +101,7 @@ public class TextRenderer {
                     if (!seamlessBgLines) size.y -= ySpacing;
 
                     float[] color = new float[] {-1, -1, bgCol.getRed(), bgCol.getGreen(), bgCol.getBlue(), bgCol.getAlpha()};
-                    Shape2d.Poly p = Shape2d.createRect(linePos.sub(bgMargin, new Vector2f()), size.add(bgMargin.mul(2, new Vector2f()), new Vector2f()), new ShapeMode.Append(color));
+                    Shape2d.Poly2d p = Shape2d.createRect(linePos.sub(bgMargin, new Vector2f()), size.add(bgMargin.mul(2, new Vector2f()), new Vector2f()), new ShapeMode.Append(color));
                     bgSb.pushSeparatedPolygon(p);
                 }
 
@@ -299,9 +299,9 @@ public class TextRenderer {
             Vector2f size = glyph.getSize().mul(scale);
             Vector2f topLeft = pos.add(accumulatedX, 0, new Vector2f());
 
-            Shape2d.Poly texturePoints = Shape2d.createRect(glyph.texTopLeft, glyph.texSize);
+            Shape2d.Poly2d texturePoints = Shape2d.createRect(glyph.texTopLeft, glyph.texSize);
             ShapeMode.UnpackAppend mode = new ShapeMode.UnpackAppend(texturePoints.toArray(), appendFloats);
-            Shape2d.Poly p = Shape2d.createRect(topLeft, size, mode);
+            Shape2d.Poly2d p = Shape2d.createRect(topLeft, size, mode);
 
             if (initial) {
                 sb.pushSeparatedPolygon(p);

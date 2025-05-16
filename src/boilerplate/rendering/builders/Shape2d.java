@@ -10,21 +10,21 @@ import java.util.ListIterator;
  * Creates shapes to be passed to a BufferBuilder.
  */
 public class Shape2d {
-    public static class Poly {
+    public static class Poly2d {
         public ShapeMode mode = null;
         public List<Vector2f> points;
         public Vector2f pos = new Vector2f();
 
-        public Poly(Vector2f... points) {
+        public Poly2d(Vector2f... points) {
             this.points = List.of(points);
         }
 
-        public Poly(ShapeMode mode, Vector2f... points) {
+        public Poly2d(ShapeMode mode, Vector2f... points) {
             this(points);
             this.mode = mode;
         }
 
-        public Poly addPos(Vector2f newPos) {
+        public Poly2d addPos(Vector2f newPos) {
             this.pos = newPos;
             return this;
         }
@@ -38,8 +38,8 @@ public class Shape2d {
         }
     }
 
-    public static Poly createRect(Vector2f topLeft, Vector2f size) {
-        return new Poly(
+    public static Poly2d createRect(Vector2f topLeft, Vector2f size) {
+        return new Poly2d(
                 topLeft,
                 topLeft.add(0, size.y, new Vector2f()),
                 topLeft.add(size.x, 0, new Vector2f()),
@@ -47,28 +47,28 @@ public class Shape2d {
         );
     }
 
-    public static Poly createRect(Vector2f topLeft, Vector2f size, ShapeMode mode) {
-        Poly p = createRect(topLeft, size);
+    public static Poly2d createRect(Vector2f topLeft, Vector2f size, ShapeMode mode) {
+        Poly2d p = createRect(topLeft, size);
         p.mode = mode;
         return p;
     }
 
-    public static Poly createLine(Vector2f point1, Vector2f point2, int thickness) {
+    public static Poly2d createLine(Vector2f point1, Vector2f point2, int thickness) {
         Vector2f perp = new Vector2f();
         point2.sub(point1, perp).normalize();
         perp.perpendicular().mul(thickness * .5f);
-        return new Poly(
+        return new Poly2d(
             point1.add(perp, new Vector2f()), point1.sub(perp, new Vector2f()),
             point2.add(perp, new Vector2f()), point2.sub(perp, new Vector2f())
         );
     }
-    public static Poly createLine(Vector2f point1, Vector2f point2, int thickness, ShapeMode mode) {
-        Poly p = createLine(point1, point2, thickness);
+    public static Poly2d createLine(Vector2f point1, Vector2f point2, int thickness, ShapeMode mode) {
+        Poly2d p = createLine(point1, point2, thickness);
         p.mode = mode;
         return p;
     }
 
-    public static Poly createRectOutline(Vector2f topLeft, Vector2f size, int thickness) {
+    public static Poly2d createRectOutline(Vector2f topLeft, Vector2f size, int thickness) {
         Vector2f pos = topLeft.add(size.div(2, new Vector2f()), new Vector2f());
 
         topLeft = topLeft.sub(pos, new Vector2f());
@@ -76,7 +76,7 @@ public class Shape2d {
         Vector2f btmRight = topLeft.add(size, new Vector2f());
         Vector2f btmLeft = topLeft.add(0, size.y, new Vector2f());
 
-        return new Poly(
+        return new Poly2d(
                 topLeft,  topLeft.add(thickness, thickness, new Vector2f()),
                 topRight, topRight.add(-thickness, thickness, new Vector2f()),
                 btmRight, btmRight.sub(thickness, thickness, new Vector2f()),
@@ -85,18 +85,18 @@ public class Shape2d {
         ).addPos(pos);
     }
 
-    public static Poly createRectOutline(Vector2f topLeft, Vector2f size, int thickness, ShapeMode mode) {
-        Poly p = createRectOutline(topLeft, size, thickness);
+    public static Poly2d createRectOutline(Vector2f topLeft, Vector2f size, int thickness, ShapeMode mode) {
+        Poly2d p = createRectOutline(topLeft, size, thickness);
         p.mode = mode;
         return p;
     }
 
-    public static void sortPoints(Poly p) {
+    public static void sortPoints(Poly2d p) {
         sortPoints(p, new Vector2f(1));
     }
 
     /** Sort points of a polygon so they are all listed in a clockwise direction */
-    public static void sortPoints(Poly p, Vector2f center) {
+    public static void sortPoints(Poly2d p, Vector2f center) {
         if (center.x == 0 && center.y == 0) center = new Vector2f(1);
         final int fidelity = 2;
 
