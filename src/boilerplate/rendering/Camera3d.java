@@ -123,6 +123,7 @@ public class Camera3d {
     }
 
     private void calculateDirections() {
+        front.zero();
         float cPitch = (float) Math.cos(Math.toRadians(pitch));
         float sPitch = (float) Math.sin(Math.toRadians(pitch));
         float cYaw = (float) Math.cos(Math.toRadians(yaw));
