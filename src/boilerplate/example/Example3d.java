@@ -20,7 +20,7 @@ public class Example3d extends GameBase {
 
     boolean renderWireFrame = false;
 
-    Camera3d camera = new Camera3d(Camera3d.MODE_FLY);
+    Camera3d camera = new Camera3d(Camera3d.MODE_TARGET);
 
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
@@ -54,7 +54,21 @@ public class Example3d extends GameBase {
             if (action == GLFW_PRESS) {
                 if (key == GLFW_KEY_ESCAPE) this.window.setToClose();
                 if (key == GLFW_KEY_TAB) renderWireFrame = !renderWireFrame;
+                if (key == GLFW_KEY_F)
+                    camera.setMode(camera.getMode() == Camera3d.MODE_FLY ? Camera3d.MODE_TARGET : Camera3d.MODE_FLY);
             }
+        });
+
+        glfwSetMouseButtonCallback(window.handle, (window, button, action, mods) -> {
+            camera.processMouseInputs(this.window);
+        });
+
+        glfwSetCursorPosCallback(window.handle, (window, xPos, yPos) -> {
+            camera.processMouseMovement(this.window, (float) xPos, (float) yPos);
+        });
+
+        glfwSetScrollCallback(window.handle, (window, xDelta, yDelta) -> {
+            camera.processScroll(this.window, (float) xDelta, (float) yDelta);
         });
     }
 
@@ -72,20 +86,20 @@ public class Example3d extends GameBase {
         va.bindBuffers(vb, veb);
         va.pushLayout(l);
 
-        vb.bufferData(new float[] {
+        vb.bufferData(new float[]{
                 // front quad
-                -.5f,  .5f, .5f,    0, 0,  // tl
-                 .5f,  .5f, .5f,    1, 0,  // tr
-                 .5f, -.5f, .5f,    1, 1,  // br
-                -.5f, -.5f, .5f,    0, 1,  // bl
+                -.5f, .5f, .5f, 0, 0,  // tl
+                .5f, .5f, .5f, 1, 0,  // tr
+                .5f, -.5f, .5f, 1, 1,  // br
+                -.5f, -.5f, .5f, 0, 1,  // bl
 
                 // back quad
-                -.5f,  .5f, -.5f,   1, 1,
-                 .5f,  .5f, -.5f,   0, 1,
-                 .5f, -.5f, -.5f,   0, 0,
-                -.5f, -.5f, -.5f,   1, 0
+                -.5f, .5f, -.5f, 1, 1,
+                .5f, .5f, -.5f, 0, 1,
+                .5f, -.5f, -.5f, 0, 0,
+                -.5f, -.5f, -.5f, 1, 0
         });
-        veb.bufferData(new int[] {
+        veb.bufferData(new int[]{
                 0, 1, 2,  // front
                 0, 2, 3,
 
@@ -138,7 +152,7 @@ public class Example3d extends GameBase {
     @Override
     public void mainLoop(double staticDt) {
         glfwPollEvents();
-        camera.processInput(window, staticDt);
+        camera.processKeyInputs(window, staticDt);
         render();
     }
 

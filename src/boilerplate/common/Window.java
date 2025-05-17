@@ -1,6 +1,7 @@
 package boilerplate.common;
 
 import boilerplate.rendering.Renderer;
+import org.joml.Vector2f;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL45;
@@ -164,5 +165,28 @@ public class Window {
 
     public boolean isMouseButtonPressed(int button) {
         return glfwGetMouseButton(handle, button) == GLFW_PRESS;
+    }
+
+    public void setCursorPos(Vector2f pos) {
+        setCursorPos(pos.x, pos.y);
+    }
+
+    public void setCursorPos(float xPos, float yPos) {
+        glfwSetCursorPos(handle, xPos, yPos);
+    }
+
+    public Vector2f getCursorPos() {
+        double[] xPos = new double[1];
+        double[] yPos = new double[1];
+        glfwGetCursorPos(handle, xPos, yPos);
+        return new Vector2f((float) xPos[0], (float) yPos[0]);
+    }
+
+    public void hideCursor() {
+        glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+
+    public void showCursor() {
+        glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 }

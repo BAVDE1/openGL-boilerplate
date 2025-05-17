@@ -3,11 +3,11 @@ package boilerplate.rendering;
 import boilerplate.common.Window;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -36,12 +36,19 @@ public class Camera3d {
 
     public float pitch = 0;
     public float yaw = -90;  // (initial -90 to look along z axis)
-    public float roll = 0;
 
     public Vector3f worldUp = new Vector3f(0, 1, 0);
     protected Vector3f front = new Vector3f();
     protected Vector3f right = new Vector3f();
     protected Vector3f up = new Vector3f();
+
+    public float rotSpeed = 70;
+    public float moveSpeed = 3;
+    public float mouseSensitivity = .1f;
+    public float scrollAmount = 1;
+
+    private boolean isMouseDown = false;
+    private Vector2f mousePosOnClick;
 
     ArrayList<Action> keyMovementActions = new ArrayList<>(Arrays.asList(
             new Action(GLFW_KEY_W, speed -> pos.add(front.mul(speed, new Vector3f()))),
@@ -57,12 +64,8 @@ public class Camera3d {
             new Action(GLFW_KEY_UP, speed -> pitch += speed),
             new Action(GLFW_KEY_DOWN, speed -> pitch -= speed),
             new Action(GLFW_KEY_RIGHT, speed -> yaw += speed),
-            new Action(GLFW_KEY_LEFT, speed -> yaw -= speed),
-            new Action(GLFW_KEY_P, speed -> roll += speed),
-            new Action(GLFW_KEY_O, speed -> roll -= speed)
-
-            ));
-    ArrayList<Action> mouseRotationActions = new ArrayList<>();
+            new Action(GLFW_KEY_LEFT, speed -> yaw -= speed)
+    ));
 
     public Camera3d(int mode) {
         this.mode = mode;
@@ -75,28 +78,56 @@ public class Camera3d {
         calculateDirections();
     }
 
-    public void processInput(Window window, double dt) {
+    public void processKeyInputs(Window window, double dt) {
         float speedMul = window.isKeyPressed(GLFW_KEY_LEFT_SHIFT) ? 2 : 1;
         boolean rotUpdated = false;
 
         // rotation
-        float rotSpeed = 70 * speedMul * (float) dt;
+        float rSpeed = rotSpeed * speedMul * (float) dt;
         for (Action action : keyRotationActions) {
             if (window.isKeyPressed(action.key)) {
-                action.callback.call(rotSpeed);
+                action.callback.call(rSpeed);
                 rotUpdated = true;
             }
         }
 
         if (rotUpdated) {
-            pitch = Math.clamp(pitch, -89, 89);
             calculateDirections();
         }
 
         // movement
-        float moveSpeed = 3 * speedMul * (float) dt;
+        float mSpeed = moveSpeed * speedMul * (float) dt;
         for (Action action : keyMovementActions) {
-            if (window.isKeyPressed(action.key)) action.callback.call(moveSpeed);
+            if (window.isKeyPressed(action.key)) action.callback.call(mSpeed);
+        }
+    }
+
+    public void processMouseInputs(Window window) {
+        isMouseDown = false;
+        if (window.isMouseButtonPressed(GLFW_MOUSE_BUTTON_2)) {
+            isMouseDown = true;
+            mousePosOnClick = window.getCursorPos();
+            window.hideCursor();
+        } else window.showCursor();
+    }
+
+    public void processMouseMovement(Window window, float xPos, float yPos) {
+        if (isMouseDown) {
+            Vector2f delta = new Vector2f(xPos, yPos).sub(mousePosOnClick);
+            window.setCursorPos(mousePosOnClick);
+
+            if (delta.y + delta.x == 0) return;
+
+            pitch -= delta.y * mouseSensitivity;
+            yaw += delta.x * mouseSensitivity;
+            calculateDirections();
+        }
+    }
+
+    public void processScroll(Window window, float xDelta, float yDelta) {
+        if (yDelta != 0) {
+            pos.add(front.mul(yDelta * scrollAmount));
+            calculateDirections();
         }
     }
 
@@ -104,11 +135,11 @@ public class Camera3d {
         float radius = 5;
         float camX = (float) Math.sin(glfwGetTime()) * radius;
         float camZ = (float) Math.cos(glfwGetTime()) * radius;
-        return new Matrix4f().lookAt(new Vector3f(camX, .0f, camZ), new Vector3f(), worldUp);
+        return new Matrix4f().lookAt(new Vector3f(camX, .0f, camZ), target, worldUp);
     }
 
     private Matrix4f generateFlyViewMatrix() {
-        return new Matrix4f().lookAt(pos, pos.add(front, new Vector3f()), up);
+        return new Matrix4f().lookAt(pos, pos.add(front, new Vector3f()), worldUp);
     }
 
     public Matrix4f generateViewMatrix() {
@@ -123,22 +154,26 @@ public class Camera3d {
     }
 
     private void calculateDirections() {
+        clampPitch();
         float cPitch = (float) Math.cos(Math.toRadians(pitch));
         float sPitch = (float) Math.sin(Math.toRadians(pitch));
         float cYaw = (float) Math.cos(Math.toRadians(yaw));
         float sYaw = (float) Math.sin(Math.toRadians(yaw));
-        front.x = cYaw * cPitch;
-        front.y = sPitch;
-        front.z = sYaw * cPitch;
-        front.normalize();
+        front.set(cYaw * cPitch, sPitch, sYaw * cPitch).normalize();
 
-        front.rotateZ((float) Math.toRadians(roll));
-        worldUp.rotateZ((float) Math.toRadians(roll), up);
+        front.cross(worldUp, right).normalize();
+        right.cross(front, up);
+    }
 
-        right = front.cross(up, new Vector3f()).normalize();
+    private void clampPitch() {
+        pitch = Math.clamp(pitch, -89, 89);
     }
 
     public void setMode(int newMode) {
         mode = newMode;
+    }
+
+    public int getMode() {
+        return mode;
     }
 }
