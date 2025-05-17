@@ -123,28 +123,19 @@ public class Camera3d {
     }
 
     private void calculateDirections() {
-        front.zero();
         float cPitch = (float) Math.cos(Math.toRadians(pitch));
         float sPitch = (float) Math.sin(Math.toRadians(pitch));
         float cYaw = (float) Math.cos(Math.toRadians(yaw));
         float sYaw = (float) Math.sin(Math.toRadians(yaw));
-        float cRoll = (float) Math.cos(Math.toRadians(roll));
-        float sRoll = (float) Math.sin(Math.toRadians(roll));
         front.x = cYaw * cPitch;
         front.y = sPitch;
-        front.z = cPitch * sYaw;
+        front.z = sYaw * cPitch;
         front.normalize();
 
-//        up = new Vector3f(0, 1, 0);
+        front.rotateZ((float) Math.toRadians(roll));
         worldUp.rotateZ((float) Math.toRadians(roll), up);
-//        front.rotateAxis((float) Math.toRadians(roll), up.x, up.y, 0);
-//        up.rotateZ((float) Math.toRadians(roll));
-//        front.rotateZ();
-////        up.rotateX((float) Math.toRadians(roll));
-////        up.rotateY((float) Math.toRadians(roll));
-//        front.rotateAxis((float) Math.toRadians(roll), up.x, up.y, up.z);
+
         right = front.cross(up, new Vector3f()).normalize();
-//        up = right.cross(front, new Vector3f()).normalize();
     }
 
     public void setMode(int newMode) {
