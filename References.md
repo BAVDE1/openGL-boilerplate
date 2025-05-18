@@ -18,6 +18,8 @@ general lwjgl 2: https://github.com/SilverTiger/lwjgl3-tutorial/wiki
 lwjgl demos: https://github.com/LWJGL/lwjgl3-demos/tree/main \
 voxel example: https://github.com/LWJGL/lwjgl3-demos/blob/main/src/org/lwjgl/demo/exampleGame/VoxelGameGL.java#L3319
 
+math-heavy openGL: https://www.songho.ca/opengl/index.html
+
 ---
 
 ### Other resources
