@@ -1,18 +1,18 @@
 //--- VERT
 #version 450 core
 
+// instanced
+layout(location = 0) in vec2 circlePosition;
+layout(location = 1) in float radius;
+layout(location = 2) in float innerRadius;
+layout(location = 3) in vec3 colour;
+
 uniform vec2 resolution;
 uniform mat4 projectionMatrix;
 
 uniform highp float time;
 uniform vec2 viewPos;
 uniform float viewScale;
-
-// instanced
-layout(location = 0) in vec2 circlePosition;
-layout(location = 1) in float radius;
-layout(location = 2) in float innerRadius;
-layout(location = 3) in vec3 colour;
 
 out vec2 v_circlePos;
 out float v_radius;
