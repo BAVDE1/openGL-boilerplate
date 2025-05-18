@@ -34,6 +34,7 @@ public class ShaderProgram {
     }
 
     public final HashMap<String, Integer> uniformCache = new HashMap<>();
+    public final HashMap<String, Integer> uniformBlockCache = new HashMap<>();
     public final ArrayList<Shader> attachedShaders = new ArrayList<>();
 
     private Integer program;
@@ -209,17 +210,28 @@ public class ShaderProgram {
         glDeleteProgram(program);
     }
 
-    public int getUniformLocation(String uniform) {
+    private int getCachedUniformOrSet(boolean isBlock, String uniformName) {
         if (!linked) {
             Logging.danger("Shader has not been linked!");
             return -1;
         }
 
-        bind();
-        if (!uniformCache.containsKey(uniform)) {
-            uniformCache.put(uniform, glGetUniformLocation(program, uniform));
+        HashMap<String, Integer> cache = isBlock ? uniformBlockCache : uniformCache;
+        if (!cache.containsKey(uniformName)) {
+            int loc = isBlock ? glGetUniformBlockIndex(program, uniformName) : glGetUniformLocation(program, uniformName);
+            cache.put(uniformName, loc);
         }
-        return uniformCache.get(uniform);
+        return cache.get(uniformName);
+    }
+
+    public int getUniformBlockLocation(String uniformBlock) {
+        bind();
+        return getCachedUniformOrSet(true, uniformBlock);
+    }
+
+    public int getUniformLocation(String uniform) {
+        bind();
+        return getCachedUniformOrSet(false, uniform);
     }
 
     public void uniform1i(String uniform, int i) {
