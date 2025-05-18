@@ -31,14 +31,15 @@ public class Camera3d {
 
     protected int mode;
 
-    public Vector3f pos = new Vector3f(0, 0, 3);
+    public Vector3f pos = new Vector3f();
     public Vector3f target = new Vector3f();
+    public float targetRadius = 5;
 
     public float pitch = 0;
     public float yaw = -90;  // (initial -90 to look along z axis)
 
     public Vector3f worldUp = new Vector3f(0, 1, 0);
-    protected Vector3f front = new Vector3f();
+    protected Vector3f forward = new Vector3f();
     protected Vector3f right = new Vector3f();
     protected Vector3f up = new Vector3f();
 
@@ -51,8 +52,8 @@ public class Camera3d {
     private Vector2f mousePosOnClick;
 
     ArrayList<Action> keyMovementActions = new ArrayList<>(Arrays.asList(
-            new Action(GLFW_KEY_W, speed -> pos.add(front.mul(speed, new Vector3f()))),
-            new Action(GLFW_KEY_S, speed -> pos.sub(front.mul(speed, new Vector3f()))),
+            new Action(GLFW_KEY_W, speed -> pos.add(forward.mul(speed, new Vector3f()))),
+            new Action(GLFW_KEY_S, speed -> pos.sub(forward.mul(speed, new Vector3f()))),
             new Action(GLFW_KEY_D, speed -> pos.add(right.mul(speed, new Vector3f()))),
             new Action(GLFW_KEY_A, speed -> pos.sub(right.mul(speed, new Vector3f()))),
             new Action(GLFW_KEY_E, speed -> pos.add(up.mul(speed, new Vector3f()))),
@@ -79,7 +80,7 @@ public class Camera3d {
     }
 
     public void processKeyInputs(Window window, double dt) {
-        float speedMul = window.isKeyPressed(GLFW_KEY_LEFT_SHIFT) ? 2 : 1;
+        float speedMul = window.isKeyPressed(GLFW_KEY_LEFT_SHIFT) ? 3 : 1;
         boolean rotUpdated = false;
 
         // rotation
@@ -91,14 +92,14 @@ public class Camera3d {
             }
         }
 
-        if (rotUpdated) {
-            calculateDirections();
-        }
+        if (rotUpdated) calculateDirections();
 
         // movement
-        float mSpeed = moveSpeed * speedMul * (float) dt;
-        for (Action action : keyMovementActions) {
-            if (window.isKeyPressed(action.key)) action.callback.call(mSpeed);
+        if (mode == MODE_FLY) {
+            float mSpeed = moveSpeed * speedMul * (float) dt;
+            for (Action action : keyMovementActions) {
+                if (window.isKeyPressed(action.key)) action.callback.call(mSpeed);
+            }
         }
     }
 
@@ -126,20 +127,22 @@ public class Camera3d {
 
     public void processScroll(Window window, float xDelta, float yDelta) {
         if (yDelta != 0) {
-            pos.add(front.mul(yDelta * scrollAmount));
-            calculateDirections();
+            if (mode == MODE_FLY) {
+                pos.add(forward.mul(yDelta * scrollAmount));
+                calculateDirections();
+            } else {
+                targetRadius -= yDelta;
+                targetRadius = Math.max(1, targetRadius);
+            }
         }
     }
 
     private Matrix4f generateTargetViewMatrix() {
-        float radius = 5;
-        float camX = (float) Math.sin(glfwGetTime()) * radius;
-        float camZ = (float) Math.cos(glfwGetTime()) * radius;
-        return new Matrix4f().lookAt(new Vector3f(camX, .0f, camZ), target, worldUp);
+        return new Matrix4f().lookAt(forward.mul(-targetRadius, new Vector3f()).add(target), target, worldUp);
     }
 
     private Matrix4f generateFlyViewMatrix() {
-        return new Matrix4f().lookAt(pos, pos.add(front, new Vector3f()), worldUp);
+        return new Matrix4f().lookAt(pos, pos.add(forward, new Vector3f()), worldUp);
     }
 
     public Matrix4f generateViewMatrix() {
@@ -159,10 +162,10 @@ public class Camera3d {
         float sPitch = (float) Math.sin(Math.toRadians(pitch));
         float cYaw = (float) Math.cos(Math.toRadians(yaw));
         float sYaw = (float) Math.sin(Math.toRadians(yaw));
-        front.set(cYaw * cPitch, sPitch, sYaw * cPitch).normalize();
+        forward.set(cYaw * cPitch, sPitch, sYaw * cPitch).normalize();
 
-        front.cross(worldUp, right).normalize();
-        right.cross(front, up);
+        forward.cross(worldUp, right).normalize();
+        right.cross(forward, up);
     }
 
     private void clampPitch() {

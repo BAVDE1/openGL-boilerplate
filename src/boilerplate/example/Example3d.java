@@ -7,6 +7,7 @@ import boilerplate.common.Window;
 import boilerplate.rendering.*;
 import boilerplate.utility.*;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.awt.*;
 
@@ -20,7 +21,7 @@ public class Example3d extends GameBase {
 
     boolean renderWireFrame = false;
 
-    Camera3d camera = new Camera3d(Camera3d.MODE_TARGET);
+    Camera3d camera = new Camera3d(Camera3d.MODE_FLY, new Vector3f(0, 0, 3));
 
     ShaderHelper sh = new ShaderHelper();
     VertexArray va = new VertexArray();
