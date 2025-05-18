@@ -24,8 +24,6 @@ public class VertexUniformBuffer extends VertexBuffer {
         int blockBinding = blockBindings.get(uniformBlock);
         int blockInx = sh.getUniformBlockLocation(uniformBlock);
 
-        System.out.println(blockInx);
-
         GL45.glUniformBlockBinding(sh.getProgram(), blockInx, blockBinding);
         if (this.blockBinding < 0) bindBufferToBlock(blockBinding);
     }
