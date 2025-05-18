@@ -5,7 +5,6 @@ import boilerplate.common.Window;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
 
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL45.*;
 
@@ -14,21 +13,26 @@ import static org.lwjgl.opengl.GL45.*;
  * Automatically binds and draws VertexArrays & Shaders
  */
 public class Renderer {
-    private static int boundArray = 0;
-    private static int boundBuffer = 0;
-    private static int boundShader = 0;
-
     /** Do before anything GL related */
-    public static void setupGLContext() {
+    public static void setupGLContext(boolean setupDefaults) {
         GL.createCapabilities();
 
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_TEXTURE_2D);
+        if (setupDefaults) {
+            enableDebugOutput();
+            enableTexture2d();
+            applyDefaultBlend();
+            setClearColour(0, 0, 0, 0);
+        }
 
-        applyDefaultBlend();
-
-        setClearColour(0, 0, 0, 0);
         Logging.debug("OpenGL capabilities created");
+    }
+
+    public static void enableDebugOutput() {
+        glEnable(GL_DEBUG_OUTPUT);
+    }
+
+    public static void enableTexture2d() {
+        glEnable(GL_TEXTURE_2D);
     }
 
     public static void enableDepthTest() {
@@ -71,12 +75,12 @@ public class Renderer {
     }
 
     public static void drawArrays(int mode, VertexArray va, int vertexCount) {
-        bindArray(va);
+        va.bind();
         glDrawArrays(mode, 0, vertexCount);
     }
 
     public static void drawInstanced(int mode, VertexArray va, int vertsPerInstance, int instanceCount) {
-        bindArray(va);
+        va.bind();
         glDrawArraysInstanced(mode, 0, vertsPerInstance, instanceCount);
     }
 
@@ -85,7 +89,7 @@ public class Renderer {
     }
 
     public static void drawElements(int mode, VertexArray va, int elementType, int vertexCount) {
-        bindArray(va);
+        va.bind();
         glDrawElements(mode, vertexCount, elementType, 0);
     }
 
@@ -95,41 +99,5 @@ public class Renderer {
 
     public static void finish(Window window) {
         glfwSwapBuffers(window.handle);
-    }
-
-    public static void bindArray(VertexArray va) {
-        int id = va.getId();
-        boundArray = id;
-        glBindVertexArray(id);
-    }
-    public static void unBindArray() {
-        boundArray = 0;
-        glBindVertexArray(0);
-    }
-
-    public static void bindBuffer(VertexBuffer vb) {
-        int id = vb.getId();
-        boundBuffer = id;
-        glBindBuffer(vb.getBufferType(), id);
-    }
-    public static void unBindBuffer() {
-        boundBuffer = 0;
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    public static void bindShader(ShaderHelper sh) {
-        if (sh.getProgram() == boundShader) return;
-        boundShader = sh.getProgram();
-        glUseProgram(sh.getProgram());
-    }
-    public static void unBindShader() {
-        boundShader = 0;
-        glUseProgram(0);
-    }
-
-    public static void unbindAll() {
-        unBindShader();
-        unBindBuffer();
-        unBindArray();
     }
 }

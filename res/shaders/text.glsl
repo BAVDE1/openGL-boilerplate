@@ -1,11 +1,11 @@
 //--- VERT
 #version 450 core
 
+uniform mat4 projectionMatrix;
+
 layout(location = 0) in vec2 pos;
 layout(location = 1) in vec2 texturePos;
 layout(location = 2) in vec4 texColour;
-
-uniform mat4 projectionMatrix;
 
 out vec2 v_texturePos;
 out vec4 v_texColour;

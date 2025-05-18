@@ -58,7 +58,7 @@ public class Window {
     public void quickSetupAndShow(Options options) {
         setOptions(options);
         setup();
-        Renderer.setupGLContext();
+        Renderer.setupGLContext(true);
         show();
     }
 

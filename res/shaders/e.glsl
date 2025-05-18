@@ -1,12 +1,17 @@
 //--- VERT
 #version 450 core
 
-layout(location = 0) in vec3 pos;
-layout(location = 1) in vec2 texPos;
+//layout (std140) uniform ViewBlock {
+//    vec3 view;          // 0
+//    vec3 projection;    // 16
+//};
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+
+layout(location = 0) in vec3 pos;
+layout(location = 1) in vec2 texPos;
 
 out vec2 v_texPos;
 

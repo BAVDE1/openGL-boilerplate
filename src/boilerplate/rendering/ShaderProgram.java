@@ -1,6 +1,5 @@
 package boilerplate.rendering;
 
-import boilerplate.common.BoilerplateConstants;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -17,7 +16,7 @@ import static org.lwjgl.opengl.GL45.*;
 /**
  * Loads, compiles and links shaders from file / file paths to its own shader program.
  */
-public class ShaderHelper {
+public class ShaderProgram {
     public static class Shader {
         int id, type;
         String resourcePath;
@@ -40,7 +39,9 @@ public class ShaderHelper {
     private Integer program;
     private boolean linked = false;
 
-    /** Gen program, attach shader multi, & then link program */
+    /**
+     * Gen program, attach shader multi, & then link program
+     */
     public void autoInitializeShadersMulti(String resourcePath) {
         genProgram();
         attachShaderMulti(resourcePath);
@@ -55,7 +56,9 @@ public class ShaderHelper {
         program = glCreateProgram();
     }
 
-    /** Attach different shaders that are in the same file. MUST be separated with a "//--- SHADER_TYPE" line */
+    /**
+     * Attach different shaders that are in the same file. MUST be separated with a "//--- SHADER_TYPE" line
+     */
     public void attachShaderMulti(String resourcePath) {
         int currentShaderType = -1;
 
@@ -154,7 +157,9 @@ public class ShaderHelper {
         Logging.debug("Shaders %s [linked with program %s]", attachedShaders, program);
     }
 
-    /** <a href="https://www.khronos.org/opengl/wiki/Shader">OpenGL shaders</a> */
+    /**
+     * <a href="https://www.khronos.org/opengl/wiki/Shader">OpenGL shaders</a>
+     */
     private static int getShaderType(File file) {
         String[] splitName = file.getName().split("\\.");
         return getShaderType(splitName[splitName.length - 1]);  // file extension
@@ -187,9 +192,17 @@ public class ShaderHelper {
         uniformMatrix4f("projectionMatrix", projectionMatrix);
     }
 
-    public void bind() {Renderer.bindShader(this);}
-    public void unbind() {Renderer.unBindShader();}
-    public int getProgram() {return program;}
+    public void bind() {
+        glUseProgram(program);
+    }
+
+    public void unbind() {
+        glUseProgram(0);
+    }
+
+    public int getProgram() {
+        return program;
+    }
 
     public void delete() {
         for (Shader shader : attachedShaders) glDeleteShader(shader.id);
@@ -212,32 +225,41 @@ public class ShaderHelper {
     public void uniform1i(String uniform, int i) {
         glUniform1i(getUniformLocation(uniform), i);
     }
+
     public void uniform1iv(String uniform, int[] intArray) {
         glUniform1iv(getUniformLocation(uniform), intArray);
     }
+
     public void uniform1f(String uniform, float f) {
         glUniform1f(getUniformLocation(uniform), f);
     }
+
     public void uniform2f(String uniform, Vector2f v) {
         uniform2f(uniform, v.x, v.y);
     }
+
     public void uniform2f(String uniform, float f1, float f2) {
         glUniform2f(getUniformLocation(uniform), f1, f2);
     }
+
     public void uniform3f(String uniform, Vector3f v) {
         uniform3f(uniform, v.x, v.y, v.z);
     }
+
     public void uniform3f(String uniform, float f1, float f2, float f3) {
         glUniform3f(getUniformLocation(uniform), f1, f2, f3);
     }
+
     public void uniformMatrix4f(String uniform, Matrix4f m) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(4*4);
+        FloatBuffer fb = BufferUtils.createFloatBuffer(4 * 4);
         m.get(fb);
         uniformMatrix4f(uniform, fb);
     }
+
     public void uniformMatrix4f(String uniform, FloatBuffer buffer) {
         glUniformMatrix4fv(getUniformLocation(uniform), false, buffer);
     }
+
     public void uniformMatrix4f(String uniform, float[] matFloats) {
         glUniformMatrix4fv(getUniformLocation(uniform), false, matFloats);
     }
@@ -245,9 +267,11 @@ public class ShaderHelper {
     public void useDemoShader() {
         autoInitializeShadersMulti("shaders/demo.glsl");
     }
+
     public void useTextShader() {
         autoInitializeShadersMulti("shaders/text.glsl");
     }
+
     public void useCircleShader() {
         autoInitializeShadersMulti("shaders/circle.glsl");
     }

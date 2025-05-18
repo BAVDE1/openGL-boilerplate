@@ -1,7 +1,6 @@
 package boilerplate.rendering.text;
 
-import boilerplate.common.BoilerplateConstants;
-import boilerplate.rendering.ShaderHelper;
+import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.Texture;
 import boilerplate.rendering.VertexArray;
 import boilerplate.utility.Logging;
@@ -175,7 +174,7 @@ public class FontManager {
     private final static HashMap<String, Integer> loadedFontUids = new HashMap<>();
 
     private static VertexArray.Layout textVertexLayout = new VertexArray.Layout();
-    private static ShaderHelper textShader = new ShaderHelper();
+    private static ShaderProgram textShader = new ShaderProgram();
 
     public static int fullWidth = 0, fullHeight = 0;
     private static Texture finalTexture;
@@ -299,7 +298,7 @@ public class FontManager {
         loadedFontUids.clear();
 
         textVertexLayout = new VertexArray.Layout();
-        textShader = new ShaderHelper();
+        textShader = new ShaderProgram();
 
         fullWidth = 0;
         fullHeight = 0;

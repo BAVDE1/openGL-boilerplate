@@ -1,16 +1,16 @@
 //--- VERT
 #version 450 core
 
-layout(location = 0) in vec2 position;
-layout(location = 1) in float mode;
-layout(location = 2) in vec3 modeVars;
-
 uniform vec2 resolution;
 uniform mat4 projectionMatrix;
 
 uniform highp float time;
 uniform vec2 viewPos;
 uniform float viewScale;
+
+layout(location = 0) in vec2 position;
+layout(location = 1) in float mode;
+layout(location = 2) in vec3 modeVars;
 
 out float v_mode;
 out vec3 v_modeVars;

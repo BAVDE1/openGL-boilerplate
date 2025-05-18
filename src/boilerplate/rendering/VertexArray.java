@@ -112,15 +112,23 @@ public class VertexArray {
         glDeleteVertexArrays(arrayId);
     }
 
+    public void bind() {
+        glBindVertexArray(arrayId);
+    }
+
+    public void unbind() {
+        glBindVertexArray(0);
+    }
+
     public void bindBuffer(VertexBuffer vb) {
-        Renderer.bindArray(this);
-        Renderer.bindBuffer(vb);
+        bind();
+        vb.bind();
     }
 
     public void bindBuffers(VertexBuffer vb, VertexElementBuffer veb) {
-        Renderer.bindArray(this);
-        Renderer.bindBuffer(vb);
-        Renderer.bindBuffer(veb);
+        bind();
+        vb.bind();
+        veb.bind();
     }
 
     public void pushLayout(Layout layout) {
@@ -129,7 +137,7 @@ public class VertexArray {
 
     /** Pushing multiple layouts adds onto last layout that was bound */
     public void pushLayout(Layout layout, int divisor) {
-        Renderer.bindArray(this);
+        bind();
 
         int offset = 0;
         ArrayList<Element> allElements = layout.getElements();

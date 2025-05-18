@@ -23,13 +23,21 @@ public class VertexBuffer {
         this.drawMethod = newDrawMethod;
     }
 
+    public void bind() {
+        glBindBuffer(getBufferType(), bufferId);
+    }
+
+    public void unbind() {
+        glBindBuffer(getBufferType(), 0);
+    }
+
     public void bufferData(float[] data) {
-        Renderer.bindBuffer(this);
+        bind();
         GL45.glBufferData(bufferType, data, drawMethod);
     }
 
     public void bufferData(int[] data) {
-        Renderer.bindBuffer(this);
+        bind();
         GL45.glBufferData(bufferType, data, drawMethod);
     }
 
@@ -38,7 +46,7 @@ public class VertexBuffer {
     }
 
     public void bufferSize(int size) {
-        Renderer.bindBuffer(this);
+        bind();
         GL45.glBufferData(bufferType, size, drawMethod);
     }
 
@@ -47,7 +55,7 @@ public class VertexBuffer {
     }
 
     public void bufferSubData(int bytesOffset, float[] data) {
-        Renderer.bindBuffer(this);
+        bind();
         GL45.glBufferSubData(bufferType, bytesOffset, data);
     }
 

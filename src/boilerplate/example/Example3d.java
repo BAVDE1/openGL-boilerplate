@@ -23,7 +23,7 @@ public class Example3d extends GameBase {
 
     Camera3d camera = new Camera3d(Camera3d.MODE_FLY, new Vector3f(0, 0, 3));
 
-    ShaderHelper sh = new ShaderHelper();
+    ShaderProgram sh = new ShaderProgram();
     VertexArray va = new VertexArray();
     VertexBuffer vb = new VertexBuffer();
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);

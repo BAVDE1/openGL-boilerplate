@@ -76,7 +76,6 @@ public class ExampleIndex extends GameBase {
         textRenderer.delete();
         FontManager.deleteAll();
         Texture.deleteAll();
-        Renderer.unbindAll();
     }
 
     public void open2dExample() {

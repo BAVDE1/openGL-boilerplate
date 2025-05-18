@@ -31,13 +31,13 @@ public class Example2d extends GameBase {
     public static boolean debugMode = false;
 
     // main buffers
-    ShaderHelper shMain = new ShaderHelper();
+    ShaderProgram shMain = new ShaderProgram();
     VertexArray vaMain = new VertexArray();
     VertexBuffer vbMain = new VertexBuffer();
     BufferBuilder2f builderMain = new BufferBuilder2f();
 
     // circle buffers
-    ShaderHelper shCircles = new ShaderHelper();
+    ShaderProgram shCircles = new ShaderProgram();
     VertexArray vaCircles = new VertexArray();
     VertexBuffer vbCircles = new VertexBuffer();
     BufferBuilder2f builderCircles = new BufferBuilder2f();
