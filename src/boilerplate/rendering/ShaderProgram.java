@@ -1,6 +1,7 @@
 package boilerplate.rendering;
 
 import boilerplate.utility.Logging;
+import boilerplate.utility.MathUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -263,9 +264,7 @@ public class ShaderProgram {
     }
 
     public void uniformMatrix4f(String uniform, Matrix4f m) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(4 * 4);
-        m.get(fb);
-        uniformMatrix4f(uniform, fb);
+        uniformMatrix4f(uniform, MathUtils.matrixToBuff(m));
     }
 
     public void uniformMatrix4f(String uniform, FloatBuffer buffer) {

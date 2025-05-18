@@ -8,10 +8,8 @@ import boilerplate.rendering.*;
 import boilerplate.utility.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 
 import java.awt.*;
-import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -72,7 +70,7 @@ public class Example3d extends GameBase {
         });
 
         glfwSetScrollCallback(window.handle, (window, xDelta, yDelta) -> {
-            camera.processScroll(this.window, (float) xDelta, (float) yDelta);
+            camera.processMouseScroll(this.window, (float) xDelta, (float) yDelta);
         });
     }
 
@@ -85,18 +83,11 @@ public class Example3d extends GameBase {
         sh.autoInitializeShadersMulti("shaders/e.glsl");
         sh.uniformResolutionData(SCREEN_SIZE, BoilerplateConstants.create2dProjectionMatrix(SCREEN_SIZE));
 
-//        Matrix4f view = camera.generateViewMatrix();
         Matrix4f projection = new Matrix4f().identity();
         projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 100);
-
-//        FloatBuffer v = BufferUtils.createFloatBuffer(4 * 4);
-//        view.get(v);
-        FloatBuffer p = BufferUtils.createFloatBuffer(4 * 4);
-        projection.get(p);
-
         vub.bindUniformBlock(sh, "ViewBlock");
-        vub.bufferData(p);
-//        vub.bufferSubData(0, p);
+        vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
+        vub.bufferSubData(0, MathUtils.matrixToBuff(projection));
 
         VertexArray.Layout l = new VertexArray.Layout();
         l.pushFloat(3);
@@ -142,15 +133,16 @@ public class Example3d extends GameBase {
 
     public void render() {
         float time = (float) glfwGetTime();
-
         Renderer.clearScreen();
 
-        Matrix4f model = new Matrix4f().identity();
-        Matrix4f view = camera.generateViewMatrix();
+        // update camera
+        if (camera.hasChanged) {
+            camera.hasChanged = false;
+            vub.bufferSubData(MathUtils.MATRIX4F_BYTES_SIZE, MathUtils.matrixToBuff(camera.generateViewMatrix()));
+        }
 
+        Matrix4f model = new Matrix4f().identity();
         sh.uniformMatrix4f("model", model);
-        sh.uniformMatrix4f("view", view);
-//        sh.uniformMatrix4f("projection", projection);
 
         sh.bind();
         Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);

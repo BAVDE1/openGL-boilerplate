@@ -5,12 +5,11 @@ layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 texPos;
 
 layout (std140) uniform ViewBlock {
-    mat4 projection;    // 0
+    mat4 projection;
+    mat4 view;
 };
 
 uniform mat4 model;
-uniform mat4 view;
-//uniform mat4 projection;
 
 out vec2 v_texPos;
 

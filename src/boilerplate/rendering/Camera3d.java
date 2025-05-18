@@ -30,6 +30,7 @@ public class Camera3d {
     public static final int MODE_TARGET = 1;
 
     protected int mode;
+    public boolean hasChanged = true;
 
     public Vector3f pos = new Vector3f();
     public Vector3f target = new Vector3f();
@@ -89,6 +90,7 @@ public class Camera3d {
             if (window.isKeyPressed(action.key)) {
                 action.callback.call(rSpeed);
                 rotUpdated = true;
+                hasChanged = true;
             }
         }
 
@@ -98,7 +100,10 @@ public class Camera3d {
         if (mode == MODE_FLY) {
             float mSpeed = moveSpeed * speedMul * (float) dt;
             for (Action action : keyMovementActions) {
-                if (window.isKeyPressed(action.key)) action.callback.call(mSpeed);
+                if (window.isKeyPressed(action.key)) {
+                    action.callback.call(mSpeed);
+                    hasChanged = true;
+                }
             }
         }
     }
@@ -122,11 +127,13 @@ public class Camera3d {
             pitch -= delta.y * mouseSensitivity;
             yaw += delta.x * mouseSensitivity;
             calculateDirections();
+            hasChanged = true;
         }
     }
 
-    public void processScroll(Window window, float xDelta, float yDelta) {
+    public void processMouseScroll(Window window, float xDelta, float yDelta) {
         if (yDelta != 0) {
+            hasChanged = true;
             if (mode == MODE_FLY) {
                 pos.add(forward.mul(yDelta * scrollAmount));
                 calculateDirections();
@@ -173,7 +180,9 @@ public class Camera3d {
     }
 
     public void setMode(int newMode) {
+        if (mode == newMode) return;
         mode = newMode;
+        hasChanged = true;
     }
 
     public int getMode() {
