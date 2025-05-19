@@ -5,7 +5,9 @@ import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.opengl.GL;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -51,6 +53,7 @@ public class Camera3d {
 
     private boolean isMouseDown = false;
     private Vector2f mousePosOnClick;
+    private Vector2f prevMousePos;  // for wayland
 
     ArrayList<Action> keyMovementActions = new ArrayList<>(Arrays.asList(
             new Action(GLFW_KEY_W, speed -> pos.add(forward.mul(speed, new Vector3f()))),
@@ -113,16 +116,18 @@ public class Camera3d {
         if (window.isMouseButtonPressed(GLFW_MOUSE_BUTTON_2)) {
             isMouseDown = true;
             mousePosOnClick = window.getCursorPos();
-            window.hideCursor();
+            prevMousePos = window.getCursorPos();
+            if (glfwGetPlatform() != GLFW_PLATFORM_WAYLAND) window.hideCursor();
         } else window.showCursor();
     }
 
     public void processMouseMovement(Window window, float xPos, float yPos) {
         if (isMouseDown) {
-            Vector2f delta = new Vector2f(xPos, yPos).sub(mousePosOnClick);
-            window.setCursorPos(mousePosOnClick);
-
+            Vector2f delta = new Vector2f(xPos, yPos).sub(window.isWaylandPlatform() ? prevMousePos : mousePosOnClick);
             if (delta.y + delta.x == 0) return;
+
+            if (window.isWaylandPlatform()) prevMousePos.set(xPos, yPos);
+            else window.setCursorPos(mousePosOnClick);
 
             pitch -= delta.y * mouseSensitivity;
             yaw += delta.x * mouseSensitivity;

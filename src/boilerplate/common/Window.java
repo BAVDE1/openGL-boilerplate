@@ -13,6 +13,7 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.system.MemoryStack.create;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -37,6 +38,8 @@ public class Window {
     public long handle;
     private boolean initialised = false;
     private Options options;
+
+    private boolean isWayland;
 
     public Window() {
         this.options = new Options();
@@ -67,6 +70,8 @@ public class Window {
 
         if (!glfwInit()) throw new IllegalStateException("Unable to initialize GLFW");
 
+        isWayland = glfwGetPlatform() == GLFW_PLATFORM_WAYLAND;
+
         // Configure window
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, options.initVisible ? GLFW_TRUE : GLFW_FALSE);
@@ -89,7 +94,7 @@ public class Window {
 
     public void centerWindow() {
         // center the window (if it can)
-        if (glfwGetPlatform() != GLFW_PLATFORM_WAYLAND) {  // cause wayland is stupid
+        if (!isWaylandPlatform()) {  // cause wayland is stupid
             try (MemoryStack stack = stackPush()) {  // Get the thread stack and push a new frame
                 IntBuffer winWidth = stack.mallocInt(1);
                 IntBuffer winHeight = stack.mallocInt(1);
@@ -159,6 +164,10 @@ public class Window {
         glfwSetWindowAttrib(handle, attrib, value);
     }
 
+    public boolean isWaylandPlatform() {
+        return isWayland;
+    }
+
     public boolean isKeyPressed(int key) {
         return glfwGetKey(handle, key) == GLFW_PRESS;
     }
@@ -172,6 +181,10 @@ public class Window {
     }
 
     public void setCursorPos(float xPos, float yPos) {
+        if (isWaylandPlatform()) {
+            Logging.warn("Cursor pos cannot be set on Wayland platforms :(");
+            return;
+        }
         glfwSetCursorPos(handle, xPos, yPos);
     }
 
