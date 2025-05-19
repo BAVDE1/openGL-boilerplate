@@ -174,8 +174,8 @@ public class BufferBuilder {
     }
 
     private int unpackIntoArray(float[] theArray, int destInx, int vertInx, ShapeMode.Unpack unpack) {
-        int unpackInx = vertInx % unpack.unpackVars.size();
-        float[] unpackVars = unpack.unpackVars.get(unpackInx);
+        int unpackInx = vertInx % unpack.unpackVars.length;
+        float[] unpackVars = unpack.unpackVars[unpackInx];
         System.arraycopy(unpackVars, 0, theArray, destInx, unpackVars.length);
         return unpackVars.length;
     }

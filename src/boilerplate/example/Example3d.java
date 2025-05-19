@@ -102,8 +102,8 @@ public class Example3d extends GameBase {
         BufferBuilder3f bb = new BufferBuilder3f();
         bb.setAdditionalVertFloats(2);
 
-        Shape3d.Poly3d p = Shape3d.createCubeE(new Vector3f(0, 0, 1), 1);
-        p.mode = new ShapeMode.Unpack(List.of(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1}));
+        Shape3d.Poly3d p = Shape3d.createCubeE(new Vector3f(), 1);
+        p.mode = new ShapeMode.Unpack(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1});
         bb.pushPolygon(p);
         vb.bufferData(bb);
         veb.bufferData(p.elementIndex);

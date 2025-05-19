@@ -24,10 +24,14 @@ public abstract class ShapeMode {
      * Unpacks the given vars to the end of each vertex (wraps)
      */
     public static class Unpack extends ShapeMode {
-        List<float[]> unpackVars;
+        float[][] unpackVars;
+
+        public Unpack(float[]... unpackVars) {
+            this.unpackVars = unpackVars;
+        }
 
         public Unpack(List<float[]> unpackVars) {
-            this.unpackVars = unpackVars;
+            this.unpackVars = unpackVars.toArray(new float[0][]);
         }
     }
 
