@@ -102,11 +102,11 @@ public class Example3d extends GameBase {
         BufferBuilder3f bb = new BufferBuilder3f();
         bb.setAdditionalVertFloats(2);
 
-        Shape3d.Poly3d p = Shape3d.createCubeE(new Vector3f(), 1);
-        p.mode = new ShapeMode.Unpack(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1});
-        bb.pushPolygon(p);
+        Shape3d.Poly3d cube = Shape3d.createRightAngleTriFlippedE(new Vector3f(), 1, 1, 1);
+        cube.mode = new ShapeMode.Unpack(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1});
+        bb.pushPolygon(cube);
         vb.bufferData(bb);
-        veb.bufferData(p.elementIndex);
+        veb.bufferData(cube.elementIndex);
 
         new Texture("textures/breaking.png").bind();
     }
@@ -125,15 +125,15 @@ public class Example3d extends GameBase {
         sh.uniformMatrix4f("model", model);
 
         sh.bind();
-        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
+        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 24);
 
         model = new Matrix4f().identity();
         model.rotateX(time * (float) Math.toRadians(120));
         model.rotateY(time * (float) Math.toRadians(70));
-        model.translate(1.2f, 0, 0);
+        model.translate(1.4f, 0, 0);
         model.scale(.8f, .5f, .5f);
         sh.uniformMatrix4f("model", model);
-        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
+        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 24);
         Renderer.finish(window);
     }
 
