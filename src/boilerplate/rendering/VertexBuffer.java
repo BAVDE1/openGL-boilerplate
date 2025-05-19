@@ -1,5 +1,6 @@
 package boilerplate.rendering;
 
+import boilerplate.rendering.builders.BufferBuilder;
 import boilerplate.rendering.builders.BufferBuilder2f;
 import boilerplate.utility.MathUtils;
 import org.joml.Matrix4f;
@@ -51,7 +52,7 @@ public class VertexBuffer {
         GL45.glBufferData(bufferType, data, drawMethod);
     }
 
-    public void bufferData(BufferBuilder2f bb) {
+    public void bufferData(BufferBuilder bb) {
         bufferData(bb.getFloats());
     }
 

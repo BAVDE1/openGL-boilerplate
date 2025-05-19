@@ -3,11 +3,14 @@ package boilerplate.rendering;
 import boilerplate.common.Window;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 
 import java.awt.*;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -40,6 +43,7 @@ public class Camera3d {
 
     public float pitch = 0;
     public float yaw = -90;  // (initial -90 to look along z axis)
+    public float roll = 0;  // TODO: not implemented
 
     public Vector3f worldUp = new Vector3f(0, 1, 0);
     protected Vector3f forward = new Vector3f();
@@ -69,7 +73,9 @@ public class Camera3d {
             new Action(GLFW_KEY_UP, speed -> pitch += speed),
             new Action(GLFW_KEY_DOWN, speed -> pitch -= speed),
             new Action(GLFW_KEY_RIGHT, speed -> yaw += speed),
-            new Action(GLFW_KEY_LEFT, speed -> yaw -= speed)
+            new Action(GLFW_KEY_LEFT, speed -> yaw -= speed),
+            new Action(GLFW_KEY_P, speed -> roll += speed),
+            new Action(GLFW_KEY_O, speed -> roll -= speed)
     ));
 
     public Camera3d(int mode) {

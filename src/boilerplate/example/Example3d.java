@@ -5,11 +5,15 @@ import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import boilerplate.rendering.*;
+import boilerplate.rendering.builders.BufferBuilder3f;
+import boilerplate.rendering.builders.Shape3d;
+import boilerplate.rendering.builders.ShapeMode;
 import boilerplate.utility.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.awt.*;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -95,38 +99,14 @@ public class Example3d extends GameBase {
         va.bindBuffers(vb, veb);
         va.pushLayout(l);
 
-        vb.bufferData(new float[]{
-                // front quad
-                -.5f, .5f, .5f, 0, 0,  // tl
-                .5f, .5f, .5f, 1, 0,  // tr
-                .5f, -.5f, .5f, 1, 1,  // br
-                -.5f, -.5f, .5f, 0, 1,  // bl
+        BufferBuilder3f bb = new BufferBuilder3f();
+        bb.setAdditionalVertFloats(2);
 
-                // back quad
-                -.5f, .5f, -.5f, 1, 1,
-                .5f, .5f, -.5f, 0, 1,
-                .5f, -.5f, -.5f, 0, 0,
-                -.5f, -.5f, -.5f, 1, 0
-        });
-        veb.bufferData(new int[]{
-                0, 1, 2,  // front
-                0, 2, 3,
-
-                4, 5, 1,  // top
-                4, 1, 0,
-
-                4, 0, 3,  // left
-                4, 3, 7,
-
-                1, 5, 6,  // right
-                1, 6, 2,
-
-                3, 2, 6,  // bottom
-                3, 6, 7,
-
-                6, 5, 4,  // back
-                6, 4, 7,
-        });
+        Shape3d.Poly3d p = Shape3d.createCubeE(new Vector3f(0, 0, 1), 1);
+        p.mode = new ShapeMode.Unpack(List.of(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1}));
+        bb.pushPolygon(p);
+        vb.bufferData(bb);
+        veb.bufferData(p.elementIndex);
 
         new Texture("textures/breaking.png").bind();
     }

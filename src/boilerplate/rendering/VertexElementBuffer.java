@@ -3,8 +3,6 @@ package boilerplate.rendering;
 import boilerplate.utility.Logging;
 import org.lwjgl.opengl.GL45;
 
-import static org.lwjgl.opengl.GL45.glDeleteBuffers;
-
 public class VertexElementBuffer extends VertexBuffer {
     public static final int ELEMENT_TYPE_BYTE = GL45.GL_UNSIGNED_BYTE;
     public static final int ELEMENT_TYPE_SHORT = GL45.GL_UNSIGNED_SHORT;

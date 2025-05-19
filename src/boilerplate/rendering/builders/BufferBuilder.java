@@ -6,6 +6,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.awt.*;
+import java.nio.FloatBuffer;
 
 /**
  * Some abstracted functions for building a buffer.
@@ -17,15 +18,15 @@ public class BufferBuilder {
     protected int size;
     protected boolean autoResize;
 
-    private int posFloatCount = 0;
-    private int floatCount = 0;
-    private int vertexCount = 0;
-    private int separationsCount = 0;
+    protected int posFloatCount = 0;
+    protected int floatCount = 0;
+    protected int vertexCount = 0;
+    protected int separationsCount = 0;
 
-    private int additionalVertFloats = 0;
-    private int floatCountPerVert = getPosFloatCount();
+    protected int additionalVertFloats = 0;
+    protected int floatCountPerVert = getPosFloatCount();
 
-    private boolean shouldNextBeSeparated = false;  // should the next time raw vertices are pushed be separated
+    protected boolean shouldNextBeSeparated = false;  // should the next time raw vertices are pushed be separated
 
     public BufferBuilder() {this(DEFAULT_SIZE, false, 0);}
     public BufferBuilder(int size) {this(size, false, 0);}
@@ -184,76 +185,29 @@ public class BufferBuilder {
         return append.vars.length;
     }
 
-    private void addPointsToArray(float[] theArray, int floatInx, int vertInx, Vector2f point, ShapeMode mode) {
-        theArray[floatInx] = point.x;
-        theArray[floatInx+1] = point.y;
+    protected void addPointsToArray(float[] theArray, int floatInx, int vertInx, FloatBuffer pointPos, ShapeMode mode) {
+        int i = 0;
+        while (pointPos.hasRemaining()) {
+            theArray[floatInx + i++] = pointPos.get();
+        }
 
         if (mode instanceof ShapeMode.Demonstration demo) {
             Vector3f typeVar = demo.getVar(vertInx);
-            theArray[floatInx + 2] = demo.type;
-            theArray[floatInx + 3] = typeVar.x;
-            theArray[floatInx + 4] = typeVar.y;
-            theArray[floatInx + 5] = typeVar.z;
+            theArray[floatInx + i] = demo.type;
+            theArray[floatInx + i + 1] = typeVar.x;
+            theArray[floatInx + i + 2] = typeVar.y;
+            theArray[floatInx + i + 3] = typeVar.z;
         } else if (mode instanceof ShapeMode.Unpack unpack) {
-            unpackIntoArray(theArray, floatInx+2, vertInx, unpack);
+            unpackIntoArray(theArray, floatInx+i, vertInx, unpack);
         } else if (mode instanceof ShapeMode.Append append) {
-            appendToArray(theArray, floatInx+2, append);
+            appendToArray(theArray, floatInx+i, append);
         } else if (mode instanceof ShapeMode.UnpackAppend unpackAppend) {
             int numUnpacked = unpackIntoArray(theArray, floatInx+2, vertInx, unpackAppend.unpack);
-            appendToArray(theArray, floatInx+2+numUnpacked, unpackAppend.append);
+            appendToArray(theArray, floatInx+i+numUnpacked, unpackAppend.append);
         } else if (mode instanceof ShapeMode.AppendUnpack appendUnpack) {
             int numAppended = appendToArray(theArray, floatInx+2, appendUnpack.append);
-            unpackIntoArray(theArray, floatInx+2+numAppended, vertInx, appendUnpack.unpack);
+            unpackIntoArray(theArray, floatInx+i+numAppended, vertInx, appendUnpack.unpack);
         }
-    }
-
-    public void pushSeparatedPolygon(Shape2d.Poly2d p) {
-        shouldNextBeSeparated = true;
-        pushPolygon(p);
-    }
-
-    /** first, second, third, ... */
-    public void pushPolygon(Shape2d.Poly2d p) {
-        float[] verts = new float[p.points.size() * floatCountPerVert];
-        for (int i = 0; i < p.points.size(); i++) {
-            int inx = i * floatCountPerVert;
-            Vector2f point = p.points.get(i);
-            addPointsToArray(verts, inx, i, point.add(p.pos, new Vector2f()), p.mode);
-        }
-        pushRawFloats(verts);
-    }
-
-    public void pushSeparatedPolygonSorted(Shape2d.Poly2d p) {
-        shouldNextBeSeparated = true;
-        pushPolygonSorted(p);
-    }
-
-    /** first, last, first+1, last-1, ... */
-    public void pushPolygonSorted(Shape2d.Poly2d p) {
-        float[] verts = new float[p.points.size() * floatCountPerVert];
-        for (int i = 0; i < p.points.size(); i++) {
-            int inx = i * floatCountPerVert;
-            int offset = (int) (i / 2f);  // floor
-
-            // choose which point to add
-            Vector2f point;
-            if (i % 2 == 0) point = p.points.get(offset);  // front
-            else point = p.points.get(p.points.size()-1 - offset);  // back
-            addPointsToArray(verts, inx, i, point.add(p.pos, new Vector2f()), p.mode);
-        }
-        pushRawFloats(verts);
-    }
-
-    /** Circles should be rendered as instanced GL_TRIANGLES */
-    public void pushCircle(Vector2f pos, float radius, Color col) {
-        pushCircle(pos, radius, 0, col);
-    }
-
-    /** Circles should be rendered as instanced GL_TRIANGLES */
-    public void pushCircle(Vector2f pos, float radius, float outline, Color col) {
-        pushRawFloats(new float[] {
-                pos.x, pos.y, radius, outline, col.getRed(), col.getGreen(), col.getBlue()
-        });
     }
 
     public void appendBuffer(BufferBuilder builder) {appendBuffer(builder, false);}
