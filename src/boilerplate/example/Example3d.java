@@ -13,7 +13,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.awt.*;
-import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -88,7 +87,7 @@ public class Example3d extends GameBase {
         sh.uniformResolutionData(SCREEN_SIZE, BoilerplateConstants.create2dProjectionMatrix(SCREEN_SIZE));
 
         Matrix4f projection = new Matrix4f().identity();
-        projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 100);
+        projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 5);
         vub.bindUniformBlock(sh, "ViewBlock");
         vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
         vub.bufferSubData(0, MathUtils.matrixToBuff(projection));
@@ -102,11 +101,11 @@ public class Example3d extends GameBase {
         BufferBuilder3f bb = new BufferBuilder3f();
         bb.setAdditionalVertFloats(2);
 
-        Shape3d.Poly3d cube = Shape3d.createRightAngleTriFlippedE(new Vector3f(), 1, 1, 1);
-        cube.mode = new ShapeMode.Unpack(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1});
-        bb.pushPolygon(cube);
+        Shape3d.Poly3d poly = Shape3d.createTri(new Vector3f(), 1, 1, .5f, 1);
+        poly.mode = new ShapeMode.Unpack(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1});
+        bb.pushPolygon(poly);
         vb.bufferData(bb);
-        veb.bufferData(cube.elementIndex);
+        veb.bufferData(poly.elementIndex);
 
         new Texture("textures/breaking.png").bind();
     }

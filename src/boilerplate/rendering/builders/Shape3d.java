@@ -1,6 +1,5 @@
 package boilerplate.rendering.builders;
 
-import boilerplate.utility.Logging;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -46,11 +45,11 @@ public class Shape3d {
         }
     }
 
-    public static Poly3d createCubeE(Vector3f center, float size) {
-        return createCuboidE(center, size, size, size);
+    public static Poly3d createCube(Vector3f center, float size) {
+        return createCuboid(center, size, size, size);
     }
 
-    public static Poly3d createCuboidE(Vector3f center, float width, float height, float depth) {
+    public static Poly3d createCuboid(Vector3f center, float width, float height, float depth) {
         float w = width * .5f;
         float h = height * .5f;
         float d = depth * .5f;
@@ -83,15 +82,15 @@ public class Shape3d {
         return p;
     }
 
-    public static Poly3d createRightAngleTriE(Vector3f cornerCenter, float height, float baseLength, float depth) {
-        return createTriE(cornerCenter, height, baseLength, 0, depth);
+    public static Poly3d createRightAngleTri(Vector3f cornerCenter, float height, float baseLength, float depth) {
+        return createTri(cornerCenter, height, baseLength, 0, depth);
     }
 
-    public static Poly3d createRightAngleTriFlippedE(Vector3f cornerCenter, float height, float baseLength, float depth) {
-        return createTriE(cornerCenter, height, 0, baseLength, depth);
+    public static Poly3d createRightAngleTriFlipped(Vector3f cornerCenter, float height, float baseLength, float depth) {
+        return createTri(cornerCenter, height, 0, baseLength, depth);
     }
 
-    public static Poly3d createTriE(Vector3f baseCenter, float height, float baseLeftLength, float baseRightLength, float depth) {
+    public static Poly3d createTri(Vector3f baseCenter, float height, float baseLeftLength, float baseRightLength, float depth) {
         float d = depth * .5f;
         Poly3d p = new Poly3d(
                 new Vector3f(baseRightLength, 0, d),  // corner
