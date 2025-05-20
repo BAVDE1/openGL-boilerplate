@@ -39,7 +39,7 @@ public class Camera3d {
 
     public Vector3f pos = new Vector3f();
     public Vector3f target = new Vector3f();
-    public float targetRadius = 5;
+    public float targetRadius = 3;
 
     public float pitch = 0;
     public float yaw = -90;  // (initial -90 to look along z axis)

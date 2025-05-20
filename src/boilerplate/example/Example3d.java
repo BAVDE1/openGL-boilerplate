@@ -90,7 +90,7 @@ public class Example3d extends GameBase {
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
 
         Matrix4f projection = new Matrix4f().identity();
-        projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 5);
+        projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 50);
         vub.bindUniformBlock(sh, "ViewBlock");
         vub.bindUniformBlock(shOutline, "ViewBlock");
         vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
@@ -117,7 +117,6 @@ public class Example3d extends GameBase {
     public void render() {
         float time = (float) glfwGetTime();
 
-        glEnable(GL_DEPTH_TEST);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);  // write 1 to all fragments that pass
         glStencilMask(0xFF);  // enable writing
         Renderer.clearScreen();
@@ -137,7 +136,6 @@ public class Example3d extends GameBase {
 
         drawObjects(model1, model2, sh);
 
-        glDisable(GL_DEPTH_TEST);
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // only draw if stencil is NOT equal to 1
         glStencilMask(0x00);  // disable writing
         drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
