@@ -27,6 +27,7 @@ public class Example3d extends GameBase {
     Camera3d camera = new Camera3d(Camera3d.MODE_FLY, new Vector3f(0, 0, 3));
 
     ShaderProgram sh = new ShaderProgram();
+    ShaderProgram shOutline = new ShaderProgram();
     VertexArray va = new VertexArray();
     VertexBuffer vb = new VertexBuffer();
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
@@ -45,6 +46,8 @@ public class Example3d extends GameBase {
         window.quickSetupAndShow(winOps);
 
         Renderer.enableDepthTest();
+        Renderer.enableStencilTest();
+        Renderer.setStencilOperation(GL_KEEP, GL_KEEP, GL_REPLACE);
         Renderer.enableFaceCullingDefault();
         glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
 
@@ -83,12 +86,13 @@ public class Example3d extends GameBase {
         veb.genId();
         vub.genId();
 
-        sh.autoInitializeShadersMulti("shaders/e.glsl");
-        sh.uniformResolutionData(SCREEN_SIZE, BoilerplateConstants.create2dProjectionMatrix(SCREEN_SIZE));
+        sh.autoInitializeShadersMulti("shaders/3d.glsl");
+        shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
 
         Matrix4f projection = new Matrix4f().identity();
         projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 5);
         vub.bindUniformBlock(sh, "ViewBlock");
+        vub.bindUniformBlock(shOutline, "ViewBlock");
         vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
         vub.bufferSubData(0, MathUtils.matrixToBuff(projection));
 
@@ -101,7 +105,7 @@ public class Example3d extends GameBase {
         BufferBuilder3f bb = new BufferBuilder3f();
         bb.setAdditionalVertFloats(2);
 
-        Shape3d.Poly3d poly = Shape3d.createTri(new Vector3f(), 1, 1, .5f, 1);
+        Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 1);
         poly.mode = new ShapeMode.Unpack(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1});
         bb.pushPolygon(poly);
         vb.bufferData(bb);
@@ -112,6 +116,10 @@ public class Example3d extends GameBase {
 
     public void render() {
         float time = (float) glfwGetTime();
+
+        glEnable(GL_DEPTH_TEST);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);  // write 1 to all fragments that pass
+        glStencilMask(0xFF);  // enable writing
         Renderer.clearScreen();
 
         // update camera
@@ -120,20 +128,29 @@ public class Example3d extends GameBase {
             vub.bufferSubData(MathUtils.MATRIX4F_BYTES_SIZE, MathUtils.matrixToBuff(camera.generateViewMatrix()));
         }
 
-        Matrix4f model = new Matrix4f().identity();
-        sh.uniformMatrix4f("model", model);
+        Matrix4f model1 = new Matrix4f().identity();
+        Matrix4f model2 = new Matrix4f().identity();
+        model2.rotateX(time * (float) Math.toRadians(120));
+        model2.rotateY(time * (float) Math.toRadians(70));
+        model2.translate(1.4f, 0, 0);
+        model2.scale(.8f, .5f, .5f);
 
-        sh.bind();
-        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 24);
+        drawObjects(model1, model2, sh);
 
-        model = new Matrix4f().identity();
-        model.rotateX(time * (float) Math.toRadians(120));
-        model.rotateY(time * (float) Math.toRadians(70));
-        model.translate(1.4f, 0, 0);
-        model.scale(.8f, .5f, .5f);
-        sh.uniformMatrix4f("model", model);
-        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 24);
+        glDisable(GL_DEPTH_TEST);
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // only draw if stencil is NOT equal to 1
+        glStencilMask(0x00);  // disable writing
+        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
+
         Renderer.finish(window);
+    }
+
+    private void drawObjects(Matrix4f model1, Matrix4f model2, ShaderProgram sh) {
+        sh.uniformMatrix4f("model", model1);
+        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
+
+        sh.uniformMatrix4f("model", model2);
+        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
     }
 
     @Override

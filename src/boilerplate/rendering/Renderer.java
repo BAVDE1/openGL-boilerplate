@@ -39,6 +39,14 @@ public class Renderer {
         glEnable(GL_DEPTH_TEST);
     }
 
+    public static void enableStencilTest() {
+        glEnable(GL_STENCIL_TEST);
+    }
+
+    public static void setStencilOperation(int stencilFails, int stencilPassDepthFails, int stencilPassDepthPass) {
+        glStencilOp(stencilFails, stencilPassDepthFails, stencilPassDepthPass);
+    }
+
     public static void enableFaceCulling(int windingOrder, int faceToCull) {
         glEnable(GL_CULL_FACE);
         glCullFace(faceToCull);
@@ -62,7 +70,7 @@ public class Renderer {
     }
 
     public static void clearScreen() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     public static void setWindingOrder(int order) {
