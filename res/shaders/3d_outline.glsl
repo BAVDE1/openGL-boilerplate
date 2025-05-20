@@ -21,5 +21,5 @@ void main() {
 out vec4 colour;
 
 void main() {
-    colour = vec4(1, gl_FragCoord.x / 800, gl_FragCoord.y / 800, 1);
+    colour = vec4(1, gl_FragCoord.x / 800, gl_FragCoord.y / 800, .4);
 }

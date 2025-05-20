@@ -167,9 +167,7 @@ public class Shape2d {
     public static Vector2f findCenter(List<Vector2f> points) {
         ListIterator<Vector2f> iterator = points.listIterator();
         Vector2f avg = new Vector2f(iterator.next());
-        while(iterator.hasNext()) {
-            avg.add(iterator.next());
-        }
+        while(iterator.hasNext()) avg.add(iterator.next());
         return avg.div(points.size());
     }
 }

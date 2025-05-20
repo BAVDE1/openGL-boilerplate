@@ -13,6 +13,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.awt.*;
+import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -129,25 +130,35 @@ public class Example3d extends GameBase {
 
         Matrix4f model1 = new Matrix4f().identity();
         Matrix4f model2 = new Matrix4f().identity();
-        model2.rotateX(time * (float) Math.toRadians(120));
-        model2.rotateY(time * (float) Math.toRadians(70));
-        model2.translate(1.4f, 0, 0);
+//        model2.rotateX(time * (float) Math.toRadians(120));
+//        model2.rotateY(time * (float) Math.toRadians(70));
+        model2.translate((float) Math.cos(time) * 1.2f, 0, (float) Math.sin(time) * 1.2f);
         model2.scale(.8f, .5f, .5f);
 
-        drawObjects(model1, model2, sh);
+        float[] m1 = new float[4*4];
+        float[] m2 = new float[4*4];
+        model1.get(m1);
+        model2.get(m2);
 
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // only draw if stencil is NOT equal to 1
+        float m1Dist = camera.pos.sub(m1[12], m1[13], m1[14], new Vector3f()).lengthSquared();
+        float m2Dist = camera.pos.sub(m2[12], m2[13], m2[14], new Vector3f()).lengthSquared();
+        System.out.println(m2Dist);
+        boolean m1First = m1Dist > m2Dist;  // further away should be rendered first if transparent
+
+        drawObjects(model1, model2, sh, m1First);
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // only draw if fragment in stencil is NOT equal to 1
         glStencilMask(0x00);  // disable writing
-        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
+        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline, m1First);
 
         Renderer.finish(window);
     }
 
-    private void drawObjects(Matrix4f model1, Matrix4f model2, ShaderProgram sh) {
-        sh.uniformMatrix4f("model", model1);
+    private void drawObjects(Matrix4f model1, Matrix4f model2, ShaderProgram sh, boolean m1First) {
+        sh.uniformMatrix4f("model", m1First ? model1 : model2);
         Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
 
-        sh.uniformMatrix4f("model", model2);
+        sh.uniformMatrix4f("model", m1First ? model2 : model1);
         Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
     }
 

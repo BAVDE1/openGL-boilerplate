@@ -1,9 +1,11 @@
 package boilerplate.rendering.builders;
 
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class Shape3d {
     public static class Poly3d {
@@ -42,6 +44,12 @@ public class Shape3d {
                 point.rotateY((float) Math.toRadians(yaw));
                 point.rotateX((float) Math.toRadians(pitch));
             }
+        }
+
+        /** Centers all points around the current position */
+        public void centerPointsAroundPos() {
+            Vector3f offset = findCenter(points);
+            for (Vector3f p : points) p.sub(offset);
         }
     }
 
@@ -113,5 +121,13 @@ public class Shape3d {
         p.pos = baseCenter;
         p.elementVertCount = 24;
         return p;
+    }
+
+    /** Finds average of all points */
+    public static Vector3f findCenter(List<Vector3f> points) {
+        ListIterator<Vector3f> iterator = points.listIterator();
+        Vector3f avg = new Vector3f(iterator.next());
+        while(iterator.hasNext()) avg.add(iterator.next());
+        return avg.div(points.size());
     }
 }
