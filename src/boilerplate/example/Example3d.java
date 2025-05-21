@@ -21,7 +21,7 @@ import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
 public class Example3d extends GameBase {
     public boilerplate.common.Window window = new Window();
-    final Dimension SCREEN_SIZE = new Dimension(800, 800);
+    public final static Dimension SCREEN_SIZE = new Dimension(800, 800);
 
     boolean renderWireFrame = false;
 
