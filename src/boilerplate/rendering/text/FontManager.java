@@ -2,7 +2,7 @@ package boilerplate.rendering.text;
 
 import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.Texture;
-import boilerplate.rendering.VertexArray;
+import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.utility.Logging;
 import org.joml.Vector2f;
 

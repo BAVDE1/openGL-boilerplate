@@ -1,5 +1,7 @@
 package boilerplate.rendering;
 
+import boilerplate.rendering.buffers.VertexArray;
+import boilerplate.rendering.buffers.VertexElementBuffer;
 import org.lwjgl.opengl.GL;
 import boilerplate.common.Window;
 import boilerplate.rendering.text.TextRenderer;

@@ -5,6 +5,7 @@ import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import boilerplate.rendering.*;
+import boilerplate.rendering.Texture;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;

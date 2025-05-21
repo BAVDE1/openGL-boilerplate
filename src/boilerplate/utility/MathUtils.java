@@ -22,8 +22,6 @@ public class MathUtils {
     }
 
     public static FloatBuffer matrixToBuff(Matrix4f m) {
-        FloatBuffer data = BufferUtils.createFloatBuffer(16);
-        m.get(data);
-        return data;
+        return m.get(BufferUtils.createFloatBuffer(16));
     }
 }

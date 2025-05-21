@@ -5,7 +5,6 @@ import boilerplate.utility.MathUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 
 import java.awt.*;
 import java.io.*;

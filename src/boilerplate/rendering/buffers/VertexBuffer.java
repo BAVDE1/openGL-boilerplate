@@ -1,10 +1,6 @@
-package boilerplate.rendering;
+package boilerplate.rendering.buffers;
 
 import boilerplate.rendering.builders.BufferBuilder;
-import boilerplate.rendering.builders.BufferBuilder2f;
-import boilerplate.utility.MathUtils;
-import org.joml.Matrix4f;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL45;
 import boilerplate.utility.Logging;
@@ -18,8 +14,12 @@ public class VertexBuffer {
     protected int drawMethod = GL15.GL_DYNAMIC_DRAW;
     protected Integer bufferId;
 
-    public VertexBuffer(){}
-    public VertexBuffer(boolean genId) {if (genId) genId();}
+    public VertexBuffer() {
+    }
+
+    public VertexBuffer(boolean genId) {
+        if (genId) genId();
+    }
 
     public void setBufferType(int bufferType) {
         this.bufferType = bufferType;
@@ -83,7 +83,15 @@ public class VertexBuffer {
         glDeleteBuffers(bufferId);
     }
 
-    public int getId() {return bufferId;}
-    public int getBufferType() {return bufferType;}
-    public int getDrawMethod() {return drawMethod;}
+    public int getId() {
+        return bufferId;
+    }
+
+    public int getBufferType() {
+        return bufferType;
+    }
+
+    public int getDrawMethod() {
+        return drawMethod;
+    }
 }

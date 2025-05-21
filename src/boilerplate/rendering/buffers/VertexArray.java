@@ -1,4 +1,4 @@
-package boilerplate.rendering;
+package boilerplate.rendering.buffers;
 
 import boilerplate.utility.Logging;
 

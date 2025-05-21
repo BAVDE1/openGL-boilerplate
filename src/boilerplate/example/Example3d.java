@@ -5,6 +5,7 @@ import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import boilerplate.rendering.*;
+import boilerplate.rendering.buffers.*;
 import boilerplate.rendering.builders.BufferBuilder3f;
 import boilerplate.rendering.builders.Shape3d;
 import boilerplate.rendering.builders.ShapeMode;
@@ -13,7 +14,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.awt.*;
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -92,8 +92,7 @@ public class Example3d extends GameBase {
 
         Matrix4f projection = new Matrix4f().identity();
         projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 50);
-        vub.bindUniformBlock(sh, "ViewBlock");
-        vub.bindUniformBlock(shOutline, "ViewBlock");
+        vub.bindUniformBlock("ViewBlock", sh, shOutline);
         vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
         vub.bufferSubData(0, MathUtils.matrixToBuff(projection));
 

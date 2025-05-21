@@ -1,6 +1,8 @@
 package boilerplate.rendering.text;
 
 import boilerplate.common.BoilerplateConstants;
+import boilerplate.rendering.buffers.VertexArray;
+import boilerplate.rendering.buffers.VertexBuffer;
 import boilerplate.rendering.builders.BufferBuilder2f;
 import boilerplate.rendering.builders.Shape2d;
 import boilerplate.rendering.*;
