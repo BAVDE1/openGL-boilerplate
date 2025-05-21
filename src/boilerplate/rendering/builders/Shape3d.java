@@ -72,18 +72,18 @@ public class Shape3d {
                 new Vector3f(-w, -h, -d)
         );
         p.elementIndex = new int[]{
-                0, 1, 2,  // front
-                0, 2, 3,
-                4, 5, 1,  // top
-                4, 1, 0,
-                4, 0, 3,  // left
-                4, 3, 7,
-                1, 5, 6,  // right
-                1, 6, 2,
-                3, 2, 6,  // bottom
-                3, 6, 7,
-                6, 5, 4,  // back
-                6, 4, 7
+                0, 2, 1,  // front
+                0, 3, 2,
+                4, 1, 5,  // top
+                4, 0, 1,
+                4, 3, 0,  // left
+                4, 7, 3,
+                1, 6, 5,  // right
+                1, 2, 6,
+                3, 6, 2,  // bottom
+                3, 7, 6,
+                6, 4, 5,  // back
+                6, 7, 4
         };
         p.pos = center;
         p.elementVertCount = 36;
@@ -109,14 +109,14 @@ public class Shape3d {
                 new Vector3f(0, height, -d)
         );
         p.elementIndex = new int[]{
-                0, 1, 2,  // front
-                1, 4, 2,  // hypotenuse
-                4, 5, 2,
-                2, 5, 3,  // opposite
-                2, 3, 0,
-                0, 3, 1,  // adjacent
-                3, 4, 1,
-                3, 5, 4  // back
+                0, 2, 1,  // front
+                1, 2, 4,  // hypotenuse
+                4, 2, 5,
+                2, 3, 5,  // opposite
+                2, 0, 3,
+                0, 1, 3,  // adjacent
+                3, 1, 4,
+                3, 4, 5  // back
         };
         p.pos = baseCenter;
         p.elementVertCount = 24;

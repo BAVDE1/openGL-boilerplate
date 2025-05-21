@@ -29,5 +29,4 @@ out vec4 colour;
 
 void main() {
     colour = texture(theTexture, v_texPos);
-    colour.a = .4;
 }

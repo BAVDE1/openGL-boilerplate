@@ -56,7 +56,7 @@ public class Renderer {
     public static void enableFaceCullingDefault() {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-        glFrontFace(GL_CW);
+        glFrontFace(GL_CCW);  // note: winding order is calculated after vertex shader
     }
 
     /** logically behaving transparency */
