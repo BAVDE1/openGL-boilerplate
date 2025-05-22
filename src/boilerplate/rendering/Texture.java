@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +43,7 @@ public class Texture {
      * for debugging, if you wanted to write the texture to file to inspect it
      */
     public static File outputFile = new File("image.png");
-    public int TEXTURE_TYPE = GL_UNSIGNED_BYTE;
+    public int textureType = GL_UNSIGNED_BYTE;
 
     private Integer texId;
     public Dimension size;
@@ -118,7 +117,7 @@ public class Texture {
      * format: format of supplied image
      */
     public void createTexture(int storedFormat, int givenImgFormat, ByteBuffer buffer) {
-        glTexImage2D(GL_TEXTURE_2D, 0, storedFormat, size.width, size.height, 0, givenImgFormat, TEXTURE_TYPE, buffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, storedFormat, size.width, size.height, 0, givenImgFormat, textureType, buffer);
     }
 
     public int getId() {
