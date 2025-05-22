@@ -9,15 +9,12 @@ import boilerplate.rendering.buffers.*;
 import boilerplate.rendering.builders.*;
 import boilerplate.utility.*;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
 public class Example3d extends GameBase {
@@ -57,7 +54,7 @@ public class Example3d extends GameBase {
         Renderer.enableDepthTest();
         Renderer.enableStencilTest();
         Renderer.setStencilOperation(GL_KEEP, GL_KEEP, GL_REPLACE);
-        Renderer.enableFaceCullingDefault();
+        Renderer.useDefaultFaceCulling();
         glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
 
         bindEvents();
@@ -151,22 +148,22 @@ public class Example3d extends GameBase {
         // --- FIRST PASS ---
         fb.bind();
         glStencilFunc(GL_ALWAYS, 1, 0xFF);  // write 1 to all fragments that pass
-        glStencilMask(0xFF);  // enable writing
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
+        Renderer.enableStencilWriting();
+        Renderer.clearCDS();
+        Renderer.enableDepthTest();
 
         walterTexture.bind();
         sh.bind();
         drawObjects(model1, model2, sh);
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // only draw if fragment in stencil is NOT equal to 1
-        glStencilMask(0x00);  // disable writing
+        Renderer.disableStencilWriting();
         drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
 
         // --- SECOND PASS ---
         FrameBuffer.unbind();
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
+        Renderer.clearC();
+        Renderer.disableDepthTest();
 
         finalSh.bind();
         fb.colourBuffers.getFirst().bind();

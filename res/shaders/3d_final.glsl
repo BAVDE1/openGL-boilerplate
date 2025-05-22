@@ -21,5 +21,5 @@ in vec2 v_texPos;
 out vec4 colour;
 
 void main() {
-    colour = vec4(1.0 - texture(screenTexture, v_texPos).xyz, 1);
+    colour = vec4(texture(screenTexture, v_texPos).xyz, 1);
 }

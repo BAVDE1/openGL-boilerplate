@@ -92,7 +92,7 @@ public class ExampleIndex extends GameBase {
     }
 
     public void render() {
-        Renderer.clearScreen();
+        Renderer.clearCDS();
         Renderer.drawText(textRenderer);
         Renderer.finish(window);
     }

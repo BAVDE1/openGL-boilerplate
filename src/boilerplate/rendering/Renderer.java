@@ -22,7 +22,7 @@ public class Renderer {
         if (setupDefaults) {
             enableDebugOutput();
             enableTexture2d();
-            applyDefaultBlend();
+            useDefaultBlend();
             setClearColour(0, 0, 0, 0);
         }
 
@@ -41,6 +41,10 @@ public class Renderer {
         glEnable(GL_DEPTH_TEST);
     }
 
+    public static void disableDepthTest() {
+        glDisable(GL_DEPTH_TEST);
+    }
+
     public static void enableStencilTest() {
         glEnable(GL_STENCIL_TEST);
     }
@@ -49,20 +53,31 @@ public class Renderer {
         glStencilOp(stencilFails, stencilPassDepthFails, stencilPassDepthPass);
     }
 
-    public static void enableFaceCulling(int windingOrder, int faceToCull) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(faceToCull);
-        glFrontFace(windingOrder);
-    }
-
-    public static void enableFaceCullingDefault() {
+    public static void useDefaultFaceCulling() {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glFrontFace(GL_CCW);  // note: winding order is calculated after vertex shader
     }
 
+    public static void enableFaceCulling(int face) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(face);
+    }
+
+    public static void setWindingOrder(int order) {
+        glFrontFace(order);
+    }
+
+    public static void enableStencilWriting() {
+        glStencilMask(0xFF);  // bitwise && 1, allows everything
+    }
+
+    public static void disableStencilWriting() {
+        glStencilMask(0x00);  // bitwise && 0, allows nothing
+    }
+
     /** logically behaving transparency */
-    public static void applyDefaultBlend() {
+    public static void useDefaultBlend() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -71,17 +86,12 @@ public class Renderer {
         glClearColor(r, g, b, a);
     }
 
-    public static void clearScreen() {
+    public static void clearCDS() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
-    public static void setWindingOrder(int order) {
-        glFrontFace(order);
-    }
-
-    public static void enableFaceCulling(int face) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(face);
+    public static void clearC() {
+        glClear(GL_COLOR_BUFFER_BIT);
     }
 
     public static void drawArrays(int mode, VertexArray va, int vertexCount) {

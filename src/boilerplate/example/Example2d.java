@@ -278,7 +278,7 @@ public class Example2d extends GameBase {
     }
 
     public void render() {
-        Renderer.clearScreen();
+        Renderer.clearCDS();
 
         // shape examples & textures
         shMain.bind();
