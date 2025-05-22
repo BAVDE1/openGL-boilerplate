@@ -161,7 +161,7 @@ public class Example2d extends GameBase {
 
         vbMain.bufferData(builderMain);
         vaMain.bindBuffer(vbMain);
-        vaMain.pushLayout(VertexArray.Layout.createDefaultLayout());
+        vaMain.pushLayout(VertexArray.Layout.useDefaultLayout());
 
         to1 = new TextRenderer.TextObject(1, "", new Vector2f(5), Color.CYAN, Color.BLACK);
         to2 = new TextRenderer.TextObject(1, "", new Vector2f(5, 50), Color.WHITE, Color.BLACK);

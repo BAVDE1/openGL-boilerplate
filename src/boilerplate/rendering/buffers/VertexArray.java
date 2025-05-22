@@ -37,11 +37,19 @@ public class VertexArray {
     }
 
     public static class Layout {
-        private static int[] defaultLayout = new int[] {2, 1, 3};  // 2x pos, 1x mode, 3x mode vars
+        private static int[] defaultLayout = new int[]{2, 1, 3};  // 2x pos, 1x mode, 3x mode vars
 
         private final ArrayList<Element> elements = new ArrayList<>();
         private int totalItems = 0;
         private int stride = 0;
+
+        public Layout() {
+
+        }
+
+        public Layout(int[] pushFloats) {
+            for (int f : pushFloats) pushFloat(f);
+        }
 
         private void push(int type, int count, boolean normalized) {
             elements.add(new Element(type, count, normalized));
@@ -70,25 +78,31 @@ public class VertexArray {
             return defaultLayout;
         }
 
-        /** Push the default vertex layout: 2 pos, 2 texCoords, 1 slot */
+        /**
+         * Push the default vertex layout: 2 pos, 2 texCoords, 1 slot
+         */
         public void setupDefaultLayout() {
             for (int f : defaultLayout) {
                 pushFloat(f);
             }
         }
 
-        public static Layout createDefaultLayout() {
+        public static Layout useDefaultLayout() {
             Layout l = new Layout();
             l.setupDefaultLayout();
             return l;
         }
 
-        /** returns the additional verts to add for the default layout */
+        /**
+         * returns the additional verts to add for the default layout
+         */
         public static int getDefaultLayoutAdditionalVerts() {
             return getDefaultLayoutTotalFloatCount() - defaultLayout[0];
         }
 
-        /** returns the number of float in 1 vertex from the default layout */
+        /**
+         * returns the number of float in 1 vertex from the default layout
+         */
         public static int getDefaultLayoutTotalFloatCount() {
             return Arrays.stream(defaultLayout).sum();
         }
@@ -98,8 +112,12 @@ public class VertexArray {
     public int attribCount = 0;
     boolean bufferBound = false;
 
-    public VertexArray() {}
-    public VertexArray(boolean genId) {if (genId) genId();}
+    public VertexArray() {
+    }
+
+    public VertexArray(boolean genId) {
+        if (genId) genId();
+    }
 
     public void genId() {
         if (arrayId != null) {
@@ -121,24 +139,28 @@ public class VertexArray {
         glBindVertexArray(0);
     }
 
-    public void bindBuffer(VertexArrayBuffer vb) {
+    public void bindBuffer(VertexBuffer... buffers) {
         bufferBound = true;
         bind();
-        vb.bind();
+        for (VertexBuffer vb : buffers) vb.bind();
     }
 
-    public void bindBuffers(VertexArrayBuffer vb, VertexElementBuffer veb) {
-        bufferBound = true;
-        bind();
-        vb.bind();
-        veb.bind();
+    public void fastSetup(int[] layoutFloats, VertexBuffer... buffers) {
+        fastSetup(new Layout(layoutFloats), buffers);
+    }
+
+    public void fastSetup(Layout layout, VertexBuffer... buffers) {
+        bindBuffer(buffers);
+        pushLayout(layout);
     }
 
     public void pushLayout(Layout layout) {
         pushLayout(layout, 0);
     }
 
-    /** Pushing multiple layouts adds onto last layout that was bound */
+    /**
+     * Pushing multiple layouts adds onto last layout that was bound
+     */
     public void pushLayout(Layout layout, int divisor) {
         if (!bufferBound) Logging.warn("Bind buffers before pushing the layout pls");
         bind();

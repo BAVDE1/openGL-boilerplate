@@ -105,14 +105,8 @@ public class Example3d extends GameBase {
         vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
         vub.bufferSubData(0, MathUtils.matrixToBuff(projection));
 
-        VertexArray.Layout l = new VertexArray.Layout();
-        l.pushFloat(3);
-        l.pushFloat(2);
-        va.bindBuffers(vb, veb);
-        va.pushLayout(l);
-
-        BufferBuilder3f bb = new BufferBuilder3f();
-        bb.setAdditionalVertFloats(2);
+        va.fastSetup(new int[] {3, 2}, vb, veb);
+        BufferBuilder3f bb = new BufferBuilder3f(true, 2);
 
         Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 1);
         poly.mode = new ShapeMode.Unpack(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1});
@@ -130,11 +124,7 @@ public class Example3d extends GameBase {
         finalVa.genId();
         finalVb.genId();
 
-        VertexArray.Layout fl = new VertexArray.Layout();
-        fl.pushFloat(2);
-        fl.pushFloat(2);
-        finalVa.bindBuffer(finalVb);
-        finalVa.pushLayout(fl);
+        finalVa.fastSetup(new int[] {2, 2}, finalVb);
         finalVb.bufferData(new float[] {
                 1, 1, 1, 1,
                 -1, 1, 0, 1,
