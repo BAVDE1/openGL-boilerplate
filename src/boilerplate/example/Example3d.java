@@ -6,17 +6,18 @@ import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import boilerplate.rendering.*;
 import boilerplate.rendering.buffers.*;
-import boilerplate.rendering.builders.BufferBuilder3f;
-import boilerplate.rendering.builders.Shape3d;
-import boilerplate.rendering.builders.ShapeMode;
+import boilerplate.rendering.builders.*;
 import boilerplate.utility.*;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
 public class Example3d extends GameBase {
@@ -27,12 +28,19 @@ public class Example3d extends GameBase {
 
     Camera3d camera = new Camera3d(Camera3d.MODE_FLY, new Vector3f(0, 0, 3));
 
+    ShaderProgram finalSh = new ShaderProgram();
+    VertexArray finalVa = new VertexArray();
+    VertexArrayBuffer finalVb = new VertexArrayBuffer();
+
     ShaderProgram sh = new ShaderProgram();
     ShaderProgram shOutline = new ShaderProgram();
     VertexArray va = new VertexArray();
-    VertexBuffer vb = new VertexBuffer();
+    VertexArrayBuffer vb = new VertexArrayBuffer();
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
     VertexUniformBuffer vub = new VertexUniformBuffer();
+    Texture walterTexture;
+
+    FrameBuffer fb = new FrameBuffer();
 
     @Override
     public void start() {
@@ -82,6 +90,7 @@ public class Example3d extends GameBase {
     }
 
     public void setupBuffers() {
+        walterTexture = new Texture("textures/breaking.png");
         va.genId();
         vb.genId();
         veb.genId();
@@ -111,17 +120,32 @@ public class Example3d extends GameBase {
         vb.bufferData(bb);
         veb.bufferData(poly.elementIndex);
 
-        new Texture("textures/breaking.png").bind();
+        fb.genId();
+        fb.attachColourBuffer(FrameBuffer.setupDefaultColourBuffer(SCREEN_SIZE));
+        fb.attachRenderBuffer(FrameBuffer.setupDefaultRenderBuffer(SCREEN_SIZE));
+        fb.checkCompletionOrError();
+        FrameBuffer.unbind();
+
+        finalSh.autoInitializeShadersMulti("shaders/3d_final.glsl");
+        finalVa.genId();
+        finalVb.genId();
+
+        VertexArray.Layout fl = new VertexArray.Layout();
+        fl.pushFloat(2);
+        fl.pushFloat(2);
+        finalVa.bindBuffer(finalVb);
+        finalVa.pushLayout(fl);
+        finalVb.bufferData(new float[] {
+                1, 1, 1, 1,
+                -1, 1, 0, 1,
+                1, -1, 1, 0,
+                -1, -1, 0, 0
+        });
     }
 
     public void render() {
         float time = (float) glfwGetTime();
 
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);  // write 1 to all fragments that pass
-        glStencilMask(0xFF);  // enable writing
-        Renderer.clearScreen();
-
-        // update camera
         if (camera.hasChanged) {
             camera.hasChanged = false;
             vub.bufferSubData(MathUtils.MATRIX4F_BYTES_SIZE, MathUtils.matrixToBuff(camera.generateViewMatrix()));
@@ -134,11 +158,29 @@ public class Example3d extends GameBase {
         model2.translate(0, 0, 1.2f);
         model2.scale(.8f, .5f, .5f);
 
+        // --- FIRST PASS ---
+        fb.bind();
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);  // write 1 to all fragments that pass
+        glStencilMask(0xFF);  // enable writing
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+
+        walterTexture.bind();
+        sh.bind();
         drawObjects(model1, model2, sh);
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // only draw if fragment in stencil is NOT equal to 1
         glStencilMask(0x00);  // disable writing
         drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
+
+        // --- SECOND PASS ---
+        FrameBuffer.unbind();
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDisable(GL_DEPTH_TEST);
+
+        finalSh.bind();
+        fb.colourBuffers.getFirst().bind();
+        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
 
         Renderer.finish(window);
     }

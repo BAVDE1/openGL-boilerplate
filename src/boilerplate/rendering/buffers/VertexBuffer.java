@@ -1,7 +1,6 @@
 package boilerplate.rendering.buffers;
 
 import boilerplate.rendering.builders.BufferBuilder;
-import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL45;
 import boilerplate.utility.Logging;
 
@@ -10,8 +9,8 @@ import java.nio.FloatBuffer;
 import static org.lwjgl.opengl.GL45.*;
 
 public class VertexBuffer {
-    protected int bufferType = GL45.GL_ARRAY_BUFFER;
-    protected int drawMethod = GL15.GL_DYNAMIC_DRAW;
+    protected Integer bufferType;
+    protected Integer usage = GL45.GL_DYNAMIC_DRAW;
     protected Integer bufferId;
 
     public VertexBuffer() {
@@ -25,31 +24,31 @@ public class VertexBuffer {
         this.bufferType = bufferType;
     }
 
-    public void setDrawMethod(int newDrawMethod) {
-        this.drawMethod = newDrawMethod;
+    public void setUsage(int newUsage) {
+        this.usage = newUsage;
     }
 
     public void bind() {
         glBindBuffer(getBufferType(), bufferId);
     }
 
-    public void unbind() {
-        glBindBuffer(getBufferType(), 0);
+    public static void unbindTYpe(int bufferType) {
+        glBindBuffer(bufferType, 0);
     }
 
     public void bufferData(float[] data) {
         bind();
-        GL45.glBufferData(bufferType, data, drawMethod);
+        GL45.glBufferData(bufferType, data, usage);
     }
 
     public void bufferData(FloatBuffer data) {
         bind();
-        GL45.glBufferData(bufferType, data, drawMethod);
+        GL45.glBufferData(bufferType, data, usage);
     }
 
     public void bufferData(int[] data) {
         bind();
-        GL45.glBufferData(bufferType, data, drawMethod);
+        GL45.glBufferData(bufferType, data, usage);
     }
 
     public void bufferData(BufferBuilder bb) {
@@ -58,7 +57,7 @@ public class VertexBuffer {
 
     public void bufferSize(int bytesSize) {
         bind();
-        GL45.glBufferData(bufferType, bytesSize, drawMethod);
+        GL45.glBufferData(bufferType, bytesSize, usage);
     }
 
     public void bufferSubData(int bytesOffset, float[] data) {
@@ -91,7 +90,7 @@ public class VertexBuffer {
         return bufferType;
     }
 
-    public int getDrawMethod() {
-        return drawMethod;
+    public int getUsage() {
+        return usage;
     }
 }

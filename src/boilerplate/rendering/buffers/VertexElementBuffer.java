@@ -27,6 +27,10 @@ public class VertexElementBuffer extends VertexBuffer {
         return elementType;
     }
 
+    public static void unbind() {
+        unbindTYpe(GL45.GL_ELEMENT_ARRAY_BUFFER);
+    }
+
     @Override
     public void setBufferType(int bufferType) {
         Logging.danger("Cannot set buffer type on this object. Use a VertexBuffer instead.");

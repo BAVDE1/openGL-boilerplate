@@ -96,6 +96,7 @@ public class VertexArray {
 
     private Integer arrayId;
     public int attribCount = 0;
+    boolean bufferBound = false;
 
     public VertexArray() {}
     public VertexArray(boolean genId) {if (genId) genId();}
@@ -116,16 +117,18 @@ public class VertexArray {
         glBindVertexArray(arrayId);
     }
 
-    public void unbind() {
+    public static void unbind() {
         glBindVertexArray(0);
     }
 
-    public void bindBuffer(VertexBuffer vb) {
+    public void bindBuffer(VertexArrayBuffer vb) {
+        bufferBound = true;
         bind();
         vb.bind();
     }
 
-    public void bindBuffers(VertexBuffer vb, VertexElementBuffer veb) {
+    public void bindBuffers(VertexArrayBuffer vb, VertexElementBuffer veb) {
+        bufferBound = true;
         bind();
         vb.bind();
         veb.bind();
@@ -137,6 +140,7 @@ public class VertexArray {
 
     /** Pushing multiple layouts adds onto last layout that was bound */
     public void pushLayout(Layout layout, int divisor) {
+        if (!bufferBound) Logging.warn("Bind buffers before pushing the layout pls");
         bind();
 
         int offset = 0;

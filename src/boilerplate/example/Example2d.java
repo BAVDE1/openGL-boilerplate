@@ -7,7 +7,7 @@ import boilerplate.common.Window;
 import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.Texture;
 import boilerplate.rendering.buffers.VertexArray;
-import boilerplate.rendering.buffers.VertexBuffer;
+import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.builders.BufferBuilder2f;
 import boilerplate.rendering.builders.ShapeMode;
 import org.joml.Vector2f;
@@ -37,13 +37,13 @@ public class Example2d extends GameBase {
     // main buffers
     ShaderProgram shMain = new ShaderProgram();
     VertexArray vaMain = new VertexArray();
-    VertexBuffer vbMain = new VertexBuffer();
+    VertexArrayBuffer vbMain = new VertexArrayBuffer();
     BufferBuilder2f builderMain = new BufferBuilder2f();
 
     // circle buffers
     ShaderProgram shCircles = new ShaderProgram();
     VertexArray vaCircles = new VertexArray();
-    VertexBuffer vbCircles = new VertexBuffer();
+    VertexArrayBuffer vbCircles = new VertexArrayBuffer();
     BufferBuilder2f builderCircles = new BufferBuilder2f();
 
     // text

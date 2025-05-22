@@ -46,7 +46,7 @@ public class Texture {
     public int textureType = GL_UNSIGNED_BYTE;
 
     private Integer texId;
-    public Dimension size;
+    public Dimension size = new Dimension();
 
     public Texture() {
     }

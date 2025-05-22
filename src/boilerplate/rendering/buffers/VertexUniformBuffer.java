@@ -46,6 +46,10 @@ public class VertexUniformBuffer extends VertexBuffer {
         GL45.glBindBufferBase(bufferType, blockBinding, bufferId);
     }
 
+    public static void unbind() {
+        unbindTYpe(GL45.GL_UNIFORM_BUFFER);
+    }
+
     @Override
     public void setBufferType(int bufferType) {
         Logging.danger("Cannot set buffer type on this object. Use a VertexBuffer instead.");

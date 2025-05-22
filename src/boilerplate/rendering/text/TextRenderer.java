@@ -2,7 +2,7 @@ package boilerplate.rendering.text;
 
 import boilerplate.common.BoilerplateConstants;
 import boilerplate.rendering.buffers.VertexArray;
-import boilerplate.rendering.buffers.VertexBuffer;
+import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.builders.BufferBuilder2f;
 import boilerplate.rendering.builders.Shape2d;
 import boilerplate.rendering.*;
@@ -216,7 +216,7 @@ public class TextRenderer {
     private final ArrayList<TextObject> textObjects = new ArrayList<>();
 
     private VertexArray va;
-    private VertexBuffer vb;
+    private VertexArrayBuffer vb;
     private BufferBuilder2f sb;
 
     private boolean hasBeenModified = false;
@@ -224,7 +224,7 @@ public class TextRenderer {
     /** after GL context created */
     public void setupBufferObjects() {
         va = new VertexArray(true);
-        vb = new VertexBuffer(true);
+        vb = new VertexArrayBuffer(true);
         sb = new BufferBuilder2f(true, FontManager.textLayoutAdditionalVerts());
 
         va.bindBuffer(vb);
