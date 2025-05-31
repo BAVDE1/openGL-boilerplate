@@ -1,7 +1,9 @@
 package boilerplate.rendering;
 
 import boilerplate.common.Window;
+import boilerplate.rendering.buffers.VertexUniformBuffer;
 import boilerplate.utility.Logging;
+import boilerplate.utility.MathUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -32,6 +34,10 @@ public class Camera3d {
 
     protected int mode;
     public boolean hasChangedView = true;
+    public boolean hasChangedPerspective = true;
+
+    protected VertexUniformBuffer vub = new VertexUniformBuffer();
+    public String uniformBlockName = "CameraView";
 
     // perspective
     public Dimension aspectSize;
@@ -93,6 +99,29 @@ public class Camera3d {
         this(aspectSize, mode);
         pos = new Vector3f(initialPos);
         calculateDirections();
+    }
+
+    public void setupUniformBuffer(ShaderProgram... shadersToBind) {
+        vub.genId();
+        vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
+        bindShaderToUniformBlock(shadersToBind);
+    }
+
+    public void bindShaderToUniformBlock(ShaderProgram... shadersToBind) {
+        vub.bindUniformBlock(uniformBlockName, shadersToBind);
+    }
+
+    /** Updates the perspective and the view if they have changed */
+    public void updateUniformBlock() {
+        if (hasChangedPerspective) {
+            hasChangedPerspective = false;
+            vub.bufferSubData(0, MathUtils.matrixToBuff(generatePerspectiveMatrix()));
+        }
+
+        if (hasChangedView) {
+            hasChangedView = false;
+            vub.bufferSubData(MathUtils.MATRIX4F_BYTES_SIZE, MathUtils.matrixToBuff(generateViewMatrix()));
+        }
     }
 
     public void processKeyInputs(Window window, double dt) {
