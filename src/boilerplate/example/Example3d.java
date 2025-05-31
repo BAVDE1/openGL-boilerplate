@@ -34,7 +34,6 @@ public class Example3d extends GameBase {
     VertexArray va = new VertexArray();
     VertexArrayBuffer vb = new VertexArrayBuffer();
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
-//    VertexUniformBuffer vub = new VertexUniformBuffer();
     Texture walterTexture;
 
     FrameBuffer fb = new FrameBuffer();
@@ -91,15 +90,11 @@ public class Example3d extends GameBase {
         va.genId();
         vb.genId();
         veb.genId();
-//        vub.genId();
 
         sh.autoInitializeShadersMulti("shaders/3d.glsl");
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
 
         camera.setupUniformBuffer(sh, shOutline);
-//        vub.bindUniformBlock("ViewBlock", sh, shOutline);
-//        vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
-//        vub.bufferSubData(0, MathUtils.matrixToBuff(camera.generatePerspectiveMatrix()));
 
         va.fastSetup(new int[] {3, 2}, vb, veb);
         BufferBuilder3f bb = new BufferBuilder3f(true, 2);
@@ -131,11 +126,6 @@ public class Example3d extends GameBase {
 
     public void render() {
         float time = (float) glfwGetTime();
-
-//        if (camera.hasChangedView) {
-//            camera.hasChangedView = false;
-//            vub.bufferSubData(MathUtils.MATRIX4F_BYTES_SIZE, MathUtils.matrixToBuff(camera.generateViewMatrix()));
-//        }
 
         Matrix4f model1 = new Matrix4f().identity();
         Matrix4f model2 = new Matrix4f().identity();
