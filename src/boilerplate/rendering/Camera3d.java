@@ -40,7 +40,7 @@ public class Camera3d {
     public String uniformBlockName = "CameraView";
 
     // perspective
-    public Dimension aspectSize;
+    public Dimension captureSize;
     protected float aspect;
     public float fov = 80;
     public float near = .1f;
@@ -90,7 +90,7 @@ public class Camera3d {
     ));
 
     public Camera3d(Dimension aspectSize, int mode) {
-        this.aspectSize = aspectSize;
+        this.captureSize = aspectSize;
         this.mode = mode;
         calculateDirections();
     }
@@ -210,7 +210,7 @@ public class Camera3d {
     }
 
     public Matrix4f generatePerspectiveMatrix() {
-        aspect = (float) aspectSize.width / (float) aspectSize.height;
+        aspect = (float) captureSize.width / (float) captureSize.height;
         return new Matrix4f().identity().perspective((float) Math.toRadians(fov), aspect, near, far);
     }
 

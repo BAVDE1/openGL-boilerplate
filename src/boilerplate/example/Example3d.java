@@ -23,7 +23,7 @@ public class Example3d extends GameBase {
 
     boolean renderWireFrame = false;
 
-    Camera3d camera = new Camera3d(SCREEN_SIZE, Camera3d.MODE_FLY, new Vector3f(0, 0, 3));
+    Camera3d camera = new Camera3d(new Dimension(1, 1), Camera3d.MODE_TARGET, new Vector3f(0, 0, 3));
 
     ShaderProgram finalSh = new ShaderProgram();
     VertexArray finalVa = new VertexArray();
@@ -105,12 +105,6 @@ public class Example3d extends GameBase {
         vb.bufferData(bb);
         veb.bufferData(poly.elementIndex);
 
-        fb.genId();
-        fb.attachColourBuffer(FrameBuffer.setupDefaultColourBuffer(SCREEN_SIZE));
-        fb.attachRenderBuffer(FrameBuffer.setupDefaultRenderBuffer(SCREEN_SIZE));
-        fb.checkCompletionOrError();
-        FrameBuffer.unbind();
-
         finalSh.autoInitializeShadersMulti("shaders/3d_final.glsl");
         finalVa.genId();
         finalVb.genId();
@@ -122,6 +116,12 @@ public class Example3d extends GameBase {
                 1, -1, 1, 0,
                 -1, -1, 0, 0
         });
+
+        fb.genId();
+        fb.attachColourBuffer(FrameBuffer.setupDefaultColourBuffer(SCREEN_SIZE));
+        fb.attachRenderBuffer(FrameBuffer.setupDefaultRenderBuffer(SCREEN_SIZE));
+        fb.checkCompletionOrError();
+        FrameBuffer.unbind();
     }
 
     public void render() {
@@ -134,7 +134,7 @@ public class Example3d extends GameBase {
         model2.translate(0, 0, 1.2f);
         model2.scale(.8f, .5f, .5f);
 
-        // --- FIRST PASS ---
+        // --- 3D SPACE --- //
         fb.bind();
         Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
         Renderer.enableStencilWriting();
@@ -149,7 +149,7 @@ public class Example3d extends GameBase {
         Renderer.disableStencilWriting();
         drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
 
-        // --- SECOND PASS ---
+        // --- POST PROCESSING --- //
         FrameBuffer.unbind();
         Renderer.clearC();
         Renderer.disableDepthTest();
