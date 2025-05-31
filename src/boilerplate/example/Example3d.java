@@ -23,7 +23,7 @@ public class Example3d extends GameBase {
 
     boolean renderWireFrame = false;
 
-    Camera3d camera = new Camera3d(Camera3d.MODE_FLY, new Vector3f(0, 0, 3));
+    Camera3d camera = new Camera3d(SCREEN_SIZE, Camera3d.MODE_FLY, new Vector3f(0, 0, 3));
 
     ShaderProgram finalSh = new ShaderProgram();
     VertexArray finalVa = new VertexArray();
@@ -96,11 +96,9 @@ public class Example3d extends GameBase {
         sh.autoInitializeShadersMulti("shaders/3d.glsl");
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
 
-        Matrix4f projection = new Matrix4f().identity();
-        projection.perspective((float) Math.toRadians(80), (float) SCREEN_SIZE.width / (float) SCREEN_SIZE.height, .1f, 50);
         vub.bindUniformBlock("ViewBlock", sh, shOutline);
         vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
-        vub.bufferSubData(0, MathUtils.matrixToBuff(projection));
+        vub.bufferSubData(0, MathUtils.matrixToBuff(camera.generatePerspectiveMatrix()));
 
         va.fastSetup(new int[] {3, 2}, vb, veb);
         BufferBuilder3f bb = new BufferBuilder3f(true, 2);
@@ -133,8 +131,8 @@ public class Example3d extends GameBase {
     public void render() {
         float time = (float) glfwGetTime();
 
-        if (camera.hasChanged) {
-            camera.hasChanged = false;
+        if (camera.hasChangedView) {
+            camera.hasChangedView = false;
             vub.bufferSubData(MathUtils.MATRIX4F_BYTES_SIZE, MathUtils.matrixToBuff(camera.generateViewMatrix()));
         }
 
@@ -147,7 +145,7 @@ public class Example3d extends GameBase {
 
         // --- FIRST PASS ---
         fb.bind();
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);  // write 1 to all fragments that pass
+        Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
         Renderer.enableStencilWriting();
         Renderer.clearCDS();
         Renderer.enableDepthTest();
@@ -156,7 +154,7 @@ public class Example3d extends GameBase {
         sh.bind();
         drawObjects(model1, model2, sh);
 
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // only draw if fragment in stencil is NOT equal to 1
+        Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
         Renderer.disableStencilWriting();
         drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
 

@@ -53,6 +53,10 @@ public class Renderer {
         glStencilOp(stencilFails, stencilPassDepthFails, stencilPassDepthPass);
     }
 
+    public static void setStencilFunc(int function, int reference, boolean maskAllowAll) {
+        glStencilFunc(function, reference, maskAllowAll ? 0xFF : 0x00);
+    }
+
     public static void useDefaultFaceCulling() {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);

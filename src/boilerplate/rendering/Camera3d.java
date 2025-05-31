@@ -3,14 +3,10 @@ package boilerplate.rendering;
 import boilerplate.common.Window;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL;
 
 import java.awt.*;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,8 +31,16 @@ public class Camera3d {
     public static final int MODE_TARGET = 1;
 
     protected int mode;
-    public boolean hasChanged = true;
+    public boolean hasChangedView = true;
 
+    // perspective
+    public Dimension aspectSize;
+    protected float aspect;
+    public float fov = 80;
+    public float near = .1f;
+    public float far = 100;
+
+    // view
     public Vector3f pos = new Vector3f();
     public Vector3f target = new Vector3f();
     public float targetRadius = 3;
@@ -50,6 +54,7 @@ public class Camera3d {
     protected Vector3f right = new Vector3f();
     protected Vector3f up = new Vector3f();
 
+    // controls
     public float rotSpeed = 70;
     public float moveSpeed = 3;
     public float mouseSensitivity = .1f;
@@ -78,13 +83,14 @@ public class Camera3d {
             new Action(GLFW_KEY_O, speed -> roll -= speed)
     ));
 
-    public Camera3d(int mode) {
+    public Camera3d(Dimension aspectSize, int mode) {
+        this.aspectSize = aspectSize;
         this.mode = mode;
         calculateDirections();
     }
 
-    public Camera3d(int mode, Vector3f initialPos) {
-        this(mode);
+    public Camera3d(Dimension aspectSize, int mode, Vector3f initialPos) {
+        this(aspectSize, mode);
         pos = new Vector3f(initialPos);
         calculateDirections();
     }
@@ -99,7 +105,7 @@ public class Camera3d {
             if (window.isKeyPressed(action.key)) {
                 action.callback.call(rSpeed);
                 rotUpdated = true;
-                hasChanged = true;
+                hasChangedView = true;
             }
         }
 
@@ -111,7 +117,7 @@ public class Camera3d {
             for (Action action : keyMovementActions) {
                 if (window.isKeyPressed(action.key)) {
                     action.callback.call(mSpeed);
-                    hasChanged = true;
+                    hasChangedView = true;
                 }
             }
         }
@@ -138,13 +144,13 @@ public class Camera3d {
             pitch -= delta.y * mouseSensitivity;
             yaw += delta.x * mouseSensitivity;
             calculateDirections();
-            hasChanged = true;
+            hasChangedView = true;
         }
     }
 
     public void processMouseScroll(Window window, float xDelta, float yDelta) {
         if (yDelta != 0) {
-            hasChanged = true;
+            hasChangedView = true;
             if (mode == MODE_FLY) {
                 pos.add(forward.mul(yDelta * scrollAmount));
                 calculateDirections();
@@ -174,6 +180,11 @@ public class Camera3d {
         };
     }
 
+    public Matrix4f generatePerspectiveMatrix() {
+        aspect = (float) aspectSize.width / (float) aspectSize.height;
+        return new Matrix4f().identity().perspective((float) Math.toRadians(fov), aspect, near, far);
+    }
+
     private void calculateDirections() {
         clampPitch();
         float cPitch = (float) Math.cos(Math.toRadians(pitch));
@@ -193,7 +204,7 @@ public class Camera3d {
     public void setMode(int newMode) {
         if (mode == newMode) return;
         mode = newMode;
-        hasChanged = true;
+        hasChangedView = true;
     }
 
     public int getMode() {
