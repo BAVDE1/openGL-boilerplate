@@ -53,6 +53,8 @@ public class FrameBuffer {
     private static int boundFrameBuffer = 0;
     protected Integer bufferId;
 
+    public Dimension bufferSize;
+
     public ArrayList<Texture> colourBuffers = new ArrayList<>();
     public Texture depthBuffer;
     public Texture stencilBuffer;
@@ -65,6 +67,15 @@ public class FrameBuffer {
 
     public FrameBuffer(boolean genId) {
         if (genId) genId();
+    }
+
+    public FrameBuffer(Dimension bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
+    public FrameBuffer(boolean genId, Dimension bufferSize) {
+        this(genId);
+        this.bufferSize = bufferSize;
     }
 
     public void attachColourBuffer(Texture colourBuff) {
@@ -97,18 +108,34 @@ public class FrameBuffer {
         GL45.glFramebufferRenderbuffer(GL45.GL_FRAMEBUFFER, renderBuff.attachment, GL45.GL_RENDERBUFFER, renderBuff.getId());
     }
 
+    public Texture setupDefaultColourBuffer() {
+        return setupDefaultColourBuffer(bufferSize);
+    }
+
     public static Texture setupDefaultColourBuffer(Dimension size) {
         Texture t = setupTextureBuffer(size, defaultColourBuffFormat);
         t.useDefaultInterpolation();
         return t;
     }
 
+    public Texture setupDefaultDepthBuffer() {
+        return setupDefaultDepthBuffer(bufferSize);
+    }
+
     public static Texture setupDefaultDepthBuffer(Dimension size) {
         return setupTextureBuffer(size, GL45.GL_DEPTH_COMPONENT);
     }
 
+    public Texture setupDefaultStencilBuffer() {
+        return setupDefaultStencilBuffer(bufferSize);
+    }
+
     public static Texture setupDefaultStencilBuffer(Dimension size) {
         return setupTextureBuffer(size, GL45.GL_STENCIL_INDEX);
+    }
+
+    public Texture setupDefaultDepthStencilBuffer() {
+        return setupDefaultDepthStencilBuffer(bufferSize);
     }
 
     public static Texture setupDefaultDepthStencilBuffer(Dimension size) {
@@ -125,6 +152,10 @@ public class FrameBuffer {
         buff.bind();
         buff.createTexture(storedFormat, givenFormat, null);
         return buff;
+    }
+
+    public RenderBuffer setupDefaultRenderBuffer() {
+        return setupDefaultRenderBuffer(bufferSize);
     }
 
     public static RenderBuffer setupDefaultRenderBuffer(Dimension size) {

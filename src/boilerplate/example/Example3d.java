@@ -36,7 +36,7 @@ public class Example3d extends GameBase {
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
     Texture walterTexture;
 
-    FrameBuffer fb = new FrameBuffer();
+    FrameBuffer fb = new FrameBuffer(new Dimension(64, 64));
 
     @Override
     public void start() {
@@ -118,8 +118,8 @@ public class Example3d extends GameBase {
         });
 
         fb.genId();
-        fb.attachColourBuffer(FrameBuffer.setupDefaultColourBuffer(SCREEN_SIZE));
-        fb.attachRenderBuffer(FrameBuffer.setupDefaultRenderBuffer(SCREEN_SIZE));
+        fb.attachColourBuffer(fb.setupDefaultColourBuffer());
+        fb.attachRenderBuffer(fb.setupDefaultRenderBuffer());
         fb.checkCompletionOrError();
         FrameBuffer.unbind();
     }
@@ -136,6 +136,7 @@ public class Example3d extends GameBase {
 
         // --- 3D SPACE --- //
         fb.bind();
+        glViewport(0, 0, 64, 64);
         Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
         Renderer.enableStencilWriting();
         Renderer.clearCDS();
@@ -154,6 +155,7 @@ public class Example3d extends GameBase {
         Renderer.clearC();
         Renderer.disableDepthTest();
 
+        glViewport(0, 0, 800, 800);
         finalSh.bind();
         fb.colourBuffers.getFirst().bind();
         Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
