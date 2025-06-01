@@ -15,7 +15,9 @@ import static org.lwjgl.opengl.GL45.*;
  * Automatically binds and draws VertexArrays & Shaders
  */
 public class Renderer {
-    /** Do before anything GL related */
+    /**
+     * Do before anything GL related
+     */
     public static void setupGLContext(boolean setupDefaults) {
         GL.createCapabilities();
 
@@ -27,6 +29,14 @@ public class Renderer {
         }
 
         Logging.debug("OpenGL capabilities created");
+    }
+
+    public static void setViewportSize(int size) {
+        setViewportSize(size, size);
+    }
+
+    public static void setViewportSize(int width, int height) {
+        glViewport(0, 0, width, height);
     }
 
     public static void enableDebugOutput() {
@@ -80,7 +90,9 @@ public class Renderer {
         glStencilMask(0x00);  // bitwise && 0, allows nothing
     }
 
-    /** logically behaving transparency */
+    /**
+     * logically behaving transparency
+     */
     public static void useDefaultBlend() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

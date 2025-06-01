@@ -53,7 +53,7 @@ public class FrameBuffer {
     private static int boundFrameBuffer = 0;
     protected Integer bufferId;
 
-    public Dimension bufferSize;
+    public Dimension bufferSize = new Dimension(128, 128);
 
     public ArrayList<Texture> colourBuffers = new ArrayList<>();
     public Texture depthBuffer;

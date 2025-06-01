@@ -96,11 +96,11 @@ public class Example3d extends GameBase {
 
         camera.setupUniformBuffer(sh, shOutline);
 
-        va.fastSetup(new int[] {3, 2}, vb, veb);
+        va.fastSetup(new int[]{3, 2}, vb, veb);
         BufferBuilder3f bb = new BufferBuilder3f(true, 2);
 
         Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 1);
-        poly.mode = new ShapeMode.Unpack(new float[] {0, 0}, new float[] {1, 0}, new float[] {1, 1}, new float[] {0, 1});
+        poly.mode = new ShapeMode.Unpack(new float[]{0, 0}, new float[]{1, 0}, new float[]{1, 1}, new float[]{0, 1});
         bb.pushPolygon(poly);
         vb.bufferData(bb);
         veb.bufferData(poly.elementIndex);
@@ -109,8 +109,8 @@ public class Example3d extends GameBase {
         finalVa.genId();
         finalVb.genId();
 
-        finalVa.fastSetup(new int[] {2, 2}, finalVb);
-        finalVb.bufferData(new float[] {
+        finalVa.fastSetup(new int[]{2, 2}, finalVb);
+        finalVb.bufferData(new float[]{
                 1, 1, 1, 1,
                 -1, 1, 0, 1,
                 1, -1, 1, 0,
@@ -136,7 +136,7 @@ public class Example3d extends GameBase {
 
         // --- 3D SPACE --- //
         fb.bind();
-        glViewport(0, 0, 64, 64);
+        Renderer.setViewportSize(64);
         Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
         Renderer.enableStencilWriting();
         Renderer.clearCDS();
@@ -154,8 +154,8 @@ public class Example3d extends GameBase {
         FrameBuffer.unbind();
         Renderer.clearC();
         Renderer.disableDepthTest();
+        Renderer.setViewportSize(800);
 
-        glViewport(0, 0, 800, 800);
         finalSh.bind();
         fb.colourBuffers.getFirst().bind();
         Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
