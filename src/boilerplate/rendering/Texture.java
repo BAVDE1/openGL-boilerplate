@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -51,9 +52,9 @@ public class Texture {
     public Texture() {
     }
 
-    public Texture(Dimension size, boolean genId) {
+    public Texture(Dimension size, boolean generateId) {
         this.size = size;
-        if (genId) genId();
+        if (generateId) genId();
     }
 
     public Texture(String resourcePath) {
@@ -109,7 +110,6 @@ public class Texture {
         createTexture(GL_RGBA, GL_RGBA, buffer);
 
         MemoryUtil.memFree(buffer);  // may want to keep for later though :shrug:
-        Logging.debug("Texture created, texId: %s", texId);
     }
 
     /**

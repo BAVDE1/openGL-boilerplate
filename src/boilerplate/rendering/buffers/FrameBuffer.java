@@ -11,9 +11,9 @@ import java.util.ArrayList;
  * Frame Buffer is a section of the GPUs memory that holds buffers (colour buffer, depth buffer, stencil buffer).
  * <p>
  * A default frame buffer is created by GLFW.
- * Custom Frame Buffers can be used for, say, mirrors or post-processing and the like.
+ * Custom Frame Buffers can be used for post-processing or mirrors and the like.
  * <p>
- * Render buffer object are write only, cannot be read (cannot be sampled), which makes them fast.
+ * Render buffer objects are write only, cannot be read (cannot be sampled), which makes them fast.
  * If you're not sampling the values in your shader, use render buffer attachment, otherwise use a texture attachment.
  */
 public class FrameBuffer {
@@ -65,16 +65,16 @@ public class FrameBuffer {
 
     }
 
-    public FrameBuffer(boolean genId) {
-        if (genId) genId();
+    public FrameBuffer(boolean generateId) {
+        if (generateId) genId();
     }
 
     public FrameBuffer(Dimension bufferSize) {
         this.bufferSize = bufferSize;
     }
 
-    public FrameBuffer(boolean genId, Dimension bufferSize) {
-        this(genId);
+    public FrameBuffer(boolean generateId, Dimension bufferSize) {
+        this(generateId);
         this.bufferSize = bufferSize;
     }
 
@@ -82,30 +82,35 @@ public class FrameBuffer {
         if (boundFrameBuffer != bufferId) bind();
         GL45.glFramebufferTexture2D(GL45.GL_FRAMEBUFFER, GL45.GL_COLOR_ATTACHMENT0 + colourBuffers.size(), GL45.GL_TEXTURE_2D, colourBuff.getId(), 0);
         colourBuffers.add(colourBuff);
+        Logging.debug("Attached colour buffer to frame buffer (id: %s), (texture id: %s, col buff index: %s)", getId(), colourBuff.getId(), colourBuffers.size());
     }
 
     public void attachDepthBuffer(Texture depthBuff) {
         if (boundFrameBuffer != bufferId) bind();
         this.depthBuffer = depthBuff;
         GL45.glFramebufferTexture2D(GL45.GL_FRAMEBUFFER, GL45.GL_DEPTH_ATTACHMENT, GL45.GL_TEXTURE_2D, depthBuff.getId(), 0);
+        Logging.debug("Attached depth buffer to frame buffer (id: %s), (texture id: %s)", getId(), depthBuff.getId());
     }
 
     public void attachStencilBuffer(Texture stencilBuff) {
         if (boundFrameBuffer != bufferId) bind();
         this.stencilBuffer = stencilBuff;
         GL45.glFramebufferTexture2D(GL45.GL_FRAMEBUFFER, GL45.GL_STENCIL_ATTACHMENT, GL45.GL_TEXTURE_2D, stencilBuff.getId(), 0);
+        Logging.debug("Attached stencil buffer to frame buffer (id: %s), (texture id: %s)", getId(), stencilBuff.getId());
     }
 
     public void attachDepthStencilBuffer(Texture depthStencilBuff) {
         if (boundFrameBuffer != bufferId) bind();
         this.depthStencilBuffer = depthStencilBuff;
         GL45.glFramebufferTexture2D(GL45.GL_FRAMEBUFFER, GL45.GL_DEPTH_STENCIL_ATTACHMENT, GL45.GL_TEXTURE_2D, depthStencilBuff.getId(), 0);
+        Logging.debug("Attached depth / stencil buffer to frame buffer (id: %s), (texture id: %s)", getId(), depthStencilBuff.getId());
     }
 
     public void attachRenderBuffer(RenderBuffer renderBuff) {
         if (boundFrameBuffer != bufferId) bind();
         this.renderBuffer = renderBuff;
         GL45.glFramebufferRenderbuffer(GL45.GL_FRAMEBUFFER, renderBuff.attachment, GL45.GL_RENDERBUFFER, renderBuff.getId());
+        Logging.debug("Attached render buffer to frame buffer (id: %s), (texture id: %s)", getId(), renderBuff.getId());
     }
 
     public Texture setupDefaultColourBuffer() {

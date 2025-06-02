@@ -25,9 +25,9 @@ public class VertexUniformBuffer extends VertexBuffer {
         this.bufferType = GL45.GL_UNIFORM_BUFFER;
     }
 
-    public VertexUniformBuffer(boolean genId) {
+    public VertexUniformBuffer(boolean generateId) {
         this();
-        if (genId) genId();
+        if (generateId) genId();
     }
 
     public void bindUniformBlock(String uniformBlock, ShaderProgram... programs) {

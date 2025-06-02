@@ -9,9 +9,9 @@ public class VertexArrayBuffer extends VertexBuffer {
         this.usage = GL45.GL_DYNAMIC_DRAW;
     }
 
-    public VertexArrayBuffer(boolean genId) {
+    public VertexArrayBuffer(boolean generateId) {
         this();
-        if (genId) genId();
+        if (generateId) genId();
     }
 
     public static void unbind() {

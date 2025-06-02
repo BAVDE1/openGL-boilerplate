@@ -115,8 +115,8 @@ public class VertexArray {
     public VertexArray() {
     }
 
-    public VertexArray(boolean genId) {
-        if (genId) genId();
+    public VertexArray(boolean generateId) {
+        if (generateId) genId();
     }
 
     public void genId() {

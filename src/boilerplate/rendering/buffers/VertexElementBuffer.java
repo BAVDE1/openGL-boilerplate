@@ -18,9 +18,9 @@ public class VertexElementBuffer extends VertexBuffer {
         this.elementType = elementType;
     }
 
-    public VertexElementBuffer(int elementType, boolean genId) {
+    public VertexElementBuffer(int elementType, boolean generateId) {
         this(elementType);
-        if (genId) genId();
+        if (generateId) genId();
     }
 
     public int getElementType() {
