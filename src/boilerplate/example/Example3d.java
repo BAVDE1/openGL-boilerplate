@@ -36,7 +36,7 @@ public class Example3d extends GameBase {
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
     Texture walterTexture;
 
-    FrameBuffer fb = new FrameBuffer(new Dimension(64, 64));
+    FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
     @Override
     public void start() {
@@ -136,7 +136,6 @@ public class Example3d extends GameBase {
 
         // --- 3D SPACE --- //
         fb.bind();
-        Renderer.setViewportSize(64);
         Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
         Renderer.enableStencilWriting();
         Renderer.clearCDS();
@@ -154,7 +153,6 @@ public class Example3d extends GameBase {
         FrameBuffer.unbind();
         Renderer.clearC();
         Renderer.disableDepthTest();
-        Renderer.setViewportSize(800);
 
         finalSh.bind();
         fb.colourBuffers.getFirst().bind();
