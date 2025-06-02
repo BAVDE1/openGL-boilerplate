@@ -8,7 +8,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -28,7 +27,11 @@ public class Texture {
         public ByteBuffer buffer;
         public int width, height;
 
-        Image(ByteBuffer i, int w, int h) {
+        public Image() {
+
+        }
+
+        public Image(ByteBuffer i, int w, int h) {
             buffer = i;
             width = w;
             height = h;
@@ -58,46 +61,17 @@ public class Texture {
     }
 
     public Texture(String resourcePath) {
-        Logging.debug("Attempting to create texture from resource path: %s", resourcePath);
-        URL url = ClassLoader.getSystemResource(resourcePath);
-        if (url == null) {
-            Logging.danger("Image failed to load from given filepath: '%s'", resourcePath);
-            return;
-        }
-
-        try {
-            createTextureFromImgBuff(ImageIO.read(url));
-        } catch (IOException e) {
-            Logging.danger("Image failed to load from given filepath: '%s'\nError:\n%s", resourcePath, e);
-        }
+        createTextureFromImgBuff(resourcePathToBufferedImage(resourcePath));
     }
 
     public Texture(BufferedImage buffImg) {
         createTextureFromImgBuff(buffImg);
     }
 
-    /**
-     * essentially BufferedImage to ByteBuffer
-     */
     public void createTextureFromImgBuff(BufferedImage buffImg) {
-        size.width = buffImg.getWidth();
-        size.height = buffImg.getHeight();
-
-        // get all pixels
-        int[] pixels = new int[size.width * size.height];
-        buffImg.getRGB(0, 0, size.width, size.height, pixels, 0, size.width);
-
-        ByteBuffer buffer = MemoryUtil.memAlloc(size.width * size.height * BPP);
-        for (int y = 0; y < size.height; y++) {
-            for (int x = 0; x < size.width; x++) {
-                int pixel = pixels[y * size.width + x];
-                buffer.put((byte) ((pixel >> 16) & 0xFF));  // Red component
-                buffer.put((byte) ((pixel >> 8) & 0xFF));   // Green component
-                buffer.put((byte) (pixel & 0xFF));          // Blue component
-                buffer.put((byte) ((pixel >> 24) & 0xFF));  // Alpha component
-            }
-        }
-        createTextureFromByteBuff(buffer);
+        Image image = bufferedImageToByteImage(buffImg);
+        size = new Dimension(image.width, image.height);
+        createTextureFromByteBuff(image.buffer);
     }
 
     private void createTextureFromByteBuff(ByteBuffer buffer) {
@@ -222,5 +196,43 @@ public class Texture {
         unbind();
         for (int id : boundSlots.values()) glDeleteTextures(id);
         boundSlots.clear();
+    }
+
+    public static BufferedImage resourcePathToBufferedImage(String resourcePath) {
+        Logging.debug("Attempting to create buffered image from resource path: %s", resourcePath);
+        URL url = ClassLoader.getSystemResource(resourcePath);
+        if (url == null) {
+            Logging.danger("Image failed to load from given filepath: '%s'", resourcePath);
+            return null;
+        }
+
+        try {
+            return ImageIO.read(url);
+        } catch (IOException e) {
+            Logging.danger("Image failed to load from given filepath: '%s'\nError:\n%s", resourcePath, e);
+            return null;
+        }
+    }
+
+    public static Image bufferedImageToByteImage(BufferedImage bufferedImage) {
+        Image image = new Image();
+        image.width = bufferedImage.getWidth();
+        image.height = bufferedImage.getHeight();
+
+        // get all pixels
+        int[] pixels = new int[image.width * image.height];
+        bufferedImage.getRGB(0, 0, image.width, image.height, pixels, 0, image.width);
+
+        image.buffer = MemoryUtil.memAlloc(image.width * image.height * BPP);
+        for (int y = 0; y < image.height; y++) {
+            for (int x = 0; x < image.width; x++) {
+                int pixel = pixels[y * image.width + x];
+                image.buffer.put((byte) ((pixel >> 16) & 0xFF));  // Red component
+                image.buffer.put((byte) ((pixel >> 8) & 0xFF));   // Green component
+                image.buffer.put((byte) (pixel & 0xFF));          // Blue component
+                image.buffer.put((byte) ((pixel >> 24) & 0xFF));  // Alpha component
+            }
+        }
+        return image;
     }
 }
