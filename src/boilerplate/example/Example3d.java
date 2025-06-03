@@ -15,6 +15,8 @@ import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
 public class Example3d extends GameBase {
@@ -35,6 +37,7 @@ public class Example3d extends GameBase {
     VertexArrayBuffer vb = new VertexArrayBuffer();
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
     Texture walterTexture;
+    CubeMap ballerCube;
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
@@ -86,7 +89,13 @@ public class Example3d extends GameBase {
     }
 
     public void setupBuffers() {
-        walterTexture = new Texture("textures/breaking.png");
+//        walterTexture = new Texture("textures/breaking.png");
+        ballerCube = new CubeMap(true);
+        Texture.Image img = Texture.resourcePathToImage("textures/baller.png");
+        ballerCube.loadFaces("textures/baller.png", "textures/baller.png", "textures/baller.png", "textures/baller.png", "textures/baller.png", "textures/baller.png");
+        ballerCube.useDefaultInterpolation();
+        ballerCube.useDefaultWrap();
+        Texture.unbind();
         va.genId();
         vb.genId();
         veb.genId();
@@ -96,11 +105,14 @@ public class Example3d extends GameBase {
 
         camera.setupUniformBuffer(sh, shOutline);
 
-        va.fastSetup(new int[]{3, 2}, vb, veb);
-        BufferBuilder3f bb = new BufferBuilder3f(true, 2);
+        va.fastSetup(new int[]{3, 3}, vb, veb);
+        BufferBuilder3f bb = new BufferBuilder3f(true, 3);
 
         Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 1);
-        poly.mode = new ShapeMode.Unpack(new float[]{0, 0}, new float[]{1, 0}, new float[]{1, 1}, new float[]{0, 1});
+        poly.mode = new ShapeMode.Unpack(
+                new float[]{-1, -1, 1}, new float[]{1, -1, 1}, new float[]{1, 1, 1}, new float[]{-1, 1, 1},
+                new float[]{-1, -1, -1}, new float[]{1, -1, -1}, new float[]{1, 1, -1}, new float[]{-1, 1, -1}
+        );
         bb.pushPolygon(poly);
         vb.bufferData(bb);
         veb.bufferData(poly.elementIndex);
@@ -135,28 +147,29 @@ public class Example3d extends GameBase {
         model2.scale(.8f, .5f, .5f);
 
         // --- 3D SPACE --- //
-        fb.bind();
-        Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
-        Renderer.enableStencilWriting();
+//        fb.bind();
+//        Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
+//        Renderer.enableStencilWriting();
         Renderer.clearCDS();
         Renderer.enableDepthTest();
 
-        walterTexture.bind();
+//        glActiveTexture(GL_TEXTURE0);
         sh.bind();
+        ballerCube.bind();
         drawObjects(model1, model2, sh);
 
-        Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
-        Renderer.disableStencilWriting();
-        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
+//        Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
+//        Renderer.disableStencilWriting();
+//        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
 
         // --- POST PROCESSING --- //
-        FrameBuffer.unbind();
-        Renderer.clearC();
-        Renderer.disableDepthTest();
-
-        finalSh.bind();
-        fb.colourBuffers.getFirst().bind();
-        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
+//        FrameBuffer.unbind();
+//        Renderer.clearC();
+//        Renderer.disableDepthTest();
+//
+//        finalSh.bind();
+//        fb.colourBuffers.getFirst().bind();
+//        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
 
         Renderer.finish(window);
     }

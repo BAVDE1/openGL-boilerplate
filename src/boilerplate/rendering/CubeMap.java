@@ -1,12 +1,9 @@
 package boilerplate.rendering;
 
 import boilerplate.utility.Logging;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL45;
 
 import java.awt.image.BufferedImage;
-
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 
 /**
  * faces order:
@@ -45,6 +42,7 @@ public class CubeMap {
     }
 
     public void loadFaces(Texture.Image... faces) {
+        bind();
         if (faces.length > 6) {
             Logging.danger("Cube map cannot have more than 6 faces (%s were given). Aborting.", faces.length);
             return;
@@ -55,6 +53,27 @@ public class CubeMap {
             Texture.Image image = faces[i];
             GL45.glTexImage2D(GL45.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, storedFormat, image.width, image.height, 0, givenImgFormat, textureType, image.buffer);
         }
+    }
+
+    public void useDefaultInterpolation() {
+        setInterpolation(GL45.GL_NEAREST);
+    }
+
+    public void setInterpolation(int interpolation) {
+        bind();
+        GL45.glTexParameteri(GL45.GL_TEXTURE_CUBE_MAP, GL45.GL_TEXTURE_MIN_FILTER, interpolation);
+        GL45.glTexParameteri(GL45.GL_TEXTURE_CUBE_MAP, GL45.GL_TEXTURE_MAG_FILTER, interpolation);
+    }
+
+    public void useDefaultWrap() {
+        setWrap(GL45.GL_CLAMP_TO_EDGE);
+    }
+
+    public void setWrap(int wrap) {
+        bind();
+        GL45.glTexParameteri(GL45.GL_TEXTURE_CUBE_MAP, GL45.GL_TEXTURE_WRAP_S, wrap);
+        GL45.glTexParameteri(GL45.GL_TEXTURE_CUBE_MAP, GL45.GL_TEXTURE_WRAP_T, wrap);
+        GL45.glTexParameteri(GL45.GL_TEXTURE_CUBE_MAP, GL45.GL_TEXTURE_WRAP_R, wrap);
     }
 
     public void genId() {

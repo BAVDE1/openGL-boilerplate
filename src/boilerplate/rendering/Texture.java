@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.lwjgl.opengl.GL45.*;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
@@ -107,9 +108,7 @@ public class Texture {
     }
 
     public void useDefaultInterpolation() {
-        bind();
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        setInterpolation(GL_NEAREST);
     }
 
     public void setInterpolation(int interpolation) {
@@ -119,9 +118,7 @@ public class Texture {
     }
 
     public void useDefaultWrap() {
-        bind();
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        setWrap(GL_CLAMP_TO_EDGE);
     }
 
     public void setWrap(int wrap) {
@@ -234,5 +231,9 @@ public class Texture {
             }
         }
         return image;
+    }
+
+    public static Image resourcePathToImage(String resourcePath) {
+        return bufferedImageToByteImage(Objects.requireNonNull(resourcePathToBufferedImage(resourcePath)));
     }
 }

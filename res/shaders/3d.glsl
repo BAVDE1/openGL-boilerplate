@@ -2,7 +2,7 @@
 #version 450 core
 
 layout(location = 0) in vec3 pos;
-layout(location = 1) in vec2 texPos;
+layout(location = 1) in vec3 texPos;
 
 layout (std140) uniform CameraView {
     mat4 projection;
@@ -11,7 +11,7 @@ layout (std140) uniform CameraView {
 
 uniform mat4 model;
 
-out vec2 v_texPos;
+out vec3 v_texPos;
 
 void main() {
     gl_Position = projection * view * model * vec4(pos, 1);
@@ -21,12 +21,13 @@ void main() {
 //--- FRAG
 #version 450 core
 
-uniform sampler2D theTexture;
+uniform samplerCube theTexture;
 
-in vec2 v_texPos;
+in vec3 v_texPos;
 
 out vec4 colour;
 
 void main() {
-    colour = texture(theTexture, v_texPos);
+    colour = vec4(texture(theTexture, v_texPos).xyz, 1);
+//    colour = vec4(v_texPos.x, v_texPos.y, v_texPos.z, 1);
 }
