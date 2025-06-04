@@ -4,10 +4,19 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
-import boilerplate.rendering.*;
-import boilerplate.rendering.buffers.*;
-import boilerplate.rendering.builders.*;
-import boilerplate.utility.*;
+import boilerplate.rendering.Camera3d;
+import boilerplate.rendering.Renderer;
+import boilerplate.rendering.ShaderProgram;
+import boilerplate.rendering.buffers.FrameBuffer;
+import boilerplate.rendering.buffers.VertexArray;
+import boilerplate.rendering.buffers.VertexArrayBuffer;
+import boilerplate.rendering.buffers.VertexElementBuffer;
+import boilerplate.rendering.builders.BufferBuilder3f;
+import boilerplate.rendering.builders.Shape3d;
+import boilerplate.rendering.builders.ShapeMode;
+import boilerplate.rendering.textures.CubeMap;
+import boilerplate.rendering.textures.Image;
+import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -15,8 +24,6 @@ import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
 public class Example3d extends GameBase {
@@ -36,7 +43,6 @@ public class Example3d extends GameBase {
     VertexArray va = new VertexArray();
     VertexArrayBuffer vb = new VertexArrayBuffer();
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
-    Texture walterTexture;
     CubeMap ballerCube;
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
@@ -89,13 +95,12 @@ public class Example3d extends GameBase {
     }
 
     public void setupBuffers() {
-//        walterTexture = new Texture("textures/breaking.png");
+        Image.flipOnSTBLoad();
         ballerCube = new CubeMap(true);
-        Texture.Image img = Texture.resourcePathToImage("textures/baller.png");
-        ballerCube.loadFaces("textures/baller.png", "textures/baller.png", "textures/baller.png", "textures/baller.png", "textures/baller.png", "textures/baller.png");
+        ballerCube.loadFaces("res/textures/baller.png");
         ballerCube.useDefaultInterpolation();
         ballerCube.useDefaultWrap();
-        Texture.unbind();
+        CubeMap.unbind();
         va.genId();
         vb.genId();
         veb.genId();
@@ -147,29 +152,28 @@ public class Example3d extends GameBase {
         model2.scale(.8f, .5f, .5f);
 
         // --- 3D SPACE --- //
-//        fb.bind();
-//        Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
-//        Renderer.enableStencilWriting();
+        fb.bind();
+        Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
+        Renderer.enableStencilWriting();
         Renderer.clearCDS();
         Renderer.enableDepthTest();
 
-//        glActiveTexture(GL_TEXTURE0);
         sh.bind();
         ballerCube.bind();
         drawObjects(model1, model2, sh);
 
-//        Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
-//        Renderer.disableStencilWriting();
-//        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
+        Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
+        Renderer.disableStencilWriting();
+        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
 
         // --- POST PROCESSING --- //
-//        FrameBuffer.unbind();
-//        Renderer.clearC();
-//        Renderer.disableDepthTest();
-//
-//        finalSh.bind();
-//        fb.colourBuffers.getFirst().bind();
-//        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
+        FrameBuffer.unbind();
+        Renderer.clearC();
+        Renderer.disableDepthTest();
+
+        finalSh.bind();
+        fb.colourBuffers.getFirst().bind();
+        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
 
         Renderer.finish(window);
     }

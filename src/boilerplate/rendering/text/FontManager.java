@@ -1,8 +1,8 @@
 package boilerplate.rendering.text;
 
 import boilerplate.rendering.ShaderProgram;
-import boilerplate.rendering.Texture;
 import boilerplate.rendering.buffers.VertexArray;
+import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
 import org.joml.Vector2f;
 
@@ -177,7 +177,7 @@ public class FontManager {
     private static ShaderProgram textShader = new ShaderProgram();
 
     public static int fullWidth = 0, fullHeight = 0;
-    private static Texture finalTexture;
+    private static Texture2d finalTexture;
     private static boolean initialized = false;
 
     /** writes to Texture's outputFile when fonts are generated and bound */
@@ -243,14 +243,14 @@ public class FontManager {
         }
 
         graphics.dispose();
-        finalTexture = new Texture(fullImage);
+        finalTexture = new Texture2d(fullImage);
         finalTexture.bindToSlot(FONT_TEXTURE_SLOT);
         Logging.debug("%s fonts generated, texture bound to slot %s", allLoadedFonts.size(), FONT_TEXTURE_SLOT);
 
         setupTextShader(screenSize, projectionMatrix);
         setupTextLayout();
 
-        if (writeFontsToFile) Texture.writeToFile(fullImage);
+        if (writeFontsToFile) Texture2d.writeToFile(fullImage);
     }
 
     private static void setupTextShader(Dimension screenSize, float[] projectionMatrix) {

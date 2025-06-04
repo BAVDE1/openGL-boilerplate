@@ -1,0 +1,115 @@
+package boilerplate.rendering.textures;
+
+import boilerplate.rendering.ShaderProgram;
+import boilerplate.utility.Logging;
+import org.lwjgl.system.MemoryUtil;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL45.glBindTextureUnit;
+
+public class Texture2d extends Texture {
+    protected static final Map<Integer, Integer> boundSlots = new HashMap<>();  // key: slot, value: texId
+    public static File outputFile = new File("image.png");  // for debugging
+    public int textureType = GL_UNSIGNED_BYTE;
+
+    public Dimension size = new Dimension();
+
+    public Texture2d() {
+        textureTarget = GL_TEXTURE_2D;
+    }
+
+    public Texture2d(Dimension size, boolean generateId) {
+        this();
+        this.size = size;
+        if (generateId) genId();
+    }
+
+    public Texture2d(String resourcePath) {
+        this();
+        createTextureFromImage(Image.loadImageFromPathSTB(resourcePath));
+    }
+
+    public Texture2d(BufferedImage buffImg) {
+        this();
+        createTextureFromImgBuff(buffImg);
+    }
+
+    public void createTextureFromImgBuff(BufferedImage buffImg) {
+        Image image = Image.bufferedImageToByteImage(buffImg);
+        size = new Dimension(image.width, image.height);
+        createTextureFromImage(image);
+    }
+
+    private void createTextureFromImage(Image image) {
+        image.buffer.flip();  // flip to read mode for openGL
+
+        genId();
+        bind();
+        useDefaultInterpolation();
+        useDefaultWrap();
+        createTexture(GL_RGBA, GL_RGBA, image.buffer);
+
+        MemoryUtil.memFree(image.buffer);  // may want to keep for later though :shrug:
+    }
+
+    /**
+     * internalFormat: format to be stored in
+     * format: format of supplied image
+     */
+    public void createTexture(int storedFormat, int givenImgFormat, ByteBuffer buffer) {
+        glTexImage2D(GL_TEXTURE_2D, 0, storedFormat, size.width, size.height, 0, givenImgFormat, textureType, buffer);
+    }
+
+    /**
+     * meant for use with a texture array
+     */
+    public void bindToSlot(int slot) {
+        if (slot == 0) {
+            Logging.danger("cannot bind texture to slot 0, use anything > 0.");
+            return;
+        }
+
+        if (boundSlots.containsKey(slot)) {
+            Logging.warn("Overriding already set texture slot '%s'", slot);
+            boundSlots.remove((Integer) slot);
+        }
+
+        glBindTextureUnit(slot, textureId);
+        boundSlots.put(slot, textureId);
+    }
+
+    public void bindToTexArray(int slot, ShaderProgram sh) {
+        bindToSlot(slot);
+        sh.uniform1iv("textures", boundSlots.keySet().stream().mapToInt(i -> i).toArray());
+    }
+
+    public static void unbind() {
+        Texture.unbind(GL_TEXTURE_2D);
+    }
+
+    public static void deleteAll() {
+        unbind();
+        for (int id : boundSlots.values()) glDeleteTextures(id);
+        boundSlots.clear();
+    }
+
+    /**
+     * debug function writes given image to src/image.png
+     */
+    public static void writeToFile(BufferedImage img) {
+        try {
+            ImageIO.write(img, "png", outputFile);
+        } catch (IOException e) {
+            Logging.danger("Failed to write given image to file 'src/image.png'\nError message thrown:\n%s", e);
+        }
+    }
+}

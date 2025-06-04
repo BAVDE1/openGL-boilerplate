@@ -4,18 +4,17 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
-import boilerplate.rendering.*;
-import boilerplate.rendering.Texture;
+import boilerplate.rendering.Renderer;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
+import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
 import org.joml.Vector2f;
-
-import static org.lwjgl.opengl.GL45.*;
 
 import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL45.glDebugMessageCallback;
 
 public class ExampleIndex extends GameBase {
     public boilerplate.common.Window window = new Window();
@@ -76,7 +75,7 @@ public class ExampleIndex extends GameBase {
         Logging.debug("Deleting GL values...");
         textRenderer.delete();
         FontManager.deleteAll();
-        Texture.deleteAll();
+        Texture2d.deleteAll();
     }
 
     public void open2dExample() {

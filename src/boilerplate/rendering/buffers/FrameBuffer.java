@@ -1,6 +1,7 @@
 package boilerplate.rendering.buffers;
 
-import boilerplate.rendering.Texture;
+import boilerplate.rendering.textures.Texture;
+import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
 import org.lwjgl.opengl.GL45;
 
@@ -152,7 +153,7 @@ public class FrameBuffer {
     }
 
     public static Texture setupTextureBuffer(Dimension size, int storedFormat, int givenFormat, int textureType) {
-        Texture buff = new Texture(size, true);
+        Texture2d buff = new Texture2d(size, true);
         buff.textureType = textureType;
         buff.bind();
         buff.createTexture(storedFormat, givenFormat, null);

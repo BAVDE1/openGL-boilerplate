@@ -4,20 +4,20 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
+import boilerplate.rendering.Renderer;
 import boilerplate.rendering.ShaderProgram;
-import boilerplate.rendering.Texture;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.builders.BufferBuilder2f;
-import boilerplate.rendering.builders.ShapeMode;
-import org.joml.Vector2f;
-import org.lwjgl.opengl.GL45;
 import boilerplate.rendering.builders.Shape2d;
-import boilerplate.rendering.*;
+import boilerplate.rendering.builders.ShapeMode;
 import boilerplate.rendering.text.FontManager;
 import boilerplate.rendering.text.TextRenderer;
+import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
 import boilerplate.utility.MathUtils;
+import org.joml.Vector2f;
+import org.lwjgl.opengl.GL45;
 
 import java.awt.*;
 
@@ -192,8 +192,8 @@ public class Example2d extends GameBase {
         shMain.useDemoShader();
         shCircles.useCircleShader();
 
-        new Texture("textures/explosion.png").bindToTexArray(2, shMain);
-        new Texture("textures/closed.png").bindToTexArray(3, shMain);
+        new Texture2d("textures/explosion.png").bindToTexArray(2, shMain);
+        new Texture2d("textures/closed.png").bindToTexArray(3, shMain);
 
         shMain.uniformResolutionData(SCREEN_SIZE, PROJECTION_MATRIX);
         shMain.uniform1f("viewScale", viewScale);
