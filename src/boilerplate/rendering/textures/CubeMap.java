@@ -13,9 +13,8 @@ import org.lwjgl.opengl.GL45;
  * 6: front  (-z)
  */
 public class CubeMap extends Texture {
-    public int Type = GL45.GL_UNSIGNED_BYTE;
-    public int storedFormat = GL45.GL_RGB;
-    public int givenImgFormat = GL45.GL_RGB;
+    public int textureType = GL45.GL_UNSIGNED_BYTE;
+    public int storedFormat = GL45.GL_RGBA;
 
     public CubeMap() {
         textureTarget = GL45.GL_TEXTURE_CUBE_MAP;
@@ -35,6 +34,7 @@ public class CubeMap extends Texture {
     public void loadFaces(String... facePaths) {
         Image[] images = new Image[facePaths.length];
         for (int i = 0; i < facePaths.length; i++) images[i] = Image.loadImageFromPathSTB(facePaths[i]);
+        System.out.println(images[0].channels);
         loadFaces(images);
         for (Image img : images) img.free();
     }
@@ -52,7 +52,7 @@ public class CubeMap extends Texture {
 
         for (int i = 0; i < 6; i++) {
             Image image = faces[i];
-            GL45.glTexImage2D(GL45.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, storedFormat, image.width, image.height, 0, givenImgFormat, Type, image.buffer);
+            GL45.glTexImage2D(GL45.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, storedFormat, image.width, image.height, 0, image.getImageFormat(), textureType, image.buffer);
         }
     }
 

@@ -2,6 +2,7 @@ package boilerplate.rendering.textures;
 
 import boilerplate.rendering.ShaderProgram;
 import boilerplate.utility.Logging;
+import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryUtil;
 
 import javax.imageio.ImageIO;
@@ -20,6 +21,7 @@ public class Texture2d extends Texture {
     protected static final Map<Integer, Integer> boundSlots = new HashMap<>();  // key: slot, value: texId
     public static File outputFile = new File("image.png");  // for debugging
     public int textureType = GL_UNSIGNED_BYTE;
+    public int storedFormat = GL45.GL_RGBA;
 
     public Dimension size = new Dimension();
 
@@ -56,7 +58,7 @@ public class Texture2d extends Texture {
         bind();
         useDefaultInterpolation();
         useDefaultWrap();
-        createTexture(GL_RGBA, GL_RGBA, image.buffer);
+        createTexture(storedFormat, image.getImageFormat(), image.buffer);
 
         MemoryUtil.memFree(image.buffer);  // may want to keep for later though :shrug:
     }

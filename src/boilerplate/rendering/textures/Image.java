@@ -3,6 +3,7 @@ package boilerplate.rendering.textures;
 import boilerplate.utility.Logging;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.opengl.GL45;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
@@ -36,6 +37,17 @@ public class Image {
         STBImage.stbi_image_free(buffer);
     }
 
+    public int getImageFormat() {
+        return switch (channels) {
+            case 3 -> GL45.GL_RGB;
+            case 4 -> GL45.GL_RGBA;
+            default -> {
+                Logging.warn("The format for this images' channels is not defined, you'll have to provide your own gl format");
+                yield 0;
+            }
+        };
+    }
+
     public static void flipOnSTBLoad() {
         STBImage.stbi_set_flip_vertically_on_load(true);
     }
@@ -44,7 +56,7 @@ public class Image {
         int[] width = new int[1];
         int[] height = new int[1];
         int[] channels = new int[1];
-        ByteBuffer data = STBImage.stbi_load(path, width, height, channels, 0);
+        ByteBuffer data = STBImage.stbi_load(path, width, height, channels, 4);
         if (data == null) Logging.danger("An error occurred when attempting to load image from '%s'.\n%s", path, stbi_failure_reason());
         return new Image(data, width[0], height[0], channels[0]);
     }
