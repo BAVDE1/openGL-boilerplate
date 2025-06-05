@@ -98,8 +98,8 @@ public class Example3d extends GameBase {
         Image.flipOnSTBLoad();
         ballerCube = new CubeMap(true);
         ballerCube.loadFaces("res/textures/space_skybox/px.png", "res/textures/space_skybox/nx.png", "res/textures/space_skybox/py.png", "res/textures/space_skybox/ny.png", "res/textures/space_skybox/pz.png", "res/textures/space_skybox/nz.png");
-        ballerCube.useDefaultInterpolation();
-        ballerCube.useDefaultWrap();
+        ballerCube.useLinearInterpolation();
+        ballerCube.useClampEdgeWrap();
         CubeMap.unbind();
         va.genId();
         vb.genId();

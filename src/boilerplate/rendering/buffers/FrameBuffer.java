@@ -120,7 +120,7 @@ public class FrameBuffer {
 
     public static Texture setupDefaultColourBuffer(Dimension size) {
         Texture t = setupTextureBuffer(size, defaultColourBuffFormat);
-        t.useDefaultInterpolation();
+        t.useNearestInterpolation();
         return t;
     }
 

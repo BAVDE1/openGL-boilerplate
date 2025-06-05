@@ -38,6 +38,8 @@ https://learnopengl.com/Getting-started/Shaders \
 https://docs.tizen.org/application/native/guides/graphics/vertex-shader/ \
 https://www.khronos.org/opengl/wiki/Shader
 
+panorama to cube map: https://jaxry.github.io/panorama-to-cubemap/
+
 ---
 
 unfinished wiki: https://en.wikibooks.org/wiki/OpenGL_Programming

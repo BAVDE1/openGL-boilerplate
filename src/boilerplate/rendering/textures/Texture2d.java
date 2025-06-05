@@ -56,8 +56,8 @@ public class Texture2d extends Texture {
 
         genId();
         bind();
-        useDefaultInterpolation();
-        useDefaultWrap();
+        useNearestInterpolation();
+        useClampEdgeWrap();
         createTexture(storedFormat, image.getImageFormat(), image.buffer);
 
         MemoryUtil.memFree(image.buffer);  // may want to keep for later though :shrug:

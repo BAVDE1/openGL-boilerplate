@@ -35,8 +35,12 @@ public abstract class Texture {
         glDeleteTextures(textureId);
     }
 
-    public void useDefaultInterpolation() {
+    public void useNearestInterpolation() {
         setInterpolation(GL_NEAREST);
+    }
+
+    public void useLinearInterpolation() {
+        setInterpolation(GL_LINEAR);
     }
 
     public void setInterpolation(int interpolation) {
@@ -45,8 +49,16 @@ public abstract class Texture {
         glTexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, interpolation);
     }
 
-    public void useDefaultWrap() {
+    public void useClampEdgeWrap() {
         setWrap(GL_CLAMP_TO_EDGE);
+    }
+
+    public void useRepeatWrap() {
+        setWrap(GL_REPEAT);
+    }
+
+    public void useMirroredRepeatWrap() {
+        setWrap(GL_MIRRORED_REPEAT);
     }
 
     public void setWrap(int wrap) {
