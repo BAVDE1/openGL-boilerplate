@@ -7,6 +7,7 @@ import boilerplate.common.Window;
 import boilerplate.rendering.Camera3d;
 import boilerplate.rendering.Renderer;
 import boilerplate.rendering.ShaderProgram;
+import boilerplate.rendering.SkyBox;
 import boilerplate.rendering.buffers.FrameBuffer;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
@@ -43,7 +44,9 @@ public class Example3d extends GameBase {
     VertexArray va = new VertexArray();
     VertexArrayBuffer vb = new VertexArrayBuffer();
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
-    CubeMap ballerCube;
+    CubeMap ballerCube = new CubeMap();
+
+    SkyBox skyBox = new SkyBox();
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
@@ -64,6 +67,7 @@ public class Example3d extends GameBase {
         Renderer.setStencilOperation(GL_KEEP, GL_KEEP, GL_REPLACE);
         Renderer.useDefaultFaceCulling();
         glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
+        Image.flipOnSTBLoad();
 
         bindEvents();
         setupBuffers();
@@ -95,8 +99,7 @@ public class Example3d extends GameBase {
     }
 
     public void setupBuffers() {
-        Image.flipOnSTBLoad();
-        ballerCube = new CubeMap(true);
+        ballerCube.genId();
         ballerCube.loadFaces("res/textures/space_skybox/px.png", "res/textures/space_skybox/nx.png", "res/textures/space_skybox/py.png", "res/textures/space_skybox/ny.png", "res/textures/space_skybox/pz.png", "res/textures/space_skybox/nz.png");
         ballerCube.useLinearInterpolation();
         ballerCube.useClampEdgeWrap();
@@ -109,6 +112,7 @@ public class Example3d extends GameBase {
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
 
         camera.setupUniformBuffer(sh, shOutline);
+        skyBox.setupBuffers(camera, "res/textures/space_skybox", "png");
 
         va.fastSetup(new int[]{3, 3}, vb, veb);
         BufferBuilder3f bb = new BufferBuilder3f(true, 3);
@@ -153,8 +157,10 @@ public class Example3d extends GameBase {
 
         // --- 3D SPACE --- //
         fb.bind();
+        Renderer.enableStencilTest();
         Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
         Renderer.enableStencilWriting();
+
         Renderer.clearCDS();
         Renderer.enableDepthTest();
 
@@ -165,6 +171,9 @@ public class Example3d extends GameBase {
         Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
         Renderer.disableStencilWriting();
         drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
+
+        Renderer.disableStencilTest();
+        skyBox.draw();
 
         // --- POST PROCESSING --- //
         FrameBuffer.unbind();

@@ -34,7 +34,6 @@ public class CubeMap extends Texture {
     public void loadFaces(String... facePaths) {
         Image[] images = new Image[facePaths.length];
         for (int i = 0; i < facePaths.length; i++) images[i] = Image.loadImageFromPathSTB(facePaths[i]);
-        System.out.println(images[0].channels);
         loadFaces(images);
         for (Image img : images) img.free();
     }

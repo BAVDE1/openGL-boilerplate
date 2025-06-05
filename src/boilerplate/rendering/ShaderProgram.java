@@ -140,7 +140,6 @@ public class ShaderProgram {
 
         glAttachShader(program, shader);
         attachedShaders.add(new Shader(shader, shaderType, filePath));
-
     }
 
     public void linkProgram() {

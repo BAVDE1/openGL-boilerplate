@@ -11,7 +11,7 @@ import static org.lwjgl.opengl.GL45.*;
 public class VertexBuffer {
     protected Integer bufferType;
     protected Integer usage = GL45.GL_DYNAMIC_DRAW;
-    protected Integer bufferId;
+    protected Integer bufferId = -1;
 
     public VertexBuffer() {
     }
@@ -71,7 +71,7 @@ public class VertexBuffer {
     }
 
     public void genId() {
-        if (bufferId != null) {
+        if (bufferId != -1) {
             Logging.warn("Attempting to re-generate already generated buffer id, aborting");
             return;
         }

@@ -59,6 +59,10 @@ public class Renderer {
         glEnable(GL_STENCIL_TEST);
     }
 
+    public static void disableStencilTest() {
+        glDisable(GL_STENCIL_TEST);
+    }
+
     public static void setStencilOperation(int stencilFails, int stencilPassDepthFails, int stencilPassDepthPass) {
         glStencilOp(stencilFails, stencilPassDepthFails, stencilPassDepthPass);
     }

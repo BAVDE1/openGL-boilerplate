@@ -102,12 +102,21 @@ public class Camera3d {
     }
 
     public void setupUniformBuffer(ShaderProgram... shadersToBind) {
+
+        if (vub.getId() != -1) {
+            Logging.danger("Uniform buffer has already been setup. Call `bindShaderToUniformBlock` to bind more shaders.");
+            return;
+        }
         vub.genId();
         vub.bufferSize(MathUtils.MATRIX4F_BYTES_SIZE * 2);
         bindShaderToUniformBlock(shadersToBind);
     }
 
     public void bindShaderToUniformBlock(ShaderProgram... shadersToBind) {
+        if (vub.getId() == -1) {
+            Logging.danger("Uniform buffer has not yet been setup. Aborting");
+            return;
+        }
         vub.bindUniformBlock(uniformBlockName, shadersToBind);
     }
 
