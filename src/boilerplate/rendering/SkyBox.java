@@ -27,7 +27,7 @@ public class SkyBox {
             out vec3 v_texPos;
             
             void main() {
-                gl_Position = projection * view * vec4(pos, 1);
+                gl_Position = projection * mat4(mat3(view)) * vec4(pos, 1);
                 v_texPos = pos;
             }
             """;

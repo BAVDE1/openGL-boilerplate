@@ -100,8 +100,8 @@ public class Example3d extends GameBase {
 
     public void setupBuffers() {
         ballerCube.genId();
-        ballerCube.loadFaces("res/textures/space_skybox/px.png", "res/textures/space_skybox/nx.png", "res/textures/space_skybox/py.png", "res/textures/space_skybox/ny.png", "res/textures/space_skybox/pz.png", "res/textures/space_skybox/nz.png");
-        ballerCube.useLinearInterpolation();
+        ballerCube.loadFaces("res/textures/baller.png");
+        ballerCube.useNearestInterpolation();
         ballerCube.useClampEdgeWrap();
         CubeMap.unbind();
         va.genId();
@@ -112,6 +112,7 @@ public class Example3d extends GameBase {
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
 
         camera.setupUniformBuffer(sh, shOutline);
+        Image.noFlipOnSTBLoad();
         skyBox.setupBuffers(camera, "res/textures/space_skybox", "png");
 
         va.fastSetup(new int[]{3, 3}, vb, veb);
@@ -158,11 +159,10 @@ public class Example3d extends GameBase {
         // --- 3D SPACE --- //
         fb.bind();
         Renderer.enableStencilTest();
+        Renderer.enableDepthTest();
         Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
         Renderer.enableStencilWriting();
-
         Renderer.clearCDS();
-        Renderer.enableDepthTest();
 
         sh.bind();
         ballerCube.bind();
@@ -171,8 +171,8 @@ public class Example3d extends GameBase {
         Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
         Renderer.disableStencilWriting();
         drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
-
         Renderer.disableStencilTest();
+
         skyBox.draw();
 
         // --- POST PROCESSING --- //

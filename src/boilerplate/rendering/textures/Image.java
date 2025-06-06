@@ -52,11 +52,15 @@ public class Image {
         STBImage.stbi_set_flip_vertically_on_load(true);
     }
 
+    public static void noFlipOnSTBLoad() {
+        STBImage.stbi_set_flip_vertically_on_load(false);
+    }
+
     public static Image loadImageFromPathSTB(String path) {
         int[] width = new int[1];
         int[] height = new int[1];
         int[] channels = new int[1];
-        ByteBuffer data = STBImage.stbi_load(path, width, height, channels, 4);
+        ByteBuffer data = STBImage.stbi_load(path, width, height, channels, 0);
         if (data == null) Logging.danger("An error occurred when attempting to load image from '%s'.\n%s", path, stbi_failure_reason());
         return new Image(data, width[0], height[0], channels[0]);
     }
