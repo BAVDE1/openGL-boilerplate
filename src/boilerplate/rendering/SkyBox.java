@@ -9,8 +9,7 @@ import boilerplate.rendering.textures.CubeMap;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL45;
 
-import static org.lwjgl.opengl.GL11.GL_LINES;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.*;
 
 public class SkyBox {
     public static String[] expectedImageNames = new String[]{"px", "nx", "py", "ny", "pz", "nz"};
@@ -27,7 +26,7 @@ public class SkyBox {
             out vec3 v_texPos;
             
             void main() {
-                gl_Position = projection * mat4(mat3(view)) * vec4(pos, 1);
+                gl_Position = (projection * mat4(mat3(view)) * vec4(pos, 1)).xyww;  // z values are always maximum (1.0) (w / w = 1.0)
                 v_texPos = pos;
             }
             """;
@@ -73,17 +72,17 @@ public class SkyBox {
         va.fastSetup(new int[]{3}, vb, veb);
 
         BufferBuilder3f bb = new BufferBuilder3f(true);
-        Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 10);
+        Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 1);
         bb.pushPolygon(poly);
         vb.bufferData(bb);
         veb.bufferData(poly.elementIndex);
 
-        String[] textures = new String[6];
+        String[] textureFileNames = new String[6];
         for (int i = 0; i < 6; i++) {
-            textures[i] = String.format("%s/%s.%s", texturesDirectory, expectedImageNames[i], imageExtension);
+            textureFileNames[i] = String.format("%s/%s.%s", texturesDirectory, expectedImageNames[i], imageExtension);
         }
         skyBoxTexture.genId();
-        skyBoxTexture.loadFaces(textures);
+        skyBoxTexture.loadFaces(textureFileNames);
         skyBoxTexture.useLinearInterpolation();
         skyBoxTexture.useClampEdgeWrap();
         CubeMap.unbind();
@@ -93,8 +92,10 @@ public class SkyBox {
         sh.bind();
         skyBoxTexture.bind();
 
+        GL45.glDepthFunc(GL_LEQUAL);  // since all skybox depth (z) values are exactly maximum (1.0)
         GL45.glCullFace(GL45.GL_FRONT);
         Renderer.drawElements(GL_TRIANGLES, va, veb, 36);
         GL45.glCullFace(GL45.GL_BACK);
+        GL45.glDepthFunc(GL_LESS);
     }
 }
