@@ -145,12 +145,12 @@ public class VertexArray {
         for (VertexBuffer vb : buffers) vb.bind();
     }
 
-    public void fastSetup(int[] layoutFloats, VertexBuffer... buffers) {
-        fastSetup(new Layout(layoutFloats), buffers);
+    public void fastSetup(int[] layoutFloats, VertexBuffer... buffersToBind) {
+        fastSetup(new Layout(layoutFloats), buffersToBind);
     }
 
-    public void fastSetup(Layout layout, VertexBuffer... buffers) {
-        bindBuffer(buffers);
+    public void fastSetup(Layout layout, VertexBuffer... buffersToBind) {
+        bindBuffer(buffersToBind);
         pushLayout(layout);
     }
 

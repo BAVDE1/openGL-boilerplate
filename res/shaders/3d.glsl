@@ -2,7 +2,6 @@
 #version 450 core
 
 layout(location = 0) in vec3 pos;
-layout(location = 1) in vec3 texPos;
 
 layout (std140) uniform CameraView {
     mat4 projection;
@@ -15,7 +14,7 @@ out vec3 v_texPos;
 
 void main() {
     gl_Position = projection * view * model * vec4(pos, 1);
-    v_texPos = texPos;
+    v_texPos = pos;
 }
 
 //--- FRAG

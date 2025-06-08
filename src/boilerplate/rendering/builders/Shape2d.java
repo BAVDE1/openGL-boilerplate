@@ -40,10 +40,10 @@ public class Shape2d {
 
     public static Poly2d createRect(Vector2f topLeft, Vector2f size) {
         return new Poly2d(
-                topLeft,
+                topLeft.add(size, new Vector2f()),
                 topLeft.add(0, size.y, new Vector2f()),
                 topLeft.add(size.x, 0, new Vector2f()),
-                topLeft.add(size, new Vector2f())
+                topLeft
         );
     }
 

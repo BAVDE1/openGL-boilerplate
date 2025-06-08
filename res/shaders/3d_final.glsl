@@ -2,13 +2,12 @@
 #version 450 core
 
 layout(location = 0) in vec2 pos;
-layout(location = 1) in vec2 texPos;
 
 out vec2 v_texPos;
 
 void main() {
     gl_Position = vec4(pos.x, pos.y, 0, 1);
-    v_texPos = texPos;
+    v_texPos = (pos - 1) * .5;
 }
 
 //--- FRAG
@@ -20,18 +19,18 @@ in vec2 v_texPos;
 
 out vec4 colour;
 
-const float kernelOff = 1.0 / 800.0;
-const vec2 kernelUffsets[9] = vec2[](
-    vec2(-kernelOff,  kernelOff), // top-left
-    vec2( 0.0f,       kernelOff), // top-center
-    vec2( kernelOff,  kernelOff), // top-right
-    vec2(-kernelOff,  0.0f),   // center-left
-    vec2( 0.0f,       0.0f),   // center-center
-    vec2( kernelOff,  0.0f),   // center-right
-    vec2(-kernelOff, -kernelOff), // bottom-left
-    vec2( 0.0f,      -kernelOff), // bottom-center
-    vec2( kernelOff, -kernelOff)  // bottom-right
-);
+//const float kernelOff = 1.0 / 800.0;
+//const vec2 kernelUffsets[9] = vec2[](
+//    vec2(-kernelOff,  kernelOff), // top-left
+//    vec2( 0.0f,       kernelOff), // top-center
+//    vec2( kernelOff,  kernelOff), // top-right
+//    vec2(-kernelOff,  0.0f),   // center-left
+//    vec2( 0.0f,       0.0f),   // center-center
+//    vec2( kernelOff,  0.0f),   // center-right
+//    vec2(-kernelOff, -kernelOff), // bottom-left
+//    vec2( 0.0f,      -kernelOff), // bottom-center
+//    vec2( kernelOff, -kernelOff)  // bottom-right
+//);
 
 void main() {
     colour = texture(screenTexture, v_texPos);

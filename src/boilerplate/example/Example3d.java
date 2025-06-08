@@ -12,16 +12,16 @@ import boilerplate.rendering.buffers.FrameBuffer;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.buffers.VertexElementBuffer;
-import boilerplate.rendering.builders.BufferBuilder3f;
-import boilerplate.rendering.builders.Shape3d;
-import boilerplate.rendering.builders.ShapeMode;
+import boilerplate.rendering.builders.*;
 import boilerplate.rendering.textures.CubeMap;
 import boilerplate.rendering.textures.Image;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.awt.*;
+import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -67,7 +67,6 @@ public class Example3d extends GameBase {
         Renderer.setStencilOperation(GL_KEEP, GL_KEEP, GL_REPLACE);
         Renderer.useDefaultFaceCulling();
         glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
-        Image.flipOnSTBLoad();
 
         bindEvents();
         setupBuffers();
@@ -112,32 +111,24 @@ public class Example3d extends GameBase {
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
 
         camera.setupUniformBuffer(sh, shOutline);
-        Image.noFlipOnSTBLoad();
         skyBox.setupBuffers(camera, "res/textures/space_skybox", "png");
 
-        va.fastSetup(new int[]{3, 3}, vb, veb);
-        BufferBuilder3f bb = new BufferBuilder3f(true, 3);
-
+        va.fastSetup(new int[]{3}, vb, veb);
+        BufferBuilder3f bb3 = new BufferBuilder3f(true);
         Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 1);
-        poly.mode = new ShapeMode.Unpack(
-                new float[]{-1, -1, 1}, new float[]{1, -1, 1}, new float[]{1, 1, 1}, new float[]{-1, 1, 1},
-                new float[]{-1, -1, -1}, new float[]{1, -1, -1}, new float[]{1, 1, -1}, new float[]{-1, 1, -1}
-        );
-        bb.pushPolygon(poly);
-        vb.bufferData(bb);
+        bb3.pushPolygon(poly);
+        vb.bufferData(bb3);
         veb.bufferData(poly.elementIndex);
 
         finalSh.autoInitializeShadersMulti("shaders/3d_final.glsl");
         finalVa.genId();
         finalVb.genId();
 
-        finalVa.fastSetup(new int[]{2, 2}, finalVb);
-        finalVb.bufferData(new float[]{
-                1, 1, 1, 1,
-                -1, 1, 0, 1,
-                1, -1, 1, 0,
-                -1, -1, 0, 0
-        });
+        finalVa.fastSetup(new int[]{2}, finalVb);
+        BufferBuilder2f bb2 = new BufferBuilder2f(true);
+        Shape2d.Poly2d poly2 = Shape2d.createRect(new Vector2f(-1), new Vector2f(2));
+        bb2.pushPolygon(poly2);
+        finalVb.bufferData(bb2);
 
         fb.genId();
         fb.attachColourBuffer(fb.setupDefaultColourBuffer());
