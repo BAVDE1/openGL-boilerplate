@@ -14,14 +14,12 @@ import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.buffers.VertexElementBuffer;
 import boilerplate.rendering.builders.*;
 import boilerplate.rendering.textures.CubeMap;
-import boilerplate.rendering.textures.Image;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.awt.*;
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -40,10 +38,11 @@ public class Example3d extends GameBase {
     VertexArrayBuffer finalVb = new VertexArrayBuffer();
 
     ShaderProgram sh = new ShaderProgram();
+    ShaderProgram shReflect = new ShaderProgram();
     ShaderProgram shOutline = new ShaderProgram();
     VertexArray va = new VertexArray();
     VertexArrayBuffer vb = new VertexArrayBuffer();
-    VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
+//    VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
     CubeMap ballerCube = new CubeMap();
 
     SkyBox skyBox = new SkyBox();
@@ -105,20 +104,22 @@ public class Example3d extends GameBase {
         CubeMap.unbind();
         va.genId();
         vb.genId();
-        veb.genId();
+//        veb.genId();
 
         sh.autoInitializeShadersMulti("shaders/3d.glsl");
+        shReflect.autoInitializeShadersMulti("shaders/3d_reflect.glsl");
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
 
-        camera.setupUniformBuffer(sh, shOutline);
+        camera.setupUniformBuffer(sh, shReflect, shOutline);
         skyBox.setupBuffers(camera, "res/textures/space_skybox", "png");
 
-        va.fastSetup(new int[]{3}, vb, veb);
-        BufferBuilder3f bb3 = new BufferBuilder3f(true);
+        va.fastSetup(new int[]{3, 3}, vb);
+        BufferBuilder3f bb3 = new BufferBuilder3f(true, 3);
         Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 1);
+        poly.mode = new ShapeMode.Unpack(Shape3d.defaultCubeNormals());
         bb3.pushPolygon(poly);
         vb.bufferData(bb3);
-        veb.bufferData(poly.elementIndex);
+//        veb.bufferData(poly.elementIndex);
 
         finalSh.autoInitializeShadersMulti("shaders/3d_final.glsl");
         finalVa.genId();
@@ -161,8 +162,15 @@ public class Example3d extends GameBase {
 
         Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
         Renderer.disableStencilWriting();
+        Renderer.cullFrontFace();
         drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
+        Renderer.cullBackFace();
         Renderer.disableStencilTest();
+
+        shReflect.bind();
+        shReflect.uniform3f("camPos", camera.pos);
+        skyBox.bindSkyBoxTexture();
+        drawObjects(model1.translate(2, 0, 0), model2.translate(2, 0, 0), shReflect);
 
         skyBox.draw();
 
@@ -180,10 +188,10 @@ public class Example3d extends GameBase {
 
     private void drawObjects(Matrix4f model1, Matrix4f model2, ShaderProgram sh) {
         sh.uniformMatrix4f("model", model1);
-        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
+        Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, 36);
 
         sh.uniformMatrix4f("model", model2);
-        Renderer.drawElements(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, veb, 36);
+        Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, 36);
     }
 
     @Override

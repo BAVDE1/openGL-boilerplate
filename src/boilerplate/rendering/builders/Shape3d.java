@@ -1,6 +1,5 @@
 package boilerplate.rendering.builders;
 
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -53,11 +52,11 @@ public class Shape3d {
         }
     }
 
-    public static Poly3d createCube(Vector3f center, float size) {
-        return createCuboid(center, size, size, size);
+    public static Poly3d createCubeE(Vector3f center, float size) {
+        return createCuboidE(center, size, size, size);
     }
 
-    public static Poly3d createCuboid(Vector3f center, float width, float height, float depth) {
+    public static Poly3d createCuboidE(Vector3f center, float width, float height, float depth) {
         float w = width * .5f;
         float h = height * .5f;
         float d = depth * .5f;
@@ -66,6 +65,7 @@ public class Shape3d {
                 new Vector3f(w, h, d),  // tr
                 new Vector3f(w, -h, d),  // br
                 new Vector3f(-w, -h, d),  // bl
+
                 new Vector3f(-w, h, -d),
                 new Vector3f(w, h, -d),
                 new Vector3f(w, -h, -d),
@@ -90,15 +90,15 @@ public class Shape3d {
         return p;
     }
 
-    public static Poly3d createRightAngleTri(Vector3f cornerCenter, float height, float baseLength, float depth) {
-        return createTri(cornerCenter, height, baseLength, 0, depth);
+    public static Poly3d createRightAngleTriE(Vector3f cornerCenter, float height, float baseLength, float depth) {
+        return createTriE(cornerCenter, height, baseLength, 0, depth);
     }
 
-    public static Poly3d createRightAngleTriFlipped(Vector3f cornerCenter, float height, float baseLength, float depth) {
-        return createTri(cornerCenter, height, 0, baseLength, depth);
+    public static Poly3d createRightAngleTriFlippedE(Vector3f cornerCenter, float height, float baseLength, float depth) {
+        return createTriE(cornerCenter, height, 0, baseLength, depth);
     }
 
-    public static Poly3d createTri(Vector3f baseCenter, float height, float baseLeftLength, float baseRightLength, float depth) {
+    public static Poly3d createTriE(Vector3f baseCenter, float height, float baseLeftLength, float baseRightLength, float depth) {
         float d = depth * .5f;
         Poly3d p = new Poly3d(
                 new Vector3f(baseRightLength, 0, d),  // corner
@@ -121,6 +121,105 @@ public class Shape3d {
         p.pos = baseCenter;
         p.elementVertCount = 24;
         return p;
+    }
+
+    public static Poly3d createCube(Vector3f center, float size) {
+        return createCuboid(center, size, size, size);
+    }
+
+    public static Poly3d createCuboid(Vector3f center, float width, float height, float depth) {
+        float w = width * .5f;
+        float h = height * .5f;
+        float d = depth * .5f;
+        return new Poly3d(
+                new Vector3f(-w, -h, d),  // front
+                new Vector3f(w, -h, d),
+                new Vector3f(w, h, d),
+                new Vector3f(w, h, d),
+                new Vector3f(-w, h, d),
+                new Vector3f(-w, -h, d),
+
+                new Vector3f(w, -h, -d),  // back
+                new Vector3f(-w, -h, -d),
+                new Vector3f(w, h, -d),
+                new Vector3f(-w, h, -d),
+                new Vector3f(w, h, -d),
+                new Vector3f(-w, -h, -d),
+
+                new Vector3f(w, h, -d),  // right
+                new Vector3f(w, h, d),
+                new Vector3f(w, -h, -d),
+                new Vector3f(w, -h, d),
+                new Vector3f(w, -h, -d),
+                new Vector3f(w, h, d),
+
+                new Vector3f(-w, h, d),  // left
+                new Vector3f(-w, h, -d),
+                new Vector3f(-w, -h, -d),
+                new Vector3f(-w, -h, -d),
+                new Vector3f(-w, -h, d),
+                new Vector3f(-w, h, d),
+
+                new Vector3f(w, h, -d),  // top
+                new Vector3f(-w, h, -d),
+                new Vector3f(w, h, d),
+                new Vector3f(-w, h, d),
+                new Vector3f(w, h, d),
+                new Vector3f(-w, h, -d),
+
+                new Vector3f(-w, -h, -d),  // bottom
+                new Vector3f(w, -h, -d),
+                new Vector3f(w, -h, d),
+                new Vector3f(w, -h, d),
+                new Vector3f(-w, -h, d),
+                new Vector3f(-w, -h, -d)
+        );
+    }
+
+    public static float[][] defaultCubeNormals() {
+        return new float[][] {
+                new float[] {0, 0, -1},  // front
+                new float[] {0, 0, -1},
+                new float[] {0, 0, -1},
+                new float[] {0, 0, -1},
+                new float[] {0, 0, -1},
+                new float[] {0, 0, -1},
+
+                new float[] {0, 0, 1},  // back
+                new float[] {0, 0, 1},
+                new float[] {0, 0, 1},
+                new float[] {0, 0, 1},
+                new float[] {0, 0, 1},
+                new float[] {0, 0, 1},
+
+                new float[] {-1, 0, 0},  // right
+                new float[] {-1, 0, 0},
+                new float[] {-1, 0, 0},
+                new float[] {-1, 0, 0},
+                new float[] {-1, 0, 0},
+                new float[] {-1, 0, 0},
+
+                new float[] {1, 0, 0},  // left
+                new float[] {1, 0, 0},
+                new float[] {1, 0, 0},
+                new float[] {1, 0, 0},
+                new float[] {1, 0, 0},
+                new float[] {1, 0, 0},
+
+                new float[] {0, -1, 0},  // top
+                new float[] {0, -1, 0},
+                new float[] {0, -1, 0},
+                new float[] {0, -1, 0},
+                new float[] {0, -1, 0},
+                new float[] {0, -1, 0},
+
+                new float[] {0, 1, 0},  // bottom
+                new float[] {0, 1, 0},
+                new float[] {0, 1, 0},
+                new float[] {0, 1, 0},
+                new float[] {0, 1, 0},
+                new float[] {0, 1, 0}
+        };
     }
 
     /** Finds average of all points */

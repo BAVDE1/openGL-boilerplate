@@ -72,7 +72,7 @@ public class SkyBox {
         va.fastSetup(new int[]{3}, vb, veb);
 
         BufferBuilder3f bb = new BufferBuilder3f(true);
-        Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 1);
+        Shape3d.Poly3d poly = Shape3d.createCubeE(new Vector3f(), 1);
         bb.pushPolygon(poly);
         vb.bufferData(bb);
         veb.bufferData(poly.elementIndex);
@@ -88,14 +88,18 @@ public class SkyBox {
         CubeMap.unbind();
     }
 
+    public void bindSkyBoxTexture() {
+        skyBoxTexture.bind();
+    }
+
     public void draw() {
         sh.bind();
-        skyBoxTexture.bind();
+        bindSkyBoxTexture();
 
         GL45.glDepthFunc(GL_LEQUAL);  // since all skybox depth (z) values are exactly maximum (1.0)
-        GL45.glCullFace(GL45.GL_FRONT);
+        Renderer.cullFrontFace();
         Renderer.drawElements(GL_TRIANGLES, va, veb, 36);
-        GL45.glCullFace(GL45.GL_BACK);
+        Renderer.cullBackFace();
         GL45.glDepthFunc(GL_LESS);
     }
 }

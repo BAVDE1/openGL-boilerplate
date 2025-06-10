@@ -191,22 +191,26 @@ public class BufferBuilder {
             theArray[floatInx + i++] = pointPos.get();
         }
 
-        if (mode instanceof ShapeMode.Demonstration demo) {
-            Vector3f typeVar = demo.getVar(vertInx);
-            theArray[floatInx + i] = demo.type;
-            theArray[floatInx + i + 1] = typeVar.x;
-            theArray[floatInx + i + 2] = typeVar.y;
-            theArray[floatInx + i + 3] = typeVar.z;
-        } else if (mode instanceof ShapeMode.Unpack unpack) {
-            unpackIntoArray(theArray, floatInx+i, vertInx, unpack);
-        } else if (mode instanceof ShapeMode.Append append) {
-            appendToArray(theArray, floatInx+i, append);
-        } else if (mode instanceof ShapeMode.UnpackAppend unpackAppend) {
-            int numUnpacked = unpackIntoArray(theArray, floatInx+2, vertInx, unpackAppend.unpack);
-            appendToArray(theArray, floatInx+i+numUnpacked, unpackAppend.append);
-        } else if (mode instanceof ShapeMode.AppendUnpack appendUnpack) {
-            int numAppended = appendToArray(theArray, floatInx+2, appendUnpack.append);
-            unpackIntoArray(theArray, floatInx+i+numAppended, vertInx, appendUnpack.unpack);
+        try {
+            if (mode instanceof ShapeMode.Demonstration demo) {
+                Vector3f typeVar = demo.getVar(vertInx);
+                theArray[floatInx + i] = demo.type;
+                theArray[floatInx + i + 1] = typeVar.x;
+                theArray[floatInx + i + 2] = typeVar.y;
+                theArray[floatInx + i + 3] = typeVar.z;
+            } else if (mode instanceof ShapeMode.Unpack unpack) {
+                unpackIntoArray(theArray, floatInx+i, vertInx, unpack);
+            } else if (mode instanceof ShapeMode.Append append) {
+                appendToArray(theArray, floatInx+i, append);
+            } else if (mode instanceof ShapeMode.UnpackAppend unpackAppend) {
+                int numUnpacked = unpackIntoArray(theArray, floatInx+2, vertInx, unpackAppend.unpack);
+                appendToArray(theArray, floatInx+i+numUnpacked, unpackAppend.append);
+            } else if (mode instanceof ShapeMode.AppendUnpack appendUnpack) {
+                int numAppended = appendToArray(theArray, floatInx+2, appendUnpack.append);
+                unpackIntoArray(theArray, floatInx+i+numAppended, vertInx, appendUnpack.unpack);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            Logging.danger("ArrayIndexOutOfBoundsException caught! did you forget to use setAdditionalVerts?\n%s", e);
         }
     }
 

@@ -82,6 +82,14 @@ public class Renderer {
         glCullFace(face);
     }
 
+    public static void cullFrontFace() {
+        glCullFace(GL_FRONT);
+    }
+
+    public static void cullBackFace() {
+        glCullFace(GL_BACK);
+    }
+
     public static void setWindingOrder(int order) {
         glFrontFace(order);
     }
