@@ -8,7 +8,7 @@ import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL45.*;
 
-public class VertexBuffer {
+public abstract class VertexBuffer {
     protected Integer bufferType;
     protected Integer usage = GL45.GL_DYNAMIC_DRAW;
     protected Integer bufferId = -1;

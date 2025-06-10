@@ -167,11 +167,11 @@ public class ShaderProgram {
 
     private static int getShaderType(String typeString) {
         return switch (typeString) {
-            case "vert" -> GL_VERTEX_SHADER;
-            case "tesc" -> GL_TESS_CONTROL_SHADER;
-            case "tese" -> GL_TESS_EVALUATION_SHADER;
-            case "geom" -> GL_GEOMETRY_SHADER;
-            case "frag" -> GL_FRAGMENT_SHADER;
+            case "vert", "vertex" -> GL_VERTEX_SHADER;
+            case "tesc", "tessellation_control" -> GL_TESS_CONTROL_SHADER;
+            case "tese", "tessellation_evaluation" -> GL_TESS_EVALUATION_SHADER;
+            case "geom", "geometry" -> GL_GEOMETRY_SHADER;
+            case "frag", "fragment" -> GL_FRAGMENT_SHADER;
             default -> -1;
         };
     }
@@ -217,8 +217,8 @@ public class ShaderProgram {
 
         HashMap<String, Integer> cache = isBlock ? uniformBlockCache : uniformCache;
         if (!cache.containsKey(uniformName)) {
-            int loc = isBlock ? glGetUniformBlockIndex(program, uniformName) : glGetUniformLocation(program, uniformName);
-            cache.put(uniformName, loc);
+            int location = isBlock ? glGetUniformBlockIndex(program, uniformName) : glGetUniformLocation(program, uniformName);
+            cache.put(uniformName, location);
         }
         return cache.get(uniformName);
     }
