@@ -11,13 +11,14 @@ import boilerplate.rendering.SkyBox;
 import boilerplate.rendering.buffers.FrameBuffer;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
-import boilerplate.rendering.buffers.VertexElementBuffer;
 import boilerplate.rendering.builders.*;
 import boilerplate.rendering.textures.CubeMap;
+import boilerplate.rendering.textures.Texture2dMultisample;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.opengl.GL45;
 
 import java.awt.*;
 
@@ -42,7 +43,6 @@ public class Example3d extends GameBase {
     ShaderProgram shOutline = new ShaderProgram();
     VertexArray va = new VertexArray();
     VertexArrayBuffer vb = new VertexArrayBuffer();
-//    VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
     CubeMap ballerCube = new CubeMap();
 
     SkyBox skyBox = new SkyBox();
@@ -104,7 +104,6 @@ public class Example3d extends GameBase {
         CubeMap.unbind();
         va.genId();
         vb.genId();
-//        veb.genId();
 
         sh.autoInitializeShadersMulti("shaders/3d.glsl");
         shReflect.autoInitializeShadersMulti("shaders/3d_reflect.glsl");
@@ -119,7 +118,6 @@ public class Example3d extends GameBase {
         poly.mode = new ShapeMode.Unpack(Shape3d.defaultCubeNormals());
         bb3.pushPolygon(poly);
         vb.bufferData(bb3);
-//        veb.bufferData(poly.elementIndex);
 
         finalSh.autoInitializeShadersMulti("shaders/3d_final.glsl");
         finalVa.genId();
@@ -132,8 +130,13 @@ public class Example3d extends GameBase {
         finalVb.bufferData(bb2);
 
         fb.genId();
-        fb.attachColourBuffer(fb.setupDefaultColourBuffer());
-        fb.attachRenderBuffer(fb.setupDefaultRenderBuffer());
+        Texture2dMultisample buff = new Texture2dMultisample(SCREEN_SIZE, true);
+        buff.bind();
+        buff.createTexture2d(FrameBuffer.defaultColourBuffFormat, 4);
+        FrameBuffer.RenderBuffer rb = new FrameBuffer.RenderBuffer(true);
+        rb.createBufferMultisample(SCREEN_SIZE, GL45.GL_DEPTH24_STENCIL8, GL45.GL_DEPTH_STENCIL_ATTACHMENT, 4);
+        fb.attachColourBuffer(buff);
+        fb.attachRenderBuffer(rb);
         fb.checkCompletionOrError();
         FrameBuffer.unbind();
     }
@@ -174,14 +177,16 @@ public class Example3d extends GameBase {
 
         skyBox.draw();
 
-        // --- POST PROCESSING --- //
-        FrameBuffer.unbind();
-        Renderer.clearC();
-        Renderer.disableDepthTest();
+        fb.blitIntoDefaultFrameBuffer(SCREEN_SIZE, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-        finalSh.bind();
-        fb.colourBuffers.getFirst().bind();
-        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
+        // --- POST PROCESSING --- //
+//        FrameBuffer.unbind();
+//        Renderer.clearC();
+//        Renderer.disableDepthTest();
+//
+//        finalSh.bind();
+//        fb.colourBuffers.getFirst().bind();
+//        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
 
         Renderer.finish(window);
     }

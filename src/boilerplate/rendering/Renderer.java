@@ -102,6 +102,14 @@ public class Renderer {
         glStencilMask(0x00);  // bitwise && 0, allows nothing
     }
 
+    public static void enableMultiSampling() {
+        glEnable(GL_MULTISAMPLE);
+    }
+
+    public static void disableMultiSampling() {
+        glDisable(GL_MULTISAMPLE);
+    }
+
     /**
      * logically behaving transparency
      */

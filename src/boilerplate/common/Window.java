@@ -13,7 +13,6 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.system.MemoryStack.create;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -29,6 +28,9 @@ public class Window {
 
         public boolean vSync = false;
         public Dimension initWindowSize = BoilerplateConstants.DEFAULT_SCREEN_SIZE;
+
+        public boolean enableDefaultFramebufferMultisampling = false;
+        public int multisamplePerPixel = 4;
 
         public int glfw_version_major = BoilerplateConstants.GLFW_VERSION_MAJOR;
         public int glfw_version_minor = BoilerplateConstants.GLFW_VERSION_MINOR;
@@ -77,6 +79,9 @@ public class Window {
         glfwWindowHint(GLFW_VISIBLE, options.initVisible ? GLFW_TRUE : GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, options.resizable ? GLFW_TRUE : GLFW_FALSE);
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+
+        // anti aliasing / multi sampling (only on default frame buffer)
+        if (options.enableDefaultFramebufferMultisampling) glfwWindowHint(GLFW_SAMPLES, options.multisamplePerPixel);
 
         // gl version 4.5
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, options.glfw_version_major);

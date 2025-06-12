@@ -2,6 +2,7 @@ package boilerplate.rendering.buffers;
 
 import boilerplate.rendering.textures.Texture;
 import boilerplate.rendering.textures.Texture2d;
+import boilerplate.rendering.textures.Texture2dMultisample;
 import boilerplate.utility.Logging;
 import org.lwjgl.opengl.GL45;
 
@@ -21,11 +22,31 @@ public class FrameBuffer {
     public static class RenderBuffer {
         private Integer id;
         public Integer attachment;
+        private boolean hasMultisampling = false;
+
+        public RenderBuffer() {
+
+        }
+
+        public RenderBuffer(boolean generateId) {
+            if (generateId) genId();
+        }
 
         public void createBuffer(Dimension size, int format, int attachment) {
+            if (hasMultisampling) {
+                Logging.warn("Cannot create normal render buffer for a render buffer that uses multisampling. Aborting.");
+                return;
+            }
             this.attachment = attachment;
             bind();
             GL45.glRenderbufferStorage(GL45.GL_RENDERBUFFER, format, size.width, size.height);
+        }
+
+        public void createBufferMultisample(Dimension size, int format, int attachment, int samples) {
+            this.hasMultisampling = true;
+            this.attachment = attachment;
+            bind();
+            GL45.glRenderbufferStorageMultisample(GL45.GL_RENDERBUFFER, samples, format, size.width, size.height);
         }
 
         public void bind() {
@@ -51,7 +72,8 @@ public class FrameBuffer {
 
     public static int defaultColourBuffFormat = GL45.GL_RGBA;
 
-    private static int boundFrameBuffer = 0;
+    private static int boundReadFrameBuffer = 0;
+    private static int boundDrawFrameBuffer = 0;
     protected Integer bufferId;
 
     public Dimension bufferSize = new Dimension(128, 128);
@@ -79,36 +101,49 @@ public class FrameBuffer {
         this.bufferSize = bufferSize;
     }
 
+    public void blitIntoFrameBuffer(FrameBuffer frameBuffer, int mask, int interpolation) {
+        bindToRead();
+        frameBuffer.bindToDraw();
+        GL45.glBlitFramebuffer(0, 0, bufferSize.width, bufferSize.height, 0, 0, frameBuffer.bufferSize.width, frameBuffer.bufferSize.height, mask, interpolation);
+    }
+
+    public void blitIntoDefaultFrameBuffer(Dimension destinationSize, int mask, int interpolation) {
+        bindToRead();
+        unbindFromDraw();
+        GL45.glBlitFramebuffer(0, 0, bufferSize.width, bufferSize.height, 0, 0, destinationSize.width, destinationSize.height, mask, interpolation);
+    }
+
     public void attachColourBuffer(Texture colourBuff) {
-        if (boundFrameBuffer != bufferId) bind();
-        GL45.glFramebufferTexture2D(GL45.GL_FRAMEBUFFER, GL45.GL_COLOR_ATTACHMENT0 + colourBuffers.size(), GL45.GL_TEXTURE_2D, colourBuff.getId(), 0);
+        boolean multisample = colourBuff instanceof Texture2dMultisample;
+        bind();
+        GL45.glFramebufferTexture2D(GL45.GL_FRAMEBUFFER, GL45.GL_COLOR_ATTACHMENT0 + colourBuffers.size(), multisample ? GL45.GL_TEXTURE_2D_MULTISAMPLE : GL45.GL_TEXTURE_2D, colourBuff.getId(), 0);
         colourBuffers.add(colourBuff);
         Logging.debug("Attached colour buffer to frame buffer (id: %s), (texture id: %s, col buff index: %s)", getId(), colourBuff.getId(), colourBuffers.size());
     }
 
     public void attachDepthBuffer(Texture depthBuff) {
-        if (boundFrameBuffer != bufferId) bind();
+        bind();
         this.depthBuffer = depthBuff;
         GL45.glFramebufferTexture2D(GL45.GL_FRAMEBUFFER, GL45.GL_DEPTH_ATTACHMENT, GL45.GL_TEXTURE_2D, depthBuff.getId(), 0);
         Logging.debug("Attached depth buffer to frame buffer (id: %s), (texture id: %s)", getId(), depthBuff.getId());
     }
 
     public void attachStencilBuffer(Texture stencilBuff) {
-        if (boundFrameBuffer != bufferId) bind();
+        bind();
         this.stencilBuffer = stencilBuff;
         GL45.glFramebufferTexture2D(GL45.GL_FRAMEBUFFER, GL45.GL_STENCIL_ATTACHMENT, GL45.GL_TEXTURE_2D, stencilBuff.getId(), 0);
         Logging.debug("Attached stencil buffer to frame buffer (id: %s), (texture id: %s)", getId(), stencilBuff.getId());
     }
 
     public void attachDepthStencilBuffer(Texture depthStencilBuff) {
-        if (boundFrameBuffer != bufferId) bind();
+        bind();
         this.depthStencilBuffer = depthStencilBuff;
         GL45.glFramebufferTexture2D(GL45.GL_FRAMEBUFFER, GL45.GL_DEPTH_STENCIL_ATTACHMENT, GL45.GL_TEXTURE_2D, depthStencilBuff.getId(), 0);
         Logging.debug("Attached depth / stencil buffer to frame buffer (id: %s), (texture id: %s)", getId(), depthStencilBuff.getId());
     }
 
     public void attachRenderBuffer(RenderBuffer renderBuff) {
-        if (boundFrameBuffer != bufferId) bind();
+        bind();
         this.renderBuffer = renderBuff;
         GL45.glFramebufferRenderbuffer(GL45.GL_FRAMEBUFFER, renderBuff.attachment, GL45.GL_RENDERBUFFER, renderBuff.getId());
         Logging.debug("Attached render buffer to frame buffer (id: %s), (texture id: %s)", getId(), renderBuff.getId());
@@ -157,7 +192,7 @@ public class FrameBuffer {
         Texture2d buff = new Texture2d(size, true);
         buff.textureType = textureType;
         buff.bind();
-        buff.createTexture(storedFormat, givenFormat, null);
+        buff.createTexture2d(storedFormat, givenFormat, null);
         return buff;
     }
 
@@ -185,31 +220,68 @@ public class FrameBuffer {
     }
 
     public void bind() {
-        if (boundFrameBuffer == bufferId) return;
-        boundFrameBuffer = bufferId;
+        if (boundReadFrameBuffer == bufferId && boundDrawFrameBuffer == bufferId) return;
+        boundReadFrameBuffer = bufferId;
+        boundDrawFrameBuffer = bufferId;
         GL45.glBindFramebuffer(GL45.GL_FRAMEBUFFER, bufferId);
+    }
+
+    public void bindToRead() {
+        if (boundReadFrameBuffer == bufferId) return;
+        boundReadFrameBuffer = bufferId;
+        GL45.glBindFramebuffer(GL45.GL_READ_FRAMEBUFFER, bufferId);
+    }
+
+    public void bindToDraw() {
+        if (boundDrawFrameBuffer == bufferId) return;
+        boundDrawFrameBuffer = bufferId;
+        GL45.glBindFramebuffer(GL45.GL_DRAW_FRAMEBUFFER, bufferId);
     }
 
     /**
      * 0 reverts to use the default frame buffer, set by the windowing system (GLFW)
      */
     public static void unbind() {
-        if (boundFrameBuffer == 0) return;
-        boundFrameBuffer = 0;
+        boundReadFrameBuffer = 0;
+        boundDrawFrameBuffer = 0;
         GL45.glBindFramebuffer(GL45.GL_FRAMEBUFFER, 0);
     }
 
+    public static void unbindFromRead() {
+        boundReadFrameBuffer = 0;
+        GL45.glBindFramebuffer(GL45.GL_READ_FRAMEBUFFER, 0);
+    }
+
+    public static void unbindFromDraw() {
+        boundDrawFrameBuffer = 0;
+        GL45.glBindFramebuffer(GL45.GL_DRAW_FRAMEBUFFER, 0);
+    }
+
     public void delete() {
-        if (boundFrameBuffer == bufferId) unbind();
+        if (boundReadFrameBuffer == bufferId) unbind();
         GL45.glDeleteFramebuffers(bufferId);
     }
 
+    public int getFrameBufferStatus() {
+        bind();
+        return GL45.glCheckFramebufferStatus(GL45.GL_FRAMEBUFFER);
+    }
+
     public boolean isCompletelyBuilt() {
-        if (boundFrameBuffer != bufferId) bind();
-        return GL45.glCheckFramebufferStatus(GL45.GL_FRAMEBUFFER) == GL45.GL_FRAMEBUFFER_COMPLETE;
+        return getFrameBufferStatus() == GL45.GL_FRAMEBUFFER_COMPLETE;
     }
 
     public void checkCompletionOrError() {
-        if (!isCompletelyBuilt()) Logging.warn("The frame buffer is not complete.");
+        if (!isCompletelyBuilt()) {
+            Logging.warn("The frame buffer is not complete.");
+            switch (getFrameBufferStatus()) {
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+            }
+        }
     }
 }

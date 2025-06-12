@@ -35,9 +35,9 @@ public class Texture2d extends Texture {
         if (generateId) genId();
     }
 
-    public Texture2d(String resourcePath) {
+    public Texture2d(String path) {
         this();
-        createTextureFromImage(Image.loadImageFromPathSTB(resourcePath));
+        createTextureFromImage(Image.loadImageFromPathSTB(path));
     }
 
     public Texture2d(BufferedImage buffImg) {
@@ -51,14 +51,14 @@ public class Texture2d extends Texture {
         createTextureFromImage(image);
     }
 
-    private void createTextureFromImage(Image image) {
+    protected void createTextureFromImage(Image image) {
         image.buffer.flip();  // flip to read mode for openGL
 
         genId();
         bind();
         useNearestInterpolation();
         useClampEdgeWrap();
-        createTexture(storedFormat, image.getImageFormat(), image.buffer);
+        createTexture2d(storedFormat, image.getImageFormat(), image.buffer);
 
         MemoryUtil.memFree(image.buffer);  // may want to keep for later though :shrug:
     }
@@ -67,7 +67,7 @@ public class Texture2d extends Texture {
      * internalFormat: format to be stored in
      * format: format of supplied image
      */
-    public void createTexture(int storedFormat, int givenImgFormat, ByteBuffer buffer) {
+    public void createTexture2d(int storedFormat, int givenImgFormat, ByteBuffer buffer) {
         glTexImage2D(GL_TEXTURE_2D, 0, storedFormat, size.width, size.height, 0, givenImgFormat, textureType, buffer);
     }
 
