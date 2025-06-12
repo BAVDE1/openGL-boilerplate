@@ -122,6 +122,9 @@ public class Renderer {
         glClearColor(r, g, b, a);
     }
 
+    /**
+     * Clear calls apply to the currently bound framebuffer
+     */
     public static void clearCDS() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }

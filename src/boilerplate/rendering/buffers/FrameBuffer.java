@@ -17,6 +17,9 @@ import java.util.ArrayList;
  * <p>
  * Render buffer objects are write only, cannot be read (cannot be sampled), which makes them fast.
  * If you're not sampling the values in your shader, use render buffer attachment, otherwise use a texture attachment.
+ * <p>
+ * Intermediary framebuffer can be used to blit a multisample framebuffer (this) into a normal framebuffer (this.intermediaryFB). For post-processing or whatever.
+ * The default setup for the intermediary framebuffer only attaches one normal color buffer with the same size as this framebuffer.
  */
 public class FrameBuffer {
     public static class RenderBuffer {
@@ -84,6 +87,8 @@ public class FrameBuffer {
     public Texture depthStencilBuffer;
     public RenderBuffer renderBuffer;
 
+    public FrameBuffer intermediaryFB = null;
+
     public FrameBuffer() {
 
     }
@@ -99,6 +104,16 @@ public class FrameBuffer {
     public FrameBuffer(boolean generateId, Dimension bufferSize) {
         this(generateId);
         this.bufferSize = bufferSize;
+    }
+
+    public void setupIntermediaryFB() {
+        intermediaryFB = new FrameBuffer(true, bufferSize);
+        intermediaryFB.attachColourBuffer(intermediaryFB.setupDefaultColourBuffer());
+        intermediaryFB.checkCompletionOrError();
+    }
+
+    public void blitIntoIntermediaryFB(int mask, int interpolation) {
+        blitIntoFrameBuffer(intermediaryFB, mask, interpolation);
     }
 
     public void blitIntoFrameBuffer(FrameBuffer frameBuffer, int mask, int interpolation) {
@@ -238,6 +253,10 @@ public class FrameBuffer {
         GL45.glBindFramebuffer(GL45.GL_DRAW_FRAMEBUFFER, bufferId);
     }
 
+    public void bindIntermediaryFBColorBuffer() {
+        intermediaryFB.colourBuffers.getFirst().bind();
+    }
+
     /**
      * 0 reverts to use the default frame buffer, set by the windowing system (GLFW)
      */
@@ -272,15 +291,22 @@ public class FrameBuffer {
     }
 
     public void checkCompletionOrError() {
-        if (!isCompletelyBuilt()) {
+        int status = getFrameBufferStatus();
+        if (status != GL45.GL_FRAMEBUFFER_COMPLETE) {
             Logging.warn("The frame buffer is not complete.");
-            switch (getFrameBufferStatus()) {
+            switch (status) {
                 case GL45.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
-                case GL45.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
-                case GL45.GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS");
-                case GL45.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
-                case GL45.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
-                case GL45.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER -> Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER ->
+                        Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS ->
+                        Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT ->
+                        Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE ->
+                        Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
+                case GL45.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER ->
+                        Logging.warn("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+                default -> Logging.warn("UNKNOWN STATUS: %s", status);
             }
         }
     }

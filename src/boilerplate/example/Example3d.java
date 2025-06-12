@@ -130,6 +130,7 @@ public class Example3d extends GameBase {
         finalVb.bufferData(bb2);
 
         fb.genId();
+        fb.setupIntermediaryFB();
         Texture2dMultisample buff = new Texture2dMultisample(SCREEN_SIZE, true);
         buff.bind();
         buff.createTexture2d(FrameBuffer.defaultColourBuffFormat, 4);
@@ -177,16 +178,16 @@ public class Example3d extends GameBase {
 
         skyBox.draw();
 
-        fb.blitIntoDefaultFrameBuffer(SCREEN_SIZE, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        fb.blitIntoIntermediaryFB(GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         // --- POST PROCESSING --- //
-//        FrameBuffer.unbind();
-//        Renderer.clearC();
-//        Renderer.disableDepthTest();
-//
-//        finalSh.bind();
-//        fb.colourBuffers.getFirst().bind();
-//        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
+        FrameBuffer.unbind();
+        Renderer.clearC();
+        Renderer.disableDepthTest();
+
+        finalSh.bind();
+        fb.bindIntermediaryFBColorBuffer();
+        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
 
         Renderer.finish(window);
     }
