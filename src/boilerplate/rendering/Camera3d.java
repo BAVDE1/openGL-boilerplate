@@ -199,8 +199,20 @@ public class Camera3d {
         }
     }
 
+    /**
+     * Returns the position of the camera in target mode
+     */
+    public Vector3f targetingCameraPos() {
+        return forward.mul(-targetRadius, new Vector3f()).add(target);
+    }
+
+    public Vector3f getPos() {
+        if (mode == MODE_TARGET) return targetingCameraPos();
+        return pos;
+    }
+
     private Matrix4f generateTargetViewMatrix() {
-        return new Matrix4f().lookAt(forward.mul(-targetRadius, new Vector3f()).add(target), target, worldUp);
+        return new Matrix4f().lookAt(targetingCameraPos(), target, worldUp);
     }
 
     private Matrix4f generateFlyViewMatrix() {
@@ -247,5 +259,17 @@ public class Camera3d {
 
     public int getMode() {
         return mode;
+    }
+
+    public Vector3f getForward() {
+        return new Vector3f(forward);
+    }
+
+    public Vector3f getRight() {
+        return new Vector3f(right);
+    }
+
+    public Vector3f getUp() {
+        return new Vector3f(up);
     }
 }

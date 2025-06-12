@@ -18,6 +18,7 @@ import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.assimp.Assimp;
 import org.lwjgl.opengl.GL45;
 
 import java.awt.*;
@@ -44,7 +45,6 @@ public class Example3d extends GameBase {
     VertexArray va = new VertexArray();
     VertexArrayBuffer vb = new VertexArrayBuffer();
     CubeMap ballerCube = new CubeMap();
-
     SkyBox skyBox = new SkyBox();
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
@@ -172,7 +172,7 @@ public class Example3d extends GameBase {
         Renderer.disableStencilTest();
 
         shReflect.bind();
-        shReflect.uniform3f("camPos", camera.pos);
+        shReflect.uniform3f("camPos", camera.getPos());
         skyBox.bindSkyBoxTexture();
         drawObjects(model1.translate(2, 0, 0), model2.translate(2, 0, 0), shReflect);
 
