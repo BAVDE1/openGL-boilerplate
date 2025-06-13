@@ -27,12 +27,16 @@ public class VertexArray {
         public static int getByteSizeForType(int type) {
             return switch (type) {
                 case (GL_FLOAT) -> Float.BYTES;
-                case (GL_UNSIGNED_INT) -> Integer.BYTES;
+                case (GL_INT), (GL_UNSIGNED_INT) -> Integer.BYTES;
                 default -> {
-                    Logging.danger("Can't find case for type '%s', no bytes returned");
+                    Logging.danger("Can't find case for type '%s', no bytes returned", type);
                     yield 0;
                 }
             };
+        }
+
+        public boolean isIntType() {
+            return type == GL_INT || type == GL_UNSIGNED_INT || type == GL_BYTE || type == GL_UNSIGNED_BYTE;
         }
     }
 
@@ -52,14 +56,30 @@ public class VertexArray {
         }
 
         private void push(int type, int count, boolean normalized) {
+            if (count == 0) return;
             elements.add(new Element(type, count, normalized));
             stride += count * Element.getByteSizeForType(type);
             totalItems += count;
         }
 
         public void pushFloat(int count) {
-            if (count == 0) return;
             push(GL_FLOAT, count, false);
+        }
+
+        public void pushInt(int count) {
+            push(GL_INT, count, false);
+        }
+
+        public void pushUnsignedInt(int count) {
+            push(GL_UNSIGNED_INT, count, false);
+        }
+
+        public void pushByte(int count) {
+            push(GL_BYTE, count, false);
+        }
+
+        public void pushUnsignedByte(int count) {
+            push(GL_UNSIGNED_BYTE, count, false);
         }
 
         public ArrayList<Element> getElements() {
@@ -172,7 +192,10 @@ public class VertexArray {
 
             int attribInx = i + attribCount;  // adding onto the last
             glEnableVertexAttribArray(attribInx);
-            glVertexAttribPointer(attribInx, element.count, element.type, element.normalized, layout.stride, offset);
+
+            if (element.isIntType()) glVertexAttribIPointer(attribInx, element.count, element.type, layout.stride, offset);
+            else glVertexAttribPointer(attribInx, element.count, element.type, element.normalized, layout.stride, offset);
+
             if (divisor > 0) glVertexAttribDivisor(attribInx, divisor);
 
             offset += element.count * element.getByteSizeForType();

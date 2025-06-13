@@ -4,6 +4,7 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
+import boilerplate.models.Mesh;
 import boilerplate.rendering.Camera3d;
 import boilerplate.rendering.Renderer;
 import boilerplate.rendering.ShaderProgram;
@@ -13,6 +14,7 @@ import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.builders.*;
 import boilerplate.rendering.textures.CubeMap;
+import boilerplate.rendering.textures.Texture2d;
 import boilerplate.rendering.textures.Texture2dMultisample;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
@@ -48,6 +50,8 @@ public class Example3d extends GameBase {
     SkyBox skyBox = new SkyBox();
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
+
+    Mesh m = new Mesh();
 
     @Override
     public void start() {
@@ -140,6 +144,14 @@ public class Example3d extends GameBase {
         fb.attachRenderBuffer(rb);
         fb.checkCompletionOrError();
         FrameBuffer.unbind();
+
+        Mesh.VertexDefault v1 = new Mesh.VertexDefault();
+        Mesh.VertexDefault v2 = new Mesh.VertexDefault();
+        v1.p = 0;
+//        v1.position = new float[] {1};
+//        v2.position = new float[] {2, 2, 2};
+        m.debugSetup = true;
+        m.setup(new Mesh.VertexDefault[] {v1}, new int[] {}, new Texture2d[] {});
     }
 
     public void render() {

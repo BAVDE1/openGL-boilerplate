@@ -4,6 +4,7 @@ import boilerplate.rendering.builders.BufferBuilder;
 import org.lwjgl.opengl.GL45;
 import boilerplate.utility.Logging;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL45.*;
@@ -44,6 +45,16 @@ public abstract class VertexBuffer {
     public void bufferData(FloatBuffer data) {
         bind();
         GL45.glBufferData(bufferType, data, usage);
+    }
+
+    public void bufferData(ByteBuffer data) {
+        bind();
+        GL45.glBufferData(bufferType, data, usage);
+    }
+
+    public void bufferData(byte[] data) {
+        // todo: flip ByteBuffer?
+        bufferData(ByteBuffer.wrap(data));
     }
 
     public void bufferData(int[] data) {

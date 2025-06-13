@@ -203,9 +203,9 @@ public class FrameBuffer {
         return setupTextureBuffer(size, format, format, GL45.GL_UNSIGNED_BYTE);
     }
 
-    public static Texture setupTextureBuffer(Dimension size, int storedFormat, int givenFormat, int textureType) {
+    public static Texture setupTextureBuffer(Dimension size, int storedFormat, int givenFormat, int pixelDataType) {
         Texture2d buff = new Texture2d(size, true);
-        buff.textureType = textureType;
+        buff.pixelDataType = pixelDataType;
         buff.bind();
         buff.createTexture2d(storedFormat, givenFormat, null);
         return buff;

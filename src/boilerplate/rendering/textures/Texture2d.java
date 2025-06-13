@@ -18,9 +18,17 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public class Texture2d extends Texture {
+    public static final int TYPE_NOTHING = 0;
+    public static final int TYPE_NORMAL = 1;
+    public static final int TYPE_HEIGHT = 2;
+    public static final int TYPE_DIFFUSE = 3;
+    public static final int TYPE_SPECULAR = 4;
+
     protected static final Map<Integer, Integer> boundSlots = new HashMap<>();  // key: slot, value: texId
     public static File outputFile = new File("image.png");  // for debugging
-    public int textureType = GL_UNSIGNED_BYTE;
+
+    public int textureType = TYPE_NOTHING;
+    public int pixelDataType = GL_UNSIGNED_BYTE;
     public int storedFormat = GL45.GL_RGBA;
 
     public Dimension size = new Dimension();
@@ -68,7 +76,7 @@ public class Texture2d extends Texture {
      * format: format of supplied image
      */
     public void createTexture2d(int storedFormat, int givenImgFormat, ByteBuffer buffer) {
-        glTexImage2D(GL_TEXTURE_2D, 0, storedFormat, size.width, size.height, 0, givenImgFormat, textureType, buffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, storedFormat, size.width, size.height, 0, givenImgFormat, pixelDataType, buffer);
     }
 
     /**
