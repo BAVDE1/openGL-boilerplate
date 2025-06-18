@@ -8,6 +8,7 @@ import boilerplate.rendering.Renderer;
 import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
+import boilerplate.rendering.buffers.VertexLayout;
 import boilerplate.rendering.builders.BufferBuilder2f;
 import boilerplate.rendering.builders.Shape2d;
 import boilerplate.rendering.builders.ShapeMode;
@@ -148,7 +149,7 @@ public class Example2d extends GameBase {
         // MAIN BUFFERS
         vbMain.genId(); vaMain.genId();
 
-        builderMain.setAdditionalVertFloats(VertexArray.Layout.getDefaultLayoutAdditionalVerts());
+        builderMain.setAdditionalVertFloats(4);
         builderMain.pushSeparatedPolygon(Shape2d.createRect(new Vector2f(50, 50), new Vector2f(500, 100), new ShapeMode.Demonstration(1, new Vector2f(), new Vector2f(1))));
         builderMain.pushSeparatedPolygon(Shape2d.createRect(new Vector2f(200, 200), new Vector2f(700, 150), new ShapeMode.Demonstration(2, new Vector2f(), new Vector2f(1))));
         builderMain.pushSeparatedPolygon(Shape2d.createLine(new Vector2f(70, 20), new Vector2f(150, 150), 20, new ShapeMode.Demonstration(3)));
@@ -161,7 +162,7 @@ public class Example2d extends GameBase {
 
         vbMain.bufferData(builderMain);
         vaMain.bindBuffer(vbMain);
-        vaMain.pushLayout(VertexArray.Layout.useDefaultLayout());
+        vaMain.fastSetup(new int[] {2, 1, 3}, vbMain);
 
         to1 = new TextRenderer.TextObject(1, "", new Vector2f(5), Color.CYAN, Color.BLACK);
         to2 = new TextRenderer.TextObject(1, "", new Vector2f(5, 50), Color.WHITE, Color.BLACK);
@@ -177,7 +178,7 @@ public class Example2d extends GameBase {
         builderCircles.pushCircle(new Vector2f(200), 50, Color.BLUE);
         builderCircles.pushCircle(new Vector2f(300), 34, 10, Color.GREEN);
 
-        VertexArray.Layout instanceLayout = new VertexArray.Layout();
+        VertexLayout instanceLayout = new VertexLayout();
         instanceLayout.pushFloat(2);  // circle pos
         instanceLayout.pushFloat(1);  // radius
         instanceLayout.pushFloat(1);  // inner radius

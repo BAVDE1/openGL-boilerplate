@@ -52,8 +52,6 @@ public class Example3d extends GameBase {
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
-    Mesh m = new Mesh();
-
     @Override
     public void start() {
         TimeStepper.startTimeStepper(BoilerplateConstants.DT, this);

@@ -2,6 +2,7 @@ package boilerplate.rendering.text;
 
 import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexArray;
+import boilerplate.rendering.buffers.VertexLayout;
 import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
 import org.joml.Vector2f;
@@ -173,7 +174,7 @@ public class FontManager {
     private final static ArrayList<LoadedFont> allLoadedFonts = new ArrayList<>();
     private final static HashMap<String, Integer> loadedFontUids = new HashMap<>();
 
-    private static VertexArray.Layout textVertexLayout = new VertexArray.Layout();
+    private static VertexLayout textVertexLayout = new VertexLayout();
     private static ShaderProgram textShader = new ShaderProgram();
 
     public static int fullWidth = 0, fullHeight = 0;
@@ -266,7 +267,7 @@ public class FontManager {
     }
 
     public static int textLayoutAdditionalVerts() {return 6;}
-    public static VertexArray.Layout getTextVertexLayout() {
+    public static VertexLayout getTextVertexLayout() {
         return textVertexLayout;
     }
 
@@ -297,7 +298,7 @@ public class FontManager {
         allLoadedFonts.clear();
         loadedFontUids.clear();
 
-        textVertexLayout = new VertexArray.Layout();
+        textVertexLayout = new VertexLayout();
         textShader = new ShaderProgram();
 
         fullWidth = 0;

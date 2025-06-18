@@ -4,43 +4,50 @@ import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.buffers.VertexElementBuffer;
+import boilerplate.rendering.buffers.VertexLayout;
 import boilerplate.rendering.textures.Texture2d;
-import boilerplate.utility.Logging;
-
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.assimp.AIVector3D;
 
 public class Mesh {
     public static final int MAX_BONE_INFLUENCE = 4;
 
-    public static abstract class Vertex implements Serializable {
-        public abstract VertexArray.Layout getVertexArrayLayout();
-    }
-
-    public static class VertexDefault extends Vertex {
-        public float p;
-        public float p2;
-//        public float[] position = new float[3];
-//        public float[] normal = new float[3];
-//        public float[] texCoords = new float[2];
-//        public float[] tangent = new float[3];
-//        public float[] bitangent = new float[3];
-//        public int[] boneIds = new int[MAX_BONE_INFLUENCE];
-//        public float[] boneWeights = new float[MAX_BONE_INFLUENCE];
-
-        public VertexArray.Layout getVertexArrayLayout() {
-            VertexArray.Layout l = new VertexArray.Layout();
-            l.pushFloat(1);
-//            l.pushFloat(3);
-//            l.pushFloat(2);
-//            l.pushFloat(3);
-//            l.pushFloat(3);
-//            l.pushInt(MAX_BONE_INFLUENCE);
-//            l.pushFloat(MAX_BONE_INFLUENCE);
-            return l;
-        }
-    }
+//    public static class Vertex implements Serializable {
+//        public static final int TYPE_POSITION = 1;
+//        public static final int TYPE_NORMAL = 2;
+//        public static final int TYPE_TEX_POS = 3;
+//
+//        public static final Map<Integer, String> typeStrings = Map.of(TYPE_POSITION, "position", TYPE_NORMAL, "normal", TYPE_TEX_POS, "tex_pos");
+//
+//        public int[] layoutTypes;
+//        public int[] layoutCount;
+//
+//        public Vertex(int[] layoutTypes, int[] layoutCount) {
+//            if (layoutTypes.length != layoutCount.length) {
+//                throw new RuntimeException("Vertex layout not valid, type and count arrays are expected wo be of equal length. types length: %s, counts length: %s".formatted(layoutTypes.length, layoutCount.length));
+//            }
+//
+//            this.layoutTypes = layoutTypes;
+//            this.layoutCount = layoutCount;
+//        }
+//
+//        public static Vertex defaultVertex() {
+//            return new Vertex(
+//                    new int[]{TYPE_POSITION, TYPE_POSITION, TYPE_NORMAL},
+//                    new int[]{3, 3, 2}
+//            );
+//        }
+//
+//        @Override
+//        public String toString() {
+//            StringBuilder s = new StringBuilder().append("Vertex(");
+//            for (int i = 0; i < layoutTypes.length; i++) {
+//                if (i != 0) s.append(", ");
+//                s.append("%s%s".formatted(typeStrings.get(layoutTypes[i]), layoutCount[i]));
+//            }
+//            return s.append(")").toString();
+//        }
+//    }
 
     public boolean debugSetup = false;
 
@@ -48,49 +55,56 @@ public class Mesh {
     VertexArrayBuffer vb = new VertexArrayBuffer();
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
 
-    Vertex[] vertices;
-    int[] indices;
+    VertexLayout vertexLayout;
+//    Vertex[] vertices;
+//    int[] indices;
     Texture2d[] textures;
 
-    public void setup(Vertex[] vertices, int[] indices, Texture2d[] textures) {
-//        this.vertices = vertices;
-//        this.indices = indices;
-//        this.textures = textures;
+    float[] data;
+
+    public Mesh(VertexLayout vertexLayout) {
+        this.vertexLayout = vertexLayout;
+    }
+
+    public void pushPosition(AIVector3D position) {
+
+    }
+
+    public void pushNormal(AIVector3D normal) {
+
+    }
+
+    public void pushNormal(int x, int y, int z) {
+
+    }
+
+    public void pushTexPos(PointerBuffer texPosBuff) {
+
+    }
+
+//    public void setup(Vertex[] vertices, int[] indices, Texture2d[] textures) {
+////        this.vertices = vertices;
+////        this.indices = indices;
+////        this.textures = textures;
+////
+////        va.genId();
+////        vb.genId();
+////        veb.genId();
 //
-//        va.genId();
-//        vb.genId();
-//        veb.genId();
-
-//        va.bindBuffer(vb, veb);
-//        va.pushLayout(vertices[0].getVertexArrayLayout());
-
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(byteStream)) {
-            out.writeObject(0);
-            out.flush();
-//            vb.bufferData(byteStream.toByteArray());
-        } catch (IOException e) {
-            Logging.danger("Error attempting to serialize given vertices into byte array.");
-            throw new RuntimeException(e);
-        }
-//        veb.bufferData(indices);
-
-        if (debugSetup) debug(byteStream);
-    }
-
-    private void debug(ByteArrayOutputStream byteStream) {
-        byte[] arr = byteStream.toByteArray();
-        ByteBuffer buff = ByteBuffer.wrap(arr);
-
-        Logging.mystical("ByteArrayOutputStream to byte[]; size: %s, data: %s", arr.length, Arrays.toString(arr));
-        ByteArrayInputStream bis = new ByteArrayInputStream(arr);
-        try (ObjectInput in = new ObjectInputStream(bis)) {
-            in.readObject();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-        Logging.mystical(Arrays.toString(bis.readAllBytes()));
-    }
+////        va.bindBuffer(vb, veb);
+////        va.pushLayout(vertices[0].getVertexArrayLayout());
+//
+//        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+//        try (ObjectOutputStream out = new ObjectOutputStream(byteStream)) {
+//            out.writeObject(0);
+//            out.flush();
+////            vb.bufferData(byteStream.toByteArray());
+//        } catch (IOException e) {
+//            Logging.danger("Error attempting to serialize given vertices into byte array.");
+//            throw new RuntimeException(e);
+//        }
+////        veb.bufferData(indices);
+//    }
 
     public void draw(ShaderProgram shaderProgram) {
 
