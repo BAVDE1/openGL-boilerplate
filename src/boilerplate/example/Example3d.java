@@ -5,6 +5,7 @@ import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
 import boilerplate.models.Mesh;
+import boilerplate.models.Model;
 import boilerplate.rendering.Camera3d;
 import boilerplate.rendering.Renderer;
 import boilerplate.rendering.ShaderProgram;
@@ -145,13 +146,15 @@ public class Example3d extends GameBase {
         fb.checkCompletionOrError();
         FrameBuffer.unbind();
 
-        Mesh.VertexDefault v1 = new Mesh.VertexDefault();
+        Model m = new Model();
+        m.loadModel("res/models/backpack/backpack.obj");
+//        Mesh.VertexDefault v1 = new Mesh.VertexDefault();
 //        Mesh.VertexDefault v2 = new Mesh.VertexDefault();
 //        v1.p = 0;
 //        v1.position = new float[] {1};
 //        v2.position = new float[] {2, 2, 2};
-        m.debugSetup = true;
-        m.setup(new Mesh.VertexDefault[] {v1}, new int[] {}, new Texture2d[] {});
+//        m.debugSetup = true;
+//        m.setup(new Mesh.VertexDefault[] {v1}, new int[] {}, new Texture2d[] {});
     }
 
     public void render() {
