@@ -1,5 +1,6 @@
 package boilerplate.models;
 
+import boilerplate.rendering.Renderer;
 import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
@@ -7,7 +8,12 @@ import boilerplate.rendering.buffers.VertexElementBuffer;
 import boilerplate.rendering.buffers.VertexLayout;
 import boilerplate.rendering.textures.Texture2d;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.assimp.AIVector2D;
 import org.lwjgl.assimp.AIVector3D;
+import org.lwjgl.opengl.GL45;
+
+import java.awt.desktop.ScreenSleepEvent;
+import java.nio.ByteBuffer;
 
 public class Mesh {
     public static final int MAX_BONE_INFLUENCE = 4;
@@ -49,8 +55,6 @@ public class Mesh {
 //        }
 //    }
 
-    public boolean debugSetup = false;
-
     VertexArray va = new VertexArray();
     VertexArrayBuffer vb = new VertexArrayBuffer();
     VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
@@ -58,28 +62,55 @@ public class Mesh {
     VertexLayout vertexLayout;
 //    Vertex[] vertices;
 //    int[] indices;
-    Texture2d[] textures;
+//    Texture2d[] textures;
 
-    float[] data;
+    int vertexCount = 0;
+    ByteBuffer data = ByteBuffer.allocate(0);
+    ByteBuffer indices = ByteBuffer.allocate(0);
 
     public Mesh(VertexLayout vertexLayout) {
         this.vertexLayout = vertexLayout;
     }
 
-    public void pushPosition(AIVector3D position) {
-
+    public void allocateMemory(int verticesBytes, int indicesBytes) {
+        System.out.println(verticesBytes);
+        data = ByteBuffer.allocate(verticesBytes);
+        indices = ByteBuffer.allocate(indicesBytes);
     }
 
-    public void pushNormal(AIVector3D normal) {
-
+    public void pushIndice(int i) {
+        indices.putInt(i);
     }
 
-    public void pushNormal(int x, int y, int z) {
-
+    public void pushFloats(float x, float y) {
+        data.putFloat(x);
+        data.putFloat(y);
     }
 
-    public void pushTexPos(PointerBuffer texPosBuff) {
+    public void pushFloats(float x, float y, float z) {
+        data.putFloat(x);
+        data.putFloat(y);
+        data.putFloat(z);
+    }
 
+    public void pushVector2D(AIVector2D vector) {
+        pushFloats(vector.x(), vector.y());
+    }
+
+    public void pushVector3D(AIVector3D vector) {
+        pushFloats(vector.x(), vector.y(), vector.z());
+    }
+
+    public void finalizeMesh() {
+        va.genId();
+        vb.genId();
+        veb.genId();
+
+        va.bindBuffer(vb, veb);
+        va.pushLayout(vertexLayout);
+
+        vb.bufferData(data);
+        veb.bufferData(indices);
     }
 
 //    public void setup(Vertex[] vertices, int[] indices, Texture2d[] textures) {
@@ -103,10 +134,10 @@ public class Mesh {
 //            Logging.danger("Error attempting to serialize given vertices into byte array.");
 //            throw new RuntimeException(e);
 //        }
-////        veb.bufferData(indices);
+
+    /// /        veb.bufferData(indices);
 //    }
-
     public void draw(ShaderProgram shaderProgram) {
-
+        Renderer.drawElements(GL45.GL_TRIANGLES, va, veb, vertexCount);
     }
 }

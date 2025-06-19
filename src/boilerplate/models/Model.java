@@ -97,53 +97,66 @@ public class Model {
     }
 
     private Mesh processMesh(AIMesh aiMesh, AIScene rootAiScene) {
-        List<Float> vertices = new ArrayList<>();
-        List<Float> normals = new ArrayList<>();
-
-        processVertices(aiMesh, vertices, normals);
-        return null;
+        Mesh mesh = new Mesh(vertexLayout);
+        mesh.allocateMemory(calculateVertexDataBytes(aiMesh), calculateIndicesBytes(aiMesh));
+        processVertices(mesh, aiMesh);
+        processFaces(mesh, aiMesh);
+        mesh.finalizeMesh();
+        return mesh;
     }
 
-    private void processVertices(AIMesh aiMesh, List<Float> vertices, List<Float> normals) {
-        Mesh processedMesh = new Mesh(vertexLayout);
+    private int calculateVertexDataBytes(AIMesh aiMesh) {
+        return aiMesh.mNumVertices() * vertexLayout.stride;
+    }
+
+    private int calculateIndicesBytes(AIMesh aiMesh) {
+        int bytes = 0;
+        for (int fi = 0; fi < aiMesh.mNumFaces(); fi++) {
+            AIFace face = aiMesh.mFaces().get(fi);
+            bytes += face.mNumIndices() * Integer.BYTES;
+        }
+        return bytes;
+    }
+
+    private void processVertices(Mesh mesh, AIMesh aiMesh) {
         AIVector3D.Buffer allVertices = aiMesh.mVertices();
         AIVector3D.Buffer allNormals = aiMesh.mNormals();
         PointerBuffer allTexPos = aiMesh.mTextureCoords();
 
         while (allVertices.hasRemaining()) {
-            AIVector3D vertex = allVertices.get();
-
-            for (int vi = 0; vi < vertexLayout.elements.size(); vi++) {
-                VertexLayout.Element element = vertexLayout.elements.get(vi);
-                switch (element.hint) {
-                    case (VertexLayout.HINT_POSITION) -> processedMesh.pushPosition(vertex);
-                    case (VertexLayout.HINT_NORMAL) -> {
-                        if (allNormals == null) {
-                            Logging.warn("Given vertex layout requires normals, but mesh data does not contain normals. Pushing zeroes instead.");
-                            processedMesh.pushNormal(0, 0, 0);
-                            continue;
-                        }
-                        processedMesh.pushNormal(allNormals.get(vi));
-                    }
-                    case (VertexLayout.HINT_TEX_POS) -> {/*todo*/}
-                    case (VertexLayout.HINT_NULL) ->
-                            throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
-                }
-//            processedMesh.pushVertex(allVertices.get());
-//                AIVector3D vertex = allVertices.get();
-//                vertices.add(vertex.x());
-//                vertices.add(vertex.y());
-//                vertices.add(vertex.z());
-//                if (allNormals != null) {
-//                    AIVector3D normal = allNormals.get();
-//                    normals.add(normal.x());
-//                    normals.add(normal.y());
-//                    normals.add(normal.z());
-//                }
-            }
+            processVertex(allVertices.get(), mesh, allNormals);
         }
     }
 
+    private void processFaces(Mesh mesh, AIMesh aiMesh) {
+        AIFace.Buffer allFaces = aiMesh.mFaces();
+
+        while (allFaces.hasRemaining()) {
+            IntBuffer indices = allFaces.get().mIndices();
+            while (indices.hasRemaining()) mesh.pushIndice(indices.get());
+        }
+    }
+
+    private void processVertex(AIVector3D vertex, Mesh mesh, AIVector3D.Buffer allNormals) {
+        mesh.vertexCount += 1;
+        for (VertexLayout.Element element : vertexLayout.elements) {
+//            VertexLayout.Element element = vertexLayout.elements.get(vi);
+            switch (element.hint) {
+                case (VertexLayout.HINT_POSITION) -> mesh.pushVector3D(vertex);
+                case (VertexLayout.HINT_NORMAL) -> {
+                    if (allNormals == null) {
+                        Logging.warn("Given vertex layout requires normals, but mesh data does not contain normals. Pushing zeroes instead.");
+                        mesh.pushFloats(0, 0, 0);
+                        continue;
+                    }
+                    mesh.pushVector3D(allNormals.get());
+                }
+                case (VertexLayout.HINT_TEX_POS) -> {/*todo*/}
+                case (VertexLayout.HINT_NULL) ->
+                        throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
+            }
+        }
+    }
 
     public void draw(ShaderProgram shaderProgram) {
         shaderProgram.bind();
@@ -152,9 +165,8 @@ public class Model {
 
     public static VertexLayout defaultVertexLayout() {
         return new VertexLayout(
-                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_POSITION),
-                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_NORMAL),
-                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 2, VertexLayout.HINT_TEX_POS)
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_POSITION)
+//                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_NORMAL)
         );
     }
 }

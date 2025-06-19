@@ -4,7 +4,6 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
-import boilerplate.models.Mesh;
 import boilerplate.models.Model;
 import boilerplate.rendering.Camera3d;
 import boilerplate.rendering.Renderer;
@@ -15,13 +14,11 @@ import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.builders.*;
 import boilerplate.rendering.textures.CubeMap;
-import boilerplate.rendering.textures.Texture2d;
 import boilerplate.rendering.textures.Texture2dMultisample;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.assimp.Assimp;
 import org.lwjgl.opengl.GL45;
 
 import java.awt.*;
@@ -51,6 +48,9 @@ public class Example3d extends GameBase {
     SkyBox skyBox = new SkyBox();
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
+
+    ShaderProgram modelShader = new ShaderProgram();
+    Model modelBackpack = new Model();
 
     @Override
     public void start() {
@@ -144,8 +144,9 @@ public class Example3d extends GameBase {
         fb.checkCompletionOrError();
         FrameBuffer.unbind();
 
-        Model m = new Model();
-        m.loadModel("res/models/backpack/backpack.obj");
+        modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
+        camera.bindShaderToUniformBlock(modelShader);
+        modelBackpack.loadModel("res/models/backpack/backpack.obj");
 //        Mesh.VertexDefault v1 = new Mesh.VertexDefault();
 //        Mesh.VertexDefault v2 = new Mesh.VertexDefault();
 //        v1.p = 0;
@@ -167,27 +168,29 @@ public class Example3d extends GameBase {
 
         // --- 3D SPACE --- //
         fb.bind();
-        Renderer.enableStencilTest();
         Renderer.enableDepthTest();
-        Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
-        Renderer.enableStencilWriting();
+//        Renderer.enableStencilTest();
+//        Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
+//        Renderer.enableStencilWriting();
         Renderer.clearCDS();
 
-        sh.bind();
-        ballerCube.bind();
-        drawObjects(model1, model2, sh);
+//        sh.bind();
+//        ballerCube.bind();
+//        drawObjects(model1, model2, sh);
+//
+//        Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
+//        Renderer.disableStencilWriting();
+//        Renderer.cullFrontFace();
+//        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
+//        Renderer.cullBackFace();
+//        Renderer.disableStencilTest();
+//
+//        shReflect.bind();
+//        shReflect.uniform3f("camPos", camera.getPos());
+//        skyBox.bindSkyBoxTexture();
+//        drawObjects(model1.translate(2, 0, 0), model2.translate(2, 0, 0), shReflect);
 
-        Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
-        Renderer.disableStencilWriting();
-        Renderer.cullFrontFace();
-        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
-        Renderer.cullBackFace();
-        Renderer.disableStencilTest();
-
-        shReflect.bind();
-        shReflect.uniform3f("camPos", camera.getPos());
-        skyBox.bindSkyBoxTexture();
-        drawObjects(model1.translate(2, 0, 0), model2.translate(2, 0, 0), shReflect);
+        modelBackpack.draw(modelShader);
 
         skyBox.draw();
 

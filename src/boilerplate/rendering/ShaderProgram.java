@@ -43,9 +43,9 @@ public class ShaderProgram {
     /**
      * Gen program, attach shader multi, & then link program
      */
-    public void autoInitializeShadersMulti(String resourcePath) {
+    public void autoInitializeShadersMulti(String path) {
         genProgram();
-        attachShaderMulti(resourcePath);
+        attachShaderMulti(path);
         linkProgram();
     }
 
@@ -60,12 +60,12 @@ public class ShaderProgram {
     /**
      * Attach different shaders that are in the same file. MUST be separated with a "//--- SHADER_TYPE" line
      */
-    public void attachShaderMulti(String resourcePath) {
+    public void attachShaderMulti(String path) {
         int currentShaderType = -1;
 
-        InputStream shaderFileStream = ClassLoader.getSystemResourceAsStream(resourcePath);
-        if (shaderFileStream == null) {
-            Logging.danger("'%s' could not be read. Aborting", resourcePath);
+        InputStream shaderFileStream = ClassLoader.getSystemResourceAsStream(path);
+        if (shaderFileStream == null || path.isEmpty()) {
+            Logging.danger("'%s' could not be read. Aborting", path);
             return;
         }
 
@@ -77,7 +77,7 @@ public class ShaderProgram {
             if (line.startsWith("//---")) {
                 // finish last shader
                 if (!charSequence.isEmpty()) {
-                    attachShader(charSequence.toString(), currentShaderType, resourcePath);
+                    attachShader(charSequence.toString(), currentShaderType, path);
                 }
 
                 // start next shader
@@ -91,21 +91,21 @@ public class ShaderProgram {
         }
 
         // finish
-        attachShader(charSequence.toString(), currentShaderType, resourcePath);
+        attachShader(charSequence.toString(), currentShaderType, path);
     }
 
     /**
      * adds new GL shader from given file (if applicable)
      * <a href="https://docs.gl/gl2/glAttachShader">Shader setup example</a>
      */
-    public void attachShader(String resourcePath) {
-        int shaderType = getShaderType(resourcePath);
+    public void attachShader(String path) {
+        int shaderType = getShaderType(path);
         if (shaderType < 0) return;  // not a shader file
 
         // get file contents
-        InputStream is = ClassLoader.getSystemResourceAsStream(resourcePath);
-        if (is == null) {
-            Logging.danger("'%s' could not be read. Aborting", resourcePath);
+        InputStream is = ClassLoader.getSystemResourceAsStream(path);
+        if (is == null || path.isEmpty()) {
+            Logging.danger("'%s' could not be read. Aborting", path);
             return;
         }
 
@@ -117,7 +117,7 @@ public class ShaderProgram {
         }
         charSequence = fileContents.toString();
 
-        attachShader(charSequence, shaderType, resourcePath);
+        attachShader(charSequence, shaderType, path);
     }
 
     public void attachShader(String shaderCode, int shaderType, String filePath) {
