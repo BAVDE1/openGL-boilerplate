@@ -43,6 +43,7 @@ public class VertexLayout {
             return switch (type) {
                 case (GL_FLOAT) -> Float.BYTES;
                 case (GL_INT), (GL_UNSIGNED_INT) -> Integer.BYTES;
+                case (GL_BYTE), (GL_UNSIGNED_BYTE) -> 1;
                 default -> {
                     Logging.danger("Can't find case for type '%s', no bytes returned", type);
                     yield 0;

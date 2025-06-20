@@ -20,6 +20,6 @@ void main() {
 out vec4 colour;
 
 void main() {
-    colour = vec4(1, 1, 1, 1);
+    colour = vec4(0, 1, 1, 1);
 //    colour = vec4(v_texPos.x, v_texPos.y, v_texPos.z, 1);
 }

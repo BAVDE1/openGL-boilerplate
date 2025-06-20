@@ -9,8 +9,6 @@ import org.lwjgl.assimp.*;
 
 import java.io.File;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Model {
     String directory;
@@ -119,6 +117,7 @@ public class Model {
     }
 
     private void processVertices(Mesh mesh, AIMesh aiMesh) {
+        mesh.vertexCount = aiMesh.mNumVertices();
         AIVector3D.Buffer allVertices = aiMesh.mVertices();
         AIVector3D.Buffer allNormals = aiMesh.mNormals();
         PointerBuffer allTexPos = aiMesh.mTextureCoords();
@@ -138,7 +137,6 @@ public class Model {
     }
 
     private void processVertex(AIVector3D vertex, Mesh mesh, AIVector3D.Buffer allNormals) {
-        mesh.vertexCount += 1;
         for (VertexLayout.Element element : vertexLayout.elements) {
 //            VertexLayout.Element element = vertexLayout.elements.get(vi);
             switch (element.hint) {

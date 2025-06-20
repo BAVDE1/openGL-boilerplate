@@ -3,9 +3,11 @@ package boilerplate.rendering.buffers;
 import boilerplate.rendering.builders.BufferBuilder;
 import org.lwjgl.opengl.GL45;
 import boilerplate.utility.Logging;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -44,17 +46,24 @@ public abstract class VertexBuffer {
 
     public void bufferData(FloatBuffer data) {
         bind();
+        if (data.remaining() == 0) data.flip();
         GL45.glBufferData(bufferType, data, usage);
     }
 
     public void bufferData(ByteBuffer data) {
         bind();
+        if (data.remaining() == 0) data.flip();
         GL45.glBufferData(bufferType, data, usage);
     }
 
     public void bufferData(byte[] data) {
-        // todo: flip ByteBuffer?
         bufferData(ByteBuffer.wrap(data));
+    }
+
+    public void bufferData(IntBuffer data) {
+        bind();
+        if (data.remaining() == 0) data.flip();
+        GL45.glBufferData(bufferType, data, usage);
     }
 
     public void bufferData(int[] data) {

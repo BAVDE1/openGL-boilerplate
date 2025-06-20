@@ -185,10 +185,10 @@ public class Example3d extends GameBase {
 //        Renderer.cullBackFace();
 //        Renderer.disableStencilTest();
 //
-//        shReflect.bind();
-//        shReflect.uniform3f("camPos", camera.getPos());
-//        skyBox.bindSkyBoxTexture();
-//        drawObjects(model1.translate(2, 0, 0), model2.translate(2, 0, 0), shReflect);
+        shReflect.bind();
+        shReflect.uniform3f("camPos", camera.getPos());
+        skyBox.bindSkyBoxTexture();
+        drawObjects(model1.translate(2, 0, 0), model2.translate(2, 0, 0), shReflect);
 
         modelBackpack.draw(modelShader);
 
