@@ -146,7 +146,7 @@ public class Example3d extends GameBase {
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
-        modelBackpack.loadModel("res/models/backpack/backpack.obj");
+        modelBackpack.loadModel("res/models/bloxy-cola/BloxyColaUpdated.obj");
 //        Mesh.VertexDefault v1 = new Mesh.VertexDefault();
 //        Mesh.VertexDefault v2 = new Mesh.VertexDefault();
 //        v1.p = 0;
