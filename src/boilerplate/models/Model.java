@@ -99,6 +99,7 @@ public class Model {
         mesh.allocateMemory(calculateVertexDataBytes(aiMesh), calculateIndicesBytes(aiMesh));
         processVertices(mesh, aiMesh);
         processFaces(mesh, aiMesh);
+        processTextures(mesh, aiMesh);
         mesh.finalizeMesh();
         return mesh;
     }
@@ -120,10 +121,10 @@ public class Model {
         mesh.vertexCount = aiMesh.mNumVertices();
         AIVector3D.Buffer allVertices = aiMesh.mVertices();
         AIVector3D.Buffer allNormals = aiMesh.mNormals();
-        PointerBuffer allTexPos = aiMesh.mTextureCoords();
+        AIVector3D.Buffer allTexPos = aiMesh.mTextureCoords(0);
 
         while (allVertices.hasRemaining()) {
-            processVertex(allVertices.get(), mesh, allNormals);
+            processVertex(allVertices.get(), mesh, allNormals, allTexPos);
         }
     }
 
@@ -136,35 +137,40 @@ public class Model {
         }
     }
 
-    private void processVertex(AIVector3D vertex, Mesh mesh, AIVector3D.Buffer allNormals) {
+    private void processVertex(AIVector3D vertex, Mesh mesh, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos) {
         for (VertexLayout.Element element : vertexLayout.elements) {
-//            VertexLayout.Element element = vertexLayout.elements.get(vi);
             switch (element.hint) {
                 case (VertexLayout.HINT_POSITION) -> mesh.pushVector3D(vertex);
                 case (VertexLayout.HINT_NORMAL) -> {
-                    if (allNormals == null) {
-                        Logging.warn("Given vertex layout requires normals, but mesh data does not contain normals. Pushing zeroes instead.");
-                        mesh.pushFloats(0, 0, 0);
-                        continue;
-                    }
+                    if (allNormals == null)
+                        throw new RuntimeException("Given vertex layout requires normals, but mesh data does not contain normals.");
                     mesh.pushVector3D(allNormals.get());
                 }
-                case (VertexLayout.HINT_TEX_POS) -> {/*todo*/}
+                case (VertexLayout.HINT_TEX_POS) -> {
+                    if (allTexPos == null)
+                        throw new RuntimeException("Given vertex layout requires texture coords, but mesh data does not contain texture coords.");
+                    mesh.pushVector2D(allTexPos.get());
+                }
                 case (VertexLayout.HINT_NULL) ->
                         throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
             }
         }
     }
 
+    public void processTextures(Mesh mesh, AIMesh aiMesh) {
+
+    }
+
     public void draw(ShaderProgram shaderProgram) {
         shaderProgram.bind();
-        for (Mesh mesh : meshes) mesh.draw(shaderProgram);
+        for (Mesh mesh : meshes) mesh.draw();
     }
 
     public static VertexLayout defaultVertexLayout() {
         return new VertexLayout(
-                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_POSITION)
-//                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_NORMAL)
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_POSITION),
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_NORMAL),
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 2, VertexLayout.HINT_TEX_POS)
         );
     }
 }

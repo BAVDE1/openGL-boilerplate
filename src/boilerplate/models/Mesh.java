@@ -55,6 +55,10 @@ public class Mesh {
         pushFloats(vector.x(), vector.y());
     }
 
+    public void pushVector2D(AIVector3D vector) {
+        pushFloats(vector.x(), vector.y());
+    }
+
     public void pushVector3D(AIVector3D vector) {
         pushFloats(vector.x(), vector.y(), vector.z());
     }
@@ -71,7 +75,7 @@ public class Mesh {
         veb.bufferData(indices);
     }
 
-    public void draw(ShaderProgram shaderProgram) {
+    public void draw() {
         Renderer.drawElements(GL45.GL_LINES, va, veb, vertexCount);
     }
 }
