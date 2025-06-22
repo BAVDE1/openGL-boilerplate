@@ -82,6 +82,10 @@ public class Renderer {
         glCullFace(face);
     }
 
+    public static void disableFaceCulling() {
+        glDisable(GL_CULL_FACE);
+    }
+
     public static void cullFrontFace() {
         glCullFace(GL_FRONT);
     }
