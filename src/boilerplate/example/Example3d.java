@@ -50,7 +50,7 @@ public class Example3d extends GameBase {
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
     ShaderProgram modelShader = new ShaderProgram();
-    Model modelBackpack = new Model();
+    Model model = new Model();
 
     @Override
     public void start() {
@@ -146,7 +146,7 @@ public class Example3d extends GameBase {
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
-        modelBackpack.loadModel("res/models/bloxy-cola/cola.obj");
+        model.loadModel("res/models/bloxy-cola/cola.obj");
 //        Mesh.VertexDefault v1 = new Mesh.VertexDefault();
 //        Mesh.VertexDefault v2 = new Mesh.VertexDefault();
 //        v1.p = 0;
@@ -190,7 +190,7 @@ public class Example3d extends GameBase {
         skyBox.bindSkyBoxTexture();
         drawObjects(model1.translate(2, 0, 0), model2.translate(2, 0, 0), shReflect);
 
-        modelBackpack.draw(modelShader);
+        model.draw(modelShader);
 
         skyBox.draw();
 

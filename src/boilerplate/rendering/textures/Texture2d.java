@@ -33,6 +33,8 @@ public class Texture2d extends Texture {
 
     public Dimension size = new Dimension();
 
+    private String loadedPath = "";
+
     public Texture2d() {
         textureTarget = GL_TEXTURE_2D;
     }
@@ -45,7 +47,10 @@ public class Texture2d extends Texture {
 
     public Texture2d(String path) {
         this();
-        createTextureFromImage(Image.loadImageFromPathSTB(path));
+        Image image = Image.loadImageFromPathSTB(path);
+        size = new Dimension(image.width, image.height);
+        loadedPath = path;
+        createTextureFromImage(image);
     }
 
     public Texture2d(BufferedImage buffImg) {
@@ -121,5 +126,10 @@ public class Texture2d extends Texture {
         } catch (IOException e) {
             Logging.danger("Failed to write given image to file 'src/image.png'\nError message thrown:\n%s", e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Texture2d(%s, %s, %s)".formatted(textureId, loadedPath, size);
     }
 }

@@ -4,18 +4,20 @@ import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexLayout;
 import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
+import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
 import java.io.File;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 
 public class Model {
     String directory;
     VertexLayout vertexLayout = defaultVertexLayout();
 
     Mesh[] meshes;
-    Texture2d[] texturesLoaded;
+    Material[] materials;
 
     public Model() {
     }
@@ -55,9 +57,18 @@ public class Model {
                 return;
             }
 
-            meshes = new Mesh[aiScene.mNumMeshes()];
-            processNode(aiScene.mRootNode(), aiScene);
+            processScene(aiScene);
         }
+    }
+
+    public void processScene(AIScene rootAiScene) {
+        // materials
+        materials = new Material[rootAiScene.mNumMaterials()];
+        processMaterials(rootAiScene);
+
+        // model
+        meshes = new Mesh[rootAiScene.mNumMeshes()];
+        processNode(rootAiScene.mRootNode(), rootAiScene);
     }
 
     /**
@@ -75,8 +86,6 @@ public class Model {
         if (allMeshes != null && nodeMeshes != null) {
             for (int i = 0; i < node.mNumMeshes(); i++) {
                 int meshInx = nodeMeshes.get(i);
-                if (meshes[meshInx] != null) continue;  // already processed this one lol
-
                 try (AIMesh aiMesh = AIMesh.create(allMeshes.get(meshInx))) {
                     meshes[meshInx] = processMesh(aiMesh, rootAiScene);
                 }
@@ -99,7 +108,7 @@ public class Model {
         mesh.allocateMemory(calculateVertexDataBytes(aiMesh), calculateIndicesBytes(aiMesh));
         processVertices(mesh, aiMesh);
         processFaces(mesh, aiMesh);
-        processTextures(mesh, aiMesh);
+        processMeshMaterial(mesh, aiMesh);
         mesh.finalizeMesh();
         return mesh;
     }
@@ -157,8 +166,46 @@ public class Model {
         }
     }
 
-    public void processTextures(Mesh mesh, AIMesh aiMesh) {
+    private void processMaterials(AIScene rootAiScene) {
+        PointerBuffer allMaterials = rootAiScene.mMaterials();
+        if (allMaterials == null) return;
 
+        for (int mi = 0; mi < rootAiScene.mNumMaterials(); mi++) {
+            try (AIMaterial material = AIMaterial.create(allMaterials.get(mi))) {
+                materials[mi] = processMaterial(material);
+            }
+            ;
+        }
+    }
+
+    private Material processMaterial(AIMaterial aiMaterial) {
+        AIString path = AIString.calloc();
+        Assimp.aiGetMaterialTexture(aiMaterial, Assimp.aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
+        String textPath = path.dataString();
+        Texture2d texture = null;
+        if (!textPath.isEmpty()) {
+            texture = new Texture2d(directory + "/" + textPath);
+        }
+
+        Vector4f ambient = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT);
+        Vector4f diffuse = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE);
+        Vector4f specular = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR);
+        return new Material(ambient, diffuse, specular, texture);
+    }
+
+    private Vector4f getMaterialColour(AIMaterial aiMaterial, String type) {
+        AIColor4D colBuff = AIColor4D.create();
+        Vector4f col = Material.DEFAULT_COLOUR;
+        int result = Assimp.aiGetMaterialColor(aiMaterial, type, Assimp.aiTextureType_NONE, 0, colBuff);
+        if (result == 0) col = new Vector4f(colBuff.r(), colBuff.g(), colBuff.b(), colBuff.a());
+        return col;
+    }
+
+    private void processMeshMaterial(Mesh mesh, AIMesh aiMesh) {
+        int matInx = aiMesh.mMaterialIndex();
+        if (matInx >= 0 && matInx < materials.length) {
+            mesh.setMaterial(materials[matInx]);
+        }
     }
 
     public void draw(ShaderProgram shaderProgram) {

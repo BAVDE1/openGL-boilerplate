@@ -16,16 +16,16 @@ import java.nio.ByteBuffer;
 public class Mesh {
     public static final int MAX_BONE_INFLUENCE = 4;
 
-    VertexArray va = new VertexArray();
-    VertexArrayBuffer vb = new VertexArrayBuffer();
-    VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
+    protected VertexArray va = new VertexArray();
+    protected VertexArrayBuffer vb = new VertexArrayBuffer();
+    protected VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
 
     VertexLayout vertexLayout;
 
     int vertexCount = 0;
-    ByteBuffer data = MemoryUtil.memAlloc(0);
-    ByteBuffer indices = MemoryUtil.memAlloc(0);
-//    Texture2d[] textures;
+    protected ByteBuffer data = MemoryUtil.memAlloc(0);
+    protected ByteBuffer indices = MemoryUtil.memAlloc(0);
+    protected Material material = new Material();
 
     public Mesh(VertexLayout vertexLayout) {
         this.vertexLayout = vertexLayout;
@@ -63,6 +63,10 @@ public class Mesh {
         pushFloats(vector.x(), vector.y(), vector.z());
     }
 
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+
     public void finalizeMesh() {
         va.genId();
         vb.genId();
@@ -76,6 +80,7 @@ public class Mesh {
     }
 
     public void draw() {
-        Renderer.drawElements(GL45.GL_LINES, va, veb, vertexCount);
+        material.bindTexture();
+        Renderer.drawElements(GL45.GL_TRIANGLES, va, veb, vertexCount);
     }
 }
