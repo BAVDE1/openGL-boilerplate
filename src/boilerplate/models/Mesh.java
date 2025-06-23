@@ -27,6 +27,8 @@ public class Mesh {
     protected ByteBuffer indices = MemoryUtil.memAlloc(0);
     protected Material material = new Material();
 
+    public int renderMode = GL45.GL_TRIANGLES;
+
     public Mesh(VertexLayout vertexLayout) {
         this.vertexLayout = vertexLayout;
     }
@@ -81,6 +83,6 @@ public class Mesh {
 
     public void draw() {
         material.bindTexture();
-        Renderer.drawElements(GL45.GL_TRIANGLES, va, veb, vertexCount);
+        Renderer.drawElements(renderMode, va, veb, vertexCount);
     }
 }

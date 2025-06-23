@@ -7,6 +7,7 @@ import boilerplate.utility.Logging;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
+import org.lwjgl.opengl.GL45;
 
 import java.io.File;
 import java.nio.IntBuffer;
@@ -19,6 +20,8 @@ public class Model {
     Mesh[] meshes;
     Material[] materials;
 
+    private boolean renderWireFrame = false;
+
     public Model() {
     }
 
@@ -26,7 +29,7 @@ public class Model {
         this.vertexLayout = vertexLayout;
     }
 
-    public void loadModel(String filePath) {
+    public void loadModel(String filePath, boolean flipTextures) {
         Logging.debug("Attempting to load model %s", filePath);
 
         File file = new File(filePath);
@@ -41,7 +44,7 @@ public class Model {
         try (AIScene aiScene = Assimp.aiImportFile(filePath,
                 Assimp.aiProcess_Triangulate |  // handles concave polygons
                         Assimp.aiProcess_GenSmoothNormals |
-                        Assimp.aiProcess_FlipUVs |  // make upper left corner 0, 0
+                        (flipTextures ? Assimp.aiProcess_FlipUVs : 0) |  // make upper left corner 0, 0
                         Assimp.aiProcess_CalcTangentSpace)) {
             boolean failed = true;
             String failedMsg = "no message";
@@ -132,8 +135,8 @@ public class Model {
         AIVector3D.Buffer allNormals = aiMesh.mNormals();
         AIVector3D.Buffer allTexPos = aiMesh.mTextureCoords(0);
 
-        while (allVertices.hasRemaining()) {
-            processVertex(allVertices.get(), mesh, allNormals, allTexPos);
+        for (int i = 0; i < aiMesh.mNumVertices(); i++) {
+            processVertex(mesh, allVertices, allNormals, allTexPos, i);
         }
     }
 
@@ -146,19 +149,20 @@ public class Model {
         }
     }
 
-    private void processVertex(AIVector3D vertex, Mesh mesh, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos) {
+    private void processVertex(Mesh mesh, AIVector3D.Buffer allVertices, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos, int i) {
         for (VertexLayout.Element element : vertexLayout.elements) {
             switch (element.hint) {
-                case (VertexLayout.HINT_POSITION) -> mesh.pushVector3D(vertex);
+                case (VertexLayout.HINT_POSITION) -> mesh.pushVector3D(allVertices.get(i));
                 case (VertexLayout.HINT_NORMAL) -> {
                     if (allNormals == null)
                         throw new RuntimeException("Given vertex layout requires normals, but mesh data does not contain normals.");
-                    mesh.pushVector3D(allNormals.get());
+                    mesh.pushVector3D(allNormals.get(i));
                 }
                 case (VertexLayout.HINT_TEX_POS) -> {
                     if (allTexPos == null)
                         throw new RuntimeException("Given vertex layout requires texture coords, but mesh data does not contain texture coords.");
-                    mesh.pushVector2D(allTexPos.get());
+                    AIVector3D x = allTexPos.get(i);
+                    mesh.pushVector2D(x);
                 }
                 case (VertexLayout.HINT_NULL) ->
                         throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
@@ -174,7 +178,6 @@ public class Model {
             try (AIMaterial material = AIMaterial.create(allMaterials.get(mi))) {
                 materials[mi] = processMaterial(material);
             }
-            ;
         }
     }
 
@@ -211,6 +214,13 @@ public class Model {
     public void draw(ShaderProgram shaderProgram) {
         shaderProgram.bind();
         for (Mesh mesh : meshes) mesh.draw();
+    }
+
+    public void renderWireFrame(boolean val) {
+        if (val == renderWireFrame) return;
+        renderWireFrame = val;
+        int mode = val ? GL45.GL_LINES : GL45.GL_TRIANGLES;
+        for (Mesh mesh : meshes) mesh.renderMode = mode;
     }
 
     public static VertexLayout defaultVertexLayout() {

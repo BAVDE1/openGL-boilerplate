@@ -80,7 +80,10 @@ public class Example3d extends GameBase {
         glfwSetKeyCallback(window.handle, (window, key, scancode, action, mods) -> {
             if (action == GLFW_PRESS) {
                 if (key == GLFW_KEY_ESCAPE) this.window.setToClose();
-                if (key == GLFW_KEY_TAB) renderWireFrame = !renderWireFrame;
+                if (key == GLFW_KEY_TAB) {
+                    renderWireFrame = !renderWireFrame;
+                    model.renderWireFrame(renderWireFrame);
+                }
                 if (key == GLFW_KEY_F)
                     camera.setMode(camera.getMode() == Camera3d.MODE_FLY ? Camera3d.MODE_TARGET : Camera3d.MODE_FLY);
             }
@@ -146,14 +149,7 @@ public class Example3d extends GameBase {
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
-        model.loadModel("res/models/bloxy-cola/cola.obj");
-//        Mesh.VertexDefault v1 = new Mesh.VertexDefault();
-//        Mesh.VertexDefault v2 = new Mesh.VertexDefault();
-//        v1.p = 0;
-//        v1.position = new float[] {1};
-//        v2.position = new float[] {2, 2, 2};
-//        m.debugSetup = true;
-//        m.setup(new Mesh.VertexDefault[] {v1}, new int[] {}, new Texture2d[] {});
+        model.loadModel("res/models/backpack/backpack.obj", false);
     }
 
     public void render() {

@@ -125,7 +125,7 @@ public class Window {
     }
 
     public void show() {
-        Logging.info("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'", glfwGetVersionString(), GL45.glGetString(GL11.GL_VERSION));
+        Logging.info("Opening window:\n--- glfw: '%s'\n--- openGL: '%s'", glfwGetVersionString(), GL45.glGetString(GL45.GL_VERSION));
         glfwShowWindow(handle);
     }
 
@@ -135,7 +135,7 @@ public class Window {
 
     public void close() {
         Logging.info("Closing window safely");
-        glfwFreeCallbacks(handle);
+        freeCallbacks();
         glfwDestroyWindow(handle);
         glfwTerminate();
         glfwSetErrorCallback(null);
@@ -206,5 +206,9 @@ public class Window {
 
     public void showCursor() {
         glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
+    public void freeCallbacks() {
+        glfwFreeCallbacks(handle);
     }
 }
