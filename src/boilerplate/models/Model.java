@@ -77,17 +77,17 @@ public class Model {
     /**
      * Recursively process a node and its children
      */
-    private void processNode(AINode node, AIScene rootAiScene) {
-        if (node == null) {
+    private void processNode(AINode aiNode, AIScene rootAiScene) {
+        if (aiNode == null) {
             Logging.warn("Node is null, scene: %s", rootAiScene);
             return;
         }
 
         // meshes
         PointerBuffer allMeshes = rootAiScene.mMeshes();
-        IntBuffer nodeMeshes = node.mMeshes();  // indexes of scene's meshes
+        IntBuffer nodeMeshes = aiNode.mMeshes();  // indexes of scene's meshes
         if (allMeshes != null && nodeMeshes != null) {
-            for (int i = 0; i < node.mNumMeshes(); i++) {
+            for (int i = 0; i < aiNode.mNumMeshes(); i++) {
                 int meshInx = nodeMeshes.get(i);
                 try (AIMesh aiMesh = AIMesh.create(allMeshes.get(meshInx))) {
                     meshes[meshInx] = processMesh(aiMesh, rootAiScene);
@@ -96,10 +96,10 @@ public class Model {
         }
 
         // process children
-        PointerBuffer children = node.mChildren();
+        PointerBuffer children = aiNode.mChildren();
         if (children == null) return;  // no children :(
 
-        for (int i = 0; i < node.mNumChildren(); i++) {
+        for (int i = 0; i < aiNode.mNumChildren(); i++) {
             try (AINode child = AINode.create(children.get(i))) {
                 processNode(child, rootAiScene);
             }
