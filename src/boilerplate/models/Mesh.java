@@ -41,15 +41,34 @@ public class Mesh {
         indices.putInt(i);
     }
 
+    public void pushInts(int x, int y) {
+        data.putInt(x);
+        data.putInt(y);
+    }
+
+    public void pushInts(int x, int y, int z) {
+        pushInts(x, y);
+        data.putInt(z);
+    }
+
+    public void pushInts(int x, int y, int z, int w) {
+        pushInts(x, y, z);
+        data.putInt(w);
+    }
+
     public void pushFloats(float x, float y) {
         data.putFloat(x);
         data.putFloat(y);
     }
 
     public void pushFloats(float x, float y, float z) {
-        data.putFloat(x);
-        data.putFloat(y);
+        pushFloats(x, y);
         data.putFloat(z);
+    }
+
+    public void pushFloats(float x, float y, float z, float w) {
+        pushFloats(x, y, z);
+        data.putFloat(w);
     }
 
     public void pushVector2D(AIVector2D vector) {

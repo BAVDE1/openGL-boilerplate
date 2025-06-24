@@ -66,6 +66,8 @@ public class VertexLayout {
     public static final int HINT_POSITION = 1;
     public static final int HINT_NORMAL = 2;
     public static final int HINT_TEX_POS = 3;
+    public static final int HINT_BONE_IDS = 4;
+    public static final int HINT_BONE_WEIGHTS = 5;
 
     public static final Map<Integer, String> TYPE_STRING_MAP = Map.of(
             TYPE_FLOAT, "float",
@@ -79,7 +81,9 @@ public class VertexLayout {
             HINT_NULL, "no_hint",
             HINT_POSITION, "position",
             HINT_NORMAL, "normal",
-            HINT_TEX_POS, "tex_pos"
+            HINT_TEX_POS, "tex_pos",
+            HINT_BONE_IDS, "bone_ids",
+            HINT_BONE_WEIGHTS, "bone_weights"
     );
 
     public final ArrayList<Element> elements = new ArrayList<>();
@@ -127,6 +131,13 @@ public class VertexLayout {
 
     public int getTotalItems() {
         return totalItems;
+    }
+
+    public boolean hasElementWithHint(int hint) {
+        for (Element e : elements) {
+            if (e.hint == hint) return true;
+        }
+        return false;
     }
 
     @Override

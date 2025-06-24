@@ -12,13 +12,17 @@ import org.lwjgl.opengl.GL45;
 
 import java.io.File;
 import java.nio.IntBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Model {
     String directory;
     VertexLayout vertexLayout = defaultVertexLayout();
+    public Animator animator = new Animator();
 
     Mesh[] meshes;
     Material[] materials;
+    HashMap<Integer, Bone> boneMap = new HashMap<>();
 
     private boolean renderWireFrame = false;
 
@@ -33,11 +37,11 @@ public class Model {
     }
 
     public void loadModel(String filePath, boolean flipTextures) {
-        Logging.debug("Attempting to load model %s", filePath);
+        Logging.debug("Attempting to load model '%s'", filePath);
 
         File file = new File(filePath);
         if (!file.isFile()) {
-            Logging.danger("Given filePath is not a valid file %s", filePath);
+            Logging.danger("Given filePath is not a valid file '%s'", filePath);
             return;
         }
 
@@ -75,6 +79,9 @@ public class Model {
         // model
         meshes = new Mesh[rootAiScene.mNumMeshes()];
         processNode(rootAiScene.mRootNode(), rootAiScene);
+
+        // animations
+        processAnimations(rootAiScene);
     }
 
     /**
@@ -113,9 +120,12 @@ public class Model {
         Mesh mesh = new Mesh(vertexLayout);
         mesh.indicesCount = findIndicesCount(aiMesh);
         mesh.allocateMemory(calculateVertexDataBytes(aiMesh), mesh.indicesCount * Integer.BYTES);
+
         processVertices(mesh, aiMesh);
         processFaces(mesh, aiMesh);
+        processBones(mesh, aiMesh);
         processMeshMaterial(mesh, aiMesh);
+
         mesh.finalizeMesh();
         return mesh;
     }
@@ -137,8 +147,15 @@ public class Model {
         AIVector3D.Buffer allNormals = aiMesh.mNormals();
         AIVector3D.Buffer allTexPos = aiMesh.mTextureCoords(0);
 
+        // data checks
+        if (allNormals == null && vertexLayout.hasElementWithHint(VertexLayout.HINT_NORMAL))
+            throw new RuntimeException("Given vertex layout contains normals, but mesh data does not contain normals.");
+        if (allTexPos == null && vertexLayout.hasElementWithHint(VertexLayout.HINT_TEX_POS))
+            throw new RuntimeException("Given vertex layout contains texture coords, but mesh data does not contain texture coords.");
+
+        // process
         for (int i = 0; i < aiMesh.mNumVertices(); i++) {
-            processVertex(mesh, allVertices, allNormals, allTexPos, i);
+            processVertex(mesh, i, allVertices, allNormals, allTexPos);
         }
     }
 
@@ -151,23 +168,26 @@ public class Model {
         }
     }
 
-    private void processVertex(Mesh mesh, AIVector3D.Buffer allVertices, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos, int i) {
+    private void processBones(Mesh mesh, AIMesh aiMesh) {
+        PointerBuffer allBones = aiMesh.mBones();
+        if (allBones == null) return;  // no bones
+
+        for (int bi = 0; bi < aiMesh.mNumBones(); bi++) {
+            try (AIBone aiBone = AIBone.create(allBones.get(bi))) {
+                Bone bone = new Bone(aiBone.mName().dataString());
+            }
+        }
+    }
+
+    private void processVertex(Mesh mesh, int vertexInx, AIVector3D.Buffer allVertices, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos) {
         for (VertexLayout.Element element : vertexLayout.elements) {
             switch (element.hint) {
-                case (VertexLayout.HINT_POSITION) -> mesh.pushVector3D(allVertices.get(i));
-                case (VertexLayout.HINT_NORMAL) -> {
-                    if (allNormals == null)
-                        throw new RuntimeException("Given vertex layout requires normals, but mesh data does not contain normals.");
-                    mesh.pushVector3D(allNormals.get(i));
-                }
-                case (VertexLayout.HINT_TEX_POS) -> {
-                    if (allTexPos == null)
-                        throw new RuntimeException("Given vertex layout requires texture coords, but mesh data does not contain texture coords.");
-                    AIVector3D x = allTexPos.get(i);
-                    mesh.pushVector2D(x);
-                }
-                case (VertexLayout.HINT_NULL) ->
-                        throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
+                case (VertexLayout.HINT_POSITION) -> mesh.pushVector3D(allVertices.get(vertexInx));
+                case (VertexLayout.HINT_NORMAL) -> mesh.pushVector3D(allNormals.get(vertexInx));
+                case (VertexLayout.HINT_TEX_POS) -> mesh.pushVector2D(allTexPos.get(vertexInx));
+                case (VertexLayout.HINT_BONE_IDS) -> mesh.pushInts(-1, -1, -1, -1);  // default
+                case (VertexLayout.HINT_BONE_WEIGHTS) -> mesh.pushFloats(0, 0, 0, 0);  // default
+                default -> throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
             }
         }
     }
@@ -213,6 +233,17 @@ public class Model {
         }
     }
 
+    private void processAnimations(AIScene rootAIScene) {
+        PointerBuffer allAnimations = rootAIScene.mAnimations();
+        if (allAnimations == null) return;  // no animations
+
+        for (int ai = 0; ai < rootAIScene.mNumAnimations(); ai++) {
+            try (AIAnimation alAnimation = AIAnimation.create(allAnimations.get(ai))) {
+                animator.addAnimation(alAnimation);
+            }
+        }
+    }
+
     public void draw(ShaderProgram shaderProgram) {
         shaderProgram.bind();
         if (hasModelTransformChanged) {
@@ -233,7 +264,9 @@ public class Model {
         return new VertexLayout(
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_POSITION),
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_NORMAL),
-                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 2, VertexLayout.HINT_TEX_POS)
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 2, VertexLayout.HINT_TEX_POS),
+                new VertexLayout.Element(VertexLayout.TYPE_INT, 4, VertexLayout.HINT_BONE_IDS),
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 4, VertexLayout.HINT_BONE_WEIGHTS)
         );
     }
 }
