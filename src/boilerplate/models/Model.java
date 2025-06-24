@@ -4,6 +4,7 @@ import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexLayout;
 import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
+import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
@@ -11,7 +12,6 @@ import org.lwjgl.opengl.GL45;
 
 import java.io.File;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 
 public class Model {
     String directory;
@@ -21,6 +21,9 @@ public class Model {
     Material[] materials;
 
     private boolean renderWireFrame = false;
+
+    public Matrix4f modelTransform = new Matrix4f().identity();
+    public boolean hasModelTransformChanged = true;
 
     public Model() {
     }
@@ -108,7 +111,8 @@ public class Model {
 
     private Mesh processMesh(AIMesh aiMesh, AIScene rootAiScene) {
         Mesh mesh = new Mesh(vertexLayout);
-        mesh.allocateMemory(calculateVertexDataBytes(aiMesh), calculateIndicesBytes(aiMesh));
+        mesh.indicesCount = findIndicesCount(aiMesh);
+        mesh.allocateMemory(calculateVertexDataBytes(aiMesh), mesh.indicesCount * Integer.BYTES);
         processVertices(mesh, aiMesh);
         processFaces(mesh, aiMesh);
         processMeshMaterial(mesh, aiMesh);
@@ -120,17 +124,15 @@ public class Model {
         return aiMesh.mNumVertices() * vertexLayout.stride;
     }
 
-    private int calculateIndicesBytes(AIMesh aiMesh) {
-        int bytes = 0;
+    private int findIndicesCount(AIMesh aiMesh) {
+        int count = 0;
         for (int fi = 0; fi < aiMesh.mNumFaces(); fi++) {
-            AIFace face = aiMesh.mFaces().get(fi);
-            bytes += face.mNumIndices() * Integer.BYTES;
+            count += aiMesh.mFaces().get(fi).mNumIndices();
         }
-        return bytes;
+        return count;
     }
 
     private void processVertices(Mesh mesh, AIMesh aiMesh) {
-        mesh.vertexCount = aiMesh.mNumVertices();
         AIVector3D.Buffer allVertices = aiMesh.mVertices();
         AIVector3D.Buffer allNormals = aiMesh.mNormals();
         AIVector3D.Buffer allTexPos = aiMesh.mTextureCoords(0);
@@ -213,6 +215,10 @@ public class Model {
 
     public void draw(ShaderProgram shaderProgram) {
         shaderProgram.bind();
+        if (hasModelTransformChanged) {
+            shaderProgram.uniformMatrix4f("model", modelTransform);
+            hasModelTransformChanged = false;
+        }
         for (Mesh mesh : meshes) mesh.draw();
     }
 

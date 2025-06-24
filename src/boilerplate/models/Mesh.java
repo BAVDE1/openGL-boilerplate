@@ -1,7 +1,6 @@
 package boilerplate.models;
 
 import boilerplate.rendering.Renderer;
-import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.buffers.VertexElementBuffer;
@@ -22,7 +21,7 @@ public class Mesh {
 
     VertexLayout vertexLayout;
 
-    int vertexCount = 0;
+    int indicesCount = 0;
     protected ByteBuffer data = MemoryUtil.memAlloc(0);
     protected ByteBuffer indices = MemoryUtil.memAlloc(0);
     protected Material material = new Material();
@@ -83,6 +82,6 @@ public class Mesh {
 
     public void draw() {
         material.bindTexture();
-        Renderer.drawElements(renderMode, va, veb, vertexCount);
+        Renderer.drawElements(renderMode, va, veb, indicesCount);
     }
 }

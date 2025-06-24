@@ -149,7 +149,8 @@ public class Example3d extends GameBase {
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
-        model.loadModel("res/models/backpack/backpack.obj", false);
+        model.loadModel("res/models/roblox/scene.gltf", true);
+        model.modelTransform.scale(.3f).translate(0, -3, 0);
     }
 
     public void render() {

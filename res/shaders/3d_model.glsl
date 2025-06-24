@@ -10,11 +10,12 @@ layout (std140) uniform CameraView {
     mat4 view;
 };
 
-//uniform mat4 model;
+uniform mat4 model;
+
 out vec2 v_texPos;
 
 void main() {
-    gl_Position = projection * view * vec4(pos, 1);
+    gl_Position = projection * view * model * vec4(pos, 1);
     v_texPos = texPos;
 }
 
