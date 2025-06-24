@@ -13,7 +13,6 @@ import org.lwjgl.opengl.GL45;
 import java.io.File;
 import java.nio.IntBuffer;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Model {
     String directory;
@@ -27,7 +26,7 @@ public class Model {
     private boolean renderWireFrame = false;
 
     public Matrix4f modelTransform = new Matrix4f().identity();
-    public boolean hasModelTransformChanged = true;
+    public boolean modelTransformChanged = true;
 
     public Model() {
     }
@@ -246,9 +245,9 @@ public class Model {
 
     public void draw(ShaderProgram shaderProgram) {
         shaderProgram.bind();
-        if (hasModelTransformChanged) {
+        if (modelTransformChanged) {
             shaderProgram.uniformMatrix4f("model", modelTransform);
-            hasModelTransformChanged = false;
+            modelTransformChanged = false;
         }
         for (Mesh mesh : meshes) mesh.draw();
     }
