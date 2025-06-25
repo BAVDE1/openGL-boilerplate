@@ -11,10 +11,9 @@ import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 public class Mesh {
-    public static final int MAX_BONE_INFLUENCE = 4;
-
     protected VertexArray va = new VertexArray();
     protected VertexArrayBuffer vb = new VertexArrayBuffer();
     protected VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
@@ -41,6 +40,10 @@ public class Mesh {
         indices.putInt(i);
     }
 
+    public void pushInt(int i) {
+        data.putInt(i);
+    }
+
     public void pushInts(int x, int y) {
         data.putInt(x);
         data.putInt(y);
@@ -56,6 +59,14 @@ public class Mesh {
         data.putInt(w);
     }
 
+    public void push4Ints(int i) {
+        pushInts(i, i, i, i);
+    }
+
+    public void pushFloat(float f) {
+        data.putFloat(f);
+    }
+
     public void pushFloats(float x, float y) {
         data.putFloat(x);
         data.putFloat(y);
@@ -69,6 +80,10 @@ public class Mesh {
     public void pushFloats(float x, float y, float z, float w) {
         pushFloats(x, y, z);
         data.putFloat(w);
+    }
+
+    public void push4Floats(float f) {
+        pushFloats(f, f, f, f);
     }
 
     public void pushVector2D(AIVector2D vector) {

@@ -3,6 +3,7 @@ package boilerplate.rendering.buffers;
 import boilerplate.utility.Logging;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -33,6 +34,11 @@ public class VertexLayout {
                 throw new RuntimeException("Invalid hint: %s\nExpected any: %s".formatted(hint, HINT_STRING_MAP));
             }
             this.hint = hint;
+        }
+
+        public Element(int type, int count, int hint, boolean normalized) {
+            this(type, count, hint);
+            this.normalized = normalized;
         }
 
         public int getByteSizeForType() {
@@ -103,7 +109,9 @@ public class VertexLayout {
     }
 
     private void push(Element element) {
-        if (element.count == 0) return;
+        if (!List.of(1, 2, 3, 4).contains(element.count)) {
+            throw new RuntimeException("An element must have a count value of 1, 2, 3, or 4. A count of %s was given. Use multiple elements if you must.".formatted(element.count));
+        }
         elements.add(element);
         stride += element.count * Element.getByteSizeForType(element.type);
         totalItems += element.count;

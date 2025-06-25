@@ -4,6 +4,7 @@ import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexLayout;
 import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
+import boilerplate.utility.MathUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
@@ -12,16 +13,41 @@ import org.lwjgl.opengl.GL45;
 
 import java.io.File;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Model {
+    public static final int MAX_BONE_INFLUENCE = 4;
+
+    public static class VertexWeight {
+        int boneId = -1;
+        float weight = 0;
+
+        public VertexWeight() {
+        }
+
+        public VertexWeight(int boneId, float weight) {
+            this.boneId = boneId;
+            this.weight = weight;
+        }
+
+        @Override
+        public String toString() {
+            return "VertexWeight(%s, %s)".formatted(boneId, weight);
+        }
+    }
+
+    String modelFile;
     String directory;
     VertexLayout vertexLayout = defaultVertexLayout();
     public Animator animator = new Animator();
 
     Mesh[] meshes;
     Material[] materials;
-    HashMap<Integer, Bone> boneMap = new HashMap<>();
+    HashMap<String, Bone> boneMap = new HashMap<>();
+    HashMap<Integer, List<VertexWeight>> vertexWeights = new HashMap<>();
+    private int boneCounter = 0;
 
     private boolean renderWireFrame = false;
 
@@ -44,6 +70,7 @@ public class Model {
             return;
         }
 
+        modelFile = filePath;
         directory = file.getParent();
 
         // https://assimp-docs.readthedocs.io/en/latest/usage/use_the_lib.html
@@ -120,9 +147,9 @@ public class Model {
         mesh.indicesCount = findIndicesCount(aiMesh);
         mesh.allocateMemory(calculateVertexDataBytes(aiMesh), mesh.indicesCount * Integer.BYTES);
 
+        processBones(aiMesh);
         processVertices(mesh, aiMesh);
         processFaces(mesh, aiMesh);
-        processBones(mesh, aiMesh);
         processMeshMaterial(mesh, aiMesh);
 
         mesh.finalizeMesh();
@@ -167,13 +194,32 @@ public class Model {
         }
     }
 
-    private void processBones(Mesh mesh, AIMesh aiMesh) {
+    private void processBones(AIMesh aiMesh) {
         PointerBuffer allBones = aiMesh.mBones();
         if (allBones == null) return;  // no bones
 
         for (int bi = 0; bi < aiMesh.mNumBones(); bi++) {
             try (AIBone aiBone = AIBone.create(allBones.get(bi))) {
-                Bone bone = new Bone(aiBone.mName().dataString());
+                String boneName = aiBone.mName().dataString();
+                Bone bone;
+                if (boneMap.containsKey(boneName)) {
+                    bone = boneMap.get(boneName);
+                } else {
+                    bone = new Bone(boneName);
+                    bone.id = boneCounter++;
+                    bone.offset = MathUtils.AIMatrixToMatrix(aiBone.mOffsetMatrix());
+                    boneMap.put(boneName, bone);
+                }
+
+                AIVertexWeight.Buffer weights = aiBone.mWeights();
+                while (weights.hasRemaining()) {
+                    AIVertexWeight aiWeight = weights.get();
+                    int vertexId = aiWeight.mVertexId();
+                    float weight = aiWeight.mWeight();
+
+                    List<VertexWeight> vwList = vertexWeights.computeIfAbsent(vertexId, _ -> new ArrayList<>());
+                    vwList.add(new VertexWeight(bone.id, weight));
+                }
             }
         }
     }
@@ -184,10 +230,26 @@ public class Model {
                 case (VertexLayout.HINT_POSITION) -> mesh.pushVector3D(allVertices.get(vertexInx));
                 case (VertexLayout.HINT_NORMAL) -> mesh.pushVector3D(allNormals.get(vertexInx));
                 case (VertexLayout.HINT_TEX_POS) -> mesh.pushVector2D(allTexPos.get(vertexInx));
-                case (VertexLayout.HINT_BONE_IDS) -> mesh.pushInts(-1, -1, -1, -1);  // default
-                case (VertexLayout.HINT_BONE_WEIGHTS) -> mesh.pushFloats(0, 0, 0, 0);  // default
+                case (VertexLayout.HINT_BONE_IDS) -> pushVertexBoneIds(mesh, vertexInx);
+                case (VertexLayout.HINT_BONE_WEIGHTS) -> pushVertexBoneWeights(mesh, vertexInx);
                 default -> throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
             }
+        }
+    }
+
+    private void pushVertexBoneIds(Mesh mesh, int vertexInx) {
+        List<VertexWeight> vwList = vertexWeights.get(vertexInx);
+        for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
+            if (i < vwList.size()) mesh.pushInt(vwList.get(i).boneId);
+            else mesh.pushInt(-1);
+        }
+    }
+
+    private void pushVertexBoneWeights(Mesh mesh, int vertexInx) {
+        List<VertexWeight> vws = vertexWeights.get(vertexInx);
+        for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
+            if (i < vws.size()) mesh.pushFloat(vws.get(i).weight);
+            else mesh.pushFloat(0);
         }
     }
 
@@ -264,8 +326,8 @@ public class Model {
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_POSITION),
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_NORMAL),
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 2, VertexLayout.HINT_TEX_POS),
-                new VertexLayout.Element(VertexLayout.TYPE_INT, 4, VertexLayout.HINT_BONE_IDS),
-                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 4, VertexLayout.HINT_BONE_WEIGHTS)
+                new VertexLayout.Element(VertexLayout.TYPE_INT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_IDS),
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_WEIGHTS, true)
         );
     }
 }
