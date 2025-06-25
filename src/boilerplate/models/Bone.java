@@ -9,7 +9,7 @@ public class Bone {
     int id;
     String name;
     Matrix4f offset;  // transforms vertex from model space to (this) bone space
-    HashMap<Integer, Float> vertexWeights = new HashMap<>();  // key: vertexId, value: weight
+//    HashMap<Integer, Float> vertexWeights = new HashMap<>();  // key: vertexId, value: weight
 
     public Bone(String name) {
         this.name = name;

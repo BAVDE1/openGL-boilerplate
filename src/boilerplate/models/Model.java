@@ -240,15 +240,15 @@ public class Model {
     private void pushVertexBoneIds(Mesh mesh, int vertexInx) {
         List<VertexWeight> vwList = vertexWeights.get(vertexInx);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
-            if (i < vwList.size()) mesh.pushInt(vwList.get(i).boneId);
+            if (vwList != null && i < vwList.size()) mesh.pushInt(vwList.get(i).boneId);
             else mesh.pushInt(-1);
         }
     }
 
     private void pushVertexBoneWeights(Mesh mesh, int vertexInx) {
-        List<VertexWeight> vws = vertexWeights.get(vertexInx);
+        List<VertexWeight> vwList = vertexWeights.get(vertexInx);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
-            if (i < vws.size()) mesh.pushFloat(vws.get(i).weight);
+            if (vwList != null && i < vwList.size()) mesh.pushFloat(vwList.get(i).weight);
             else mesh.pushFloat(0);
         }
     }

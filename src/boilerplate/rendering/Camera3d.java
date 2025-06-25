@@ -43,7 +43,7 @@ public class Camera3d {
     public Dimension captureSize;
     protected float aspect;
     public float fov = 80;
-    public float near = .1f;
+    public float near = .05f;
     public float far = 100;
 
     // view
