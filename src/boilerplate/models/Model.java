@@ -107,7 +107,7 @@ public class Model {
         }
     }
 
-    public void processScene(AIScene rootAiScene) {
+    private void processScene(AIScene rootAiScene) {
         // materials
         materials = new Material[rootAiScene.mNumMaterials()];
         processMaterials(rootAiScene);

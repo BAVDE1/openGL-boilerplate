@@ -18,8 +18,8 @@ public class Animator {
         animations.put(animation.name, animation);
     }
 
-    public void removeAnimation(String name) {
-        animations.remove(name);
+    public void removeAnimation(String animationName) {
+        animations.remove(animationName);
     }
 
     public void playAnimation(String animationName) {
