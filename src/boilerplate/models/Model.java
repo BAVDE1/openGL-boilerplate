@@ -38,6 +38,16 @@ public class Model {
         }
     }
 
+    public static class BoneInfo {
+        int id;
+        Matrix4f offset;
+
+        public BoneInfo(int boneId, Matrix4f offset) {
+            this.id = boneId;
+            this.offset = offset;
+        }
+    }
+
     String modelFile;
     String directory;
     VertexLayout vertexLayout = defaultVertexLayout();
@@ -45,7 +55,7 @@ public class Model {
 
     Mesh[] meshes;
     Material[] materials;
-    HashMap<String, Bone> boneMap = new HashMap<>();
+    HashMap<String, BoneInfo> boneInfoMap = new HashMap<>();
     HashMap<Integer, List<VertexWeight>> vertexWeights = new HashMap<>();
     private int boneCounter = 0;
 
@@ -123,10 +133,10 @@ public class Model {
         PointerBuffer allMeshes = rootAiScene.mMeshes();
         IntBuffer nodeMeshes = aiNode.mMeshes();  // indexes of scene's meshes
         if (allMeshes != null && nodeMeshes != null) {
-            for (int i = 0; i < aiNode.mNumMeshes(); i++) {
-                int meshInx = nodeMeshes.get(i);
+            while (nodeMeshes.hasRemaining()) {
+                int meshInx = nodeMeshes.get();
                 try (AIMesh aiMesh = AIMesh.create(allMeshes.get(meshInx))) {
-                    meshes[meshInx] = processMesh(aiMesh, rootAiScene);
+                    meshes[meshInx] = processMesh(aiMesh);
                 }
             }
         }
@@ -142,7 +152,7 @@ public class Model {
         }
     }
 
-    private Mesh processMesh(AIMesh aiMesh, AIScene rootAiScene) {
+    private Mesh processMesh(AIMesh aiMesh) {
         Mesh mesh = new Mesh(vertexLayout);
         mesh.indicesCount = findIndicesCount(aiMesh);
         mesh.allocateMemory(calculateVertexDataBytes(aiMesh), mesh.indicesCount * Integer.BYTES);
@@ -198,18 +208,13 @@ public class Model {
         PointerBuffer allBones = aiMesh.mBones();
         if (allBones == null) return;  // no bones
 
-        for (int bi = 0; bi < aiMesh.mNumBones(); bi++) {
-            try (AIBone aiBone = AIBone.create(allBones.get(bi))) {
+        while (allBones.hasRemaining()) {
+            try (AIBone aiBone = AIBone.create(allBones.get())) {
                 String boneName = aiBone.mName().dataString();
-                Bone bone;
-                if (boneMap.containsKey(boneName)) {
-                    bone = boneMap.get(boneName);
-                } else {
-                    bone = new Bone(boneName);
-                    bone.id = boneCounter++;
-                    bone.offset = MathUtils.AIMatrixToMatrix(aiBone.mOffsetMatrix());
-                    boneMap.put(boneName, bone);
-                }
+                BoneInfo boneInfo = boneInfoMap.computeIfAbsent(
+                        boneName,
+                        _ -> new BoneInfo(boneCounter++, MathUtils.AIMatrixToMatrix(aiBone.mOffsetMatrix()))  // todo: are you sure?
+                );
 
                 AIVertexWeight.Buffer weights = aiBone.mWeights();
                 while (weights.hasRemaining()) {
@@ -218,12 +223,32 @@ public class Model {
                     float weight = aiWeight.mWeight();
 
                     List<VertexWeight> vwList = vertexWeights.computeIfAbsent(vertexId, _ -> new ArrayList<>());
-                    vwList.add(new VertexWeight(bone.id, weight));
+                    vwList.add(new VertexWeight(boneInfo.id, weight));
                 }
             }
         }
     }
 
+    /**
+     * After process bones
+     */
+    private void processAnimations(AIScene rootAIScene) {
+        PointerBuffer allAnimations = rootAIScene.mAnimations();
+        if (allAnimations == null) return;  // no animations
+
+        while (allAnimations.hasRemaining()) {
+            try (AIAnimation aiAnimation = AIAnimation.create(allAnimations.get())) {
+                Logging.info("new animation, %s", aiAnimation.mName().dataString());
+
+                Animation animation = new Animation(aiAnimation, boneInfoMap);
+                animator.addAnimation(animation);
+            }
+        }
+    }
+
+    /**
+     * After process bones
+     */
     private void processVertex(Mesh mesh, int vertexInx, AIVector3D.Buffer allVertices, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos) {
         for (VertexLayout.Element element : vertexLayout.elements) {
             switch (element.hint) {
@@ -291,17 +316,6 @@ public class Model {
         int matInx = aiMesh.mMaterialIndex();
         if (matInx >= 0 && matInx < materials.length) {
             mesh.setMaterial(materials[matInx]);
-        }
-    }
-
-    private void processAnimations(AIScene rootAIScene) {
-        PointerBuffer allAnimations = rootAIScene.mAnimations();
-        if (allAnimations == null) return;  // no animations
-
-        for (int ai = 0; ai < rootAIScene.mNumAnimations(); ai++) {
-            try (AIAnimation alAnimation = AIAnimation.create(allAnimations.get(ai))) {
-                animator.addAnimation(alAnimation);
-            }
         }
     }
 

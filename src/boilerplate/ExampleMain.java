@@ -11,7 +11,7 @@ public class ExampleMain {
     public static void main(String[] args) {
         System.setProperty("joml.format", "false");  // stop it
         Logging.setupFileLogging(BoilerplateConstants.LOGGING_FILE_NAME);
-        Logging.mystical("Starting program (opengl-boilerplate)");
+        Logging.mystical("Starting example program");
         new Example3d().start();
     }
 }

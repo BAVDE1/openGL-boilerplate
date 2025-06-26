@@ -1,8 +1,14 @@
 package boilerplate.utility;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.AIMatrix4x4;
+import org.lwjgl.assimp.AIQuaternion;
+import org.lwjgl.assimp.AIVector2D;
+import org.lwjgl.assimp.AIVector3D;
 
 import java.nio.FloatBuffer;
 
@@ -26,7 +32,20 @@ public class MathUtils {
         return m.get(BufferUtils.createFloatBuffer(16));
     }
 
+    public static Vector3f AIVectorToVector(AIVector3D aiVector3D) {
+        return new Vector3f(aiVector3D.x(), aiVector3D.y(), aiVector3D.z());
+    }
+
+    public static Vector2f AIVectorToVector(AIVector2D aiVector2D) {
+        return new Vector2f(aiVector2D.x(), aiVector2D.y());
+    }
+
+    public static Quaternionf AIQuatToQuat(AIQuaternion aiQuaternion) {
+        return new Quaternionf(aiQuaternion.x(), aiQuaternion.y(), aiQuaternion.z(), aiQuaternion.w());
+    }
+
     public static Matrix4f AIMatrixToMatrix(AIMatrix4x4 aiMatrix4x4) {
+        // todo wrong way around?
         Matrix4f m = new Matrix4f();
         m.m00(aiMatrix4x4.a1());
         m.m01(aiMatrix4x4.a2());
