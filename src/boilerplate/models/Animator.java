@@ -51,6 +51,7 @@ public class Animator {
 
     public void update(float dt) {
         if (currentAnimation == null) return;
+        System.out.println("=============================================");
 
         Animation animation = getCurrentAnimation();
         animationTime += (animation.ticksPerSecond * .2f) * dt;
@@ -62,6 +63,7 @@ public class Animator {
         Animation currentAnim = getCurrentAnimation();
         Matrix4f nodeTransform = node.transform;
         AnimatedBone bone = currentAnim.getAnimatedBone(node.name);
+        System.out.println(bone);
 
         if (bone != null) nodeTransform = bone.calcInterpolatedMatrix(animationTime);
         Matrix4f globalTransform = parentTransform.mul(nodeTransform, new Matrix4f());

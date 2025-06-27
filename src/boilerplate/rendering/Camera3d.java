@@ -44,7 +44,7 @@ public class Camera3d {
     protected float aspect;
     public float fov = 80;
     public float near = .05f;
-    public float far = 100;
+    public float far = 1000;
 
     // view
     public Vector3f pos = new Vector3f();

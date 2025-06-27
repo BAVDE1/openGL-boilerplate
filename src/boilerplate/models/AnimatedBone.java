@@ -146,4 +146,9 @@ public class AnimatedBone {
         Vector3f scale = keyScales.get(currentKeyInx).scale.lerp(keyScales.get(nextKeyInx).scale, percent, new Vector3f());
         return new Matrix4f().identity().scale(scale);
     }
+
+    @Override
+    public String toString() {
+        return "AnimatedBone(%s, %s)".formatted(id, name);
+    }
 }
