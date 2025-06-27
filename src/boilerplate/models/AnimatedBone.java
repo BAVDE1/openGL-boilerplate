@@ -28,19 +28,14 @@ public class AnimatedBone {
         float timestamp;
     }
 
+    final Bone bone;
+
     List<KeyPosition> keyPositions = new ArrayList<>();
     List<KeyRotation> keyRotations = new ArrayList<>();
     List<KeyScale> keyScales = new ArrayList<>();
 
-    String name;
-    int id;
-
-    public AnimatedBone(AINodeAnim aiNodeAnim) {
-        processBoneAnimation(aiNodeAnim);
-    }
-
-    private void processBoneAnimation(AINodeAnim aiNodeAnim) {
-        name = aiNodeAnim.mNodeName().dataString();
+    public AnimatedBone(AINodeAnim aiNodeAnim, Bone bone) {
+        this.bone = bone;
 
         processPosKeys(aiNodeAnim.mPositionKeys());
         processRotKeys(aiNodeAnim.mRotationKeys());
@@ -149,6 +144,6 @@ public class AnimatedBone {
 
     @Override
     public String toString() {
-        return "AnimatedBone(%s, %s)".formatted(id, name);
+        return "AnimatedBone(%s, %s)".formatted(bone.id, bone.name);
     }
 }

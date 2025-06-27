@@ -1,19 +1,21 @@
 package boilerplate.models;
 
-import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class Animator {
+    private final Model model;
     private final HashMap<String, Animation> animations = new HashMap<>();
     private String currentAnimation;
     private float animationTime;
 
     public Model.NodeData rootNode;
     public Matrix4f[] finalBoneMatrices;
+
+    public Animator(Model model) {
+        this.model = model;
+    }
 
     public void init(int boneCount) {
         finalBoneMatrices = new Matrix4f[boneCount];
@@ -62,15 +64,15 @@ public class Animator {
     private void calcBoneTransformations(Model.NodeData node, Matrix4f parentTransform) {
         Animation currentAnim = getCurrentAnimation();
         Matrix4f nodeTransform = node.transform;
-        AnimatedBone bone = currentAnim.getAnimatedBone(node.name);
-        System.out.println(bone);
+        AnimatedBone animatedBone = currentAnim.getAnimatedBone(node.name);
+        System.out.println(animatedBone);
 
-        if (bone != null) nodeTransform = bone.calcInterpolatedMatrix(animationTime);
+        if (animatedBone != null) nodeTransform = animatedBone.calcInterpolatedMatrix(animationTime);
         Matrix4f globalTransform = parentTransform.mul(nodeTransform, new Matrix4f());
 
-        if (currentAnim.boneInfoMap.containsKey(node.name)) {
-            Model.BoneInfo boneInfo = currentAnim.boneInfoMap.get(node.name);
-            finalBoneMatrices[boneInfo.id] = globalTransform.mul(boneInfo.offset, new Matrix4f());
+        if (model.boneMap.containsKey(node.name)) {
+            Bone bone = model.boneMap.get(node.name);
+            finalBoneMatrices[bone.id] = globalTransform.mul(bone.offset, new Matrix4f());
 //            finalBoneMatrices[boneInfo.id] = new Matrix4f().identity();
         }
 

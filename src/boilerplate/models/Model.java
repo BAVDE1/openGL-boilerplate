@@ -14,7 +14,6 @@ import org.lwjgl.opengl.GL45;
 import java.io.File;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,25 +44,15 @@ public class Model {
         }
     }
 
-    public static class BoneInfo {
-        int id;
-        Matrix4f offset;
-
-        public BoneInfo(int boneId, Matrix4f offset) {
-            this.id = boneId;
-            this.offset = offset;
-        }
-    }
-
     String modelFile;
     String directory;
     VertexLayout vertexLayout = defaultVertexLayout();
-    public Animator animator = new Animator();
+    public Animator animator = new Animator(this);
 
     private final NodeData rootNode = new NodeData();
     Mesh[] meshes;
     Material[] materials;
-    HashMap<String, BoneInfo> boneInfoMap = new HashMap<>();
+    HashMap<String, Bone> boneMap = new HashMap<>();
     HashMap<Integer, List<VertexWeight>> vertexWeights = new HashMap<>();
     private int boneCounter = 0;
 
@@ -227,10 +216,7 @@ public class Model {
         while (allBones.hasRemaining()) {
             try (AIBone aiBone = AIBone.create(allBones.get())) {
                 String boneName = aiBone.mName().dataString();
-                BoneInfo boneInfo = boneInfoMap.computeIfAbsent(
-                        boneName,
-                        _ -> new BoneInfo(boneCounter++, MathUtils.AIMatrixToMatrix(aiBone.mOffsetMatrix()))  // todo: are you sure?
-                );
+                Bone boneInfo = boneMap.computeIfAbsent(boneName, _ -> new Bone(boneCounter++, aiBone));
 
                 AIVertexWeight.Buffer weights = aiBone.mWeights();
                 while (weights.hasRemaining()) {
@@ -256,7 +242,7 @@ public class Model {
             try (AIAnimation aiAnimation = AIAnimation.create(allAnimations.get())) {
                 Logging.info("new animation, %s", aiAnimation.mName().dataString());
 
-                Animation animation = new Animation(aiAnimation, boneInfoMap);
+                Animation animation = new Animation(aiAnimation, this);
                 animator.addAnimation(animation);
             }
         }

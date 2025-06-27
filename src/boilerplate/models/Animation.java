@@ -7,17 +7,16 @@ import org.lwjgl.assimp.AINodeAnim;
 import java.util.HashMap;
 
 public class Animation {
+    private final Model model;
     String name;
     float duration;
     float ticksPerSecond;
 
-    HashMap<String, Model.BoneInfo> boneInfoMap;
-
 //    List<AnimatedBone> animatedBones = new ArrayList<>();
     HashMap<String, AnimatedBone> animatedBones = new HashMap<>();
 
-    public Animation(AIAnimation aiAnimation, HashMap<String, Model.BoneInfo> boneInfoMap) {
-        this.boneInfoMap = boneInfoMap;
+    public Animation(AIAnimation aiAnimation, Model model) {
+        this.model = model;
         processAnimation(aiAnimation);
     }
 
@@ -31,9 +30,10 @@ public class Animation {
 
         while (allChannels.hasRemaining()) {
             try (AINodeAnim aiNodeAnim = AINodeAnim.create(allChannels.get())) {
-                AnimatedBone bone = new AnimatedBone(aiNodeAnim);
-                bone.id = boneInfoMap.get(bone.name).id;
-                animatedBones.put(bone.name, bone);
+                String relatedBoneName = aiNodeAnim.mNodeName().dataString();
+                Bone bone = model.boneMap.get(relatedBoneName);
+                AnimatedBone animatedBone = new AnimatedBone(aiNodeAnim, bone);
+                animatedBones.put(animatedBone.bone.name, animatedBone);
             }
         }
     }
