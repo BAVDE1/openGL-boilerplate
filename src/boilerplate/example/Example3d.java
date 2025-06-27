@@ -86,6 +86,7 @@ public class Example3d extends GameBase {
                 }
                 if (key == GLFW_KEY_F)
                     camera.setMode(camera.getMode() == Camera3d.MODE_FLY ? Camera3d.MODE_TARGET : Camera3d.MODE_FLY);
+                if (key == GLFW_KEY_K) model.animator.playAnimation("R6Armature|WalkAnim");
             }
         });
 
@@ -189,7 +190,7 @@ public class Example3d extends GameBase {
 
         model.draw(modelShader);
 
-        skyBox.draw();
+//        skyBox.draw();
 
         fb.blitIntoIntermediaryFB(GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
@@ -218,6 +219,7 @@ public class Example3d extends GameBase {
         glfwPollEvents();
         camera.processKeyInputs(window, staticDt);
         camera.updateUniformBlock();
+        model.updateAnimation(staticDt);
         render();
     }
 

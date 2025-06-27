@@ -1,7 +1,7 @@
 package boilerplate.models;
 
+import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
-import org.lwjgl.assimp.AIAnimation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +12,15 @@ public class Animator {
     private String currentAnimation;
     private float animationTime;
 
-    public List<Matrix4f> finalBoneMatrices = new ArrayList<>();
+    public Model.NodeData rootNode;
+    public Matrix4f[] finalBoneMatrices;
+
+    public void init(int boneCount) {
+        finalBoneMatrices = new Matrix4f[boneCount];
+        for (int i = 0; i < boneCount; i++) {
+            finalBoneMatrices[i] = new Matrix4f().identity();
+        }
+    }
 
     public void addAnimation(Animation animation) {
         animations.put(animation.name, animation);
@@ -28,8 +36,8 @@ public class Animator {
     }
 
     public void stopPlayingAnimation() {
-        currentAnimation = null;
         animationTime = 0;
+        currentAnimation = null;
     }
 
     public boolean hasAnimation(String animationName) {
@@ -45,11 +53,27 @@ public class Animator {
         if (currentAnimation == null) return;
 
         Animation animation = getCurrentAnimation();
-        animationTime += animation.ticksPerSecond * dt;
+        animationTime += (animation.ticksPerSecond * .2f) * dt;
         animationTime = animationTime % animation.duration;
+        calcBoneTransformations(rootNode, new Matrix4f().identity());
     }
 
-    private void calcBoneTransformations() {
+    private void calcBoneTransformations(Model.NodeData node, Matrix4f parentTransform) {
+        Animation currentAnim = getCurrentAnimation();
+        Matrix4f nodeTransform = node.transform;
+        AnimatedBone bone = currentAnim.getAnimatedBone(node.name);
 
+        if (bone != null) nodeTransform = bone.calcInterpolatedMatrix(animationTime);
+        Matrix4f globalTransform = parentTransform.mul(nodeTransform, new Matrix4f());
+
+        if (currentAnim.boneInfoMap.containsKey(node.name)) {
+            Model.BoneInfo boneInfo = currentAnim.boneInfoMap.get(node.name);
+            finalBoneMatrices[boneInfo.id] = globalTransform.mul(boneInfo.offset, new Matrix4f());
+//            finalBoneMatrices[boneInfo.id] = new Matrix4f().identity();
+        }
+
+        for (Model.NodeData child : node.children) {
+            calcBoneTransformations(child, globalTransform);
+        }
     }
 }

@@ -14,11 +14,18 @@ import org.lwjgl.opengl.GL45;
 import java.io.File;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class Model {
     public static final int MAX_BONE_INFLUENCE = 4;
+
+    public static class NodeData {
+        String name;
+        Matrix4f transform;
+        List<NodeData> children = new ArrayList<>();
+    }
 
     public static class VertexWeight {
         int boneId = -1;
@@ -53,6 +60,7 @@ public class Model {
     VertexLayout vertexLayout = defaultVertexLayout();
     public Animator animator = new Animator();
 
+    private final NodeData rootNode = new NodeData();
     Mesh[] meshes;
     Material[] materials;
     HashMap<String, BoneInfo> boneInfoMap = new HashMap<>();
@@ -112,22 +120,28 @@ public class Model {
         materials = new Material[rootAiScene.mNumMaterials()];
         processMaterials(rootAiScene);
 
-        // model
+        // node hierarchy & model
         meshes = new Mesh[rootAiScene.mNumMeshes()];
-        processNode(rootAiScene.mRootNode(), rootAiScene);
+        processNode(rootAiScene.mRootNode(), rootAiScene, rootNode);
+        animator.rootNode = rootNode;
 
         // animations
+        animator.init(boneCounter);
         processAnimations(rootAiScene);
     }
 
     /**
      * Recursively process a node and its children
      */
-    private void processNode(AINode aiNode, AIScene rootAiScene) {
+    private void processNode(AINode aiNode, AIScene rootAiScene, NodeData nodeDest) {
         if (aiNode == null) {
             Logging.warn("Node is null, scene: %s", rootAiScene);
             return;
         }
+
+        // node hierarchy
+        nodeDest.name = aiNode.mName().dataString();
+        nodeDest.transform = MathUtils.AIMatrixToMatrix(aiNode.mTransformation());
 
         // meshes
         PointerBuffer allMeshes = rootAiScene.mMeshes();
@@ -147,7 +161,9 @@ public class Model {
 
         for (int i = 0; i < aiNode.mNumChildren(); i++) {
             try (AINode child = AINode.create(children.get(i))) {
-                processNode(child, rootAiScene);
+                NodeData childNode = new NodeData();
+                processNode(child, rootAiScene, childNode);
+                nodeDest.children.add(childNode);
             }
         }
     }
@@ -319,8 +335,17 @@ public class Model {
         }
     }
 
+    public void updateAnimation(double dt) {
+        animator.update((float) dt);
+    }
+
     public void draw(ShaderProgram shaderProgram) {
         shaderProgram.bind();
+
+        for (int i = 0; i < boneCounter; i++) {
+            shaderProgram.uniformMatrix4f("finalBonesMatrices[%s]".formatted(i), animator.finalBoneMatrices[i]);
+        }
+
         if (modelTransformChanged) {
             shaderProgram.uniformMatrix4f("model", modelTransform);
             modelTransformChanged = false;
@@ -341,7 +366,7 @@ public class Model {
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_NORMAL),
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 2, VertexLayout.HINT_TEX_POS),
                 new VertexLayout.Element(VertexLayout.TYPE_INT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_IDS),
-                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_WEIGHTS, true)
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_WEIGHTS)
         );
     }
 }
