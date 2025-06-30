@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL45;
 import java.io.File;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,6 +25,14 @@ public class Model {
         String name;
         Matrix4f transform;
         List<NodeData> children = new ArrayList<>();
+
+        @Override
+        public String toString() {
+            return "NodeData(" +
+                    "name='" + name + '\'' +
+                    ", children=" + children +
+                    ')';
+        }
     }
 
     public static class VertexWeight {
@@ -354,5 +363,12 @@ public class Model {
                 new VertexLayout.Element(VertexLayout.TYPE_INT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_IDS),
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_WEIGHTS)
         );
+    }
+
+    @Override
+    public String toString() {
+        return "Model(" +
+                "modelFile='" + modelFile + '\'' +
+                ')';
     }
 }

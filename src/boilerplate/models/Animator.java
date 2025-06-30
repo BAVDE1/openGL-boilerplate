@@ -1,5 +1,6 @@
 package boilerplate.models;
 
+import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 
 import java.util.HashMap;
@@ -33,6 +34,10 @@ public class Animator {
     }
 
     public void playAnimation(String animationName) {
+        if (!animations.containsKey(animationName)) {
+            Logging.danger("No animation '%s' exists for this model, %s", animationName, model);
+            return;
+        }
         animationTime = 0;
         currentAnimation = animationName;
     }
@@ -53,7 +58,6 @@ public class Animator {
 
     public void update(float dt) {
         if (currentAnimation == null) return;
-        System.out.println("=============================================");
 
         Animation animation = getCurrentAnimation();
         animationTime += (animation.ticksPerSecond * .2f) * dt;
@@ -63,17 +67,16 @@ public class Animator {
 
     private void calcBoneTransformations(Model.NodeData node, Matrix4f parentTransform) {
         Animation currentAnim = getCurrentAnimation();
-        Matrix4f nodeTransform = node.transform;
         AnimatedBone animatedBone = currentAnim.getAnimatedBone(node.name);
-        System.out.println(animatedBone);
+        Matrix4f globalTransform;
 
-        if (animatedBone != null) nodeTransform = animatedBone.calcInterpolatedMatrix(animationTime);
-        Matrix4f globalTransform = parentTransform.mul(nodeTransform, new Matrix4f());
-
-        if (model.boneMap.containsKey(node.name)) {
-            Bone bone = model.boneMap.get(node.name);
+        if (animatedBone != null) {
+            Bone bone = animatedBone.bone;
+            Matrix4f boneTransform = animatedBone.calcInterpolatedMatrix(animationTime);
+            globalTransform = parentTransform.mul(boneTransform, new Matrix4f());
             finalBoneMatrices[bone.id] = globalTransform.mul(bone.offset, new Matrix4f());
-//            finalBoneMatrices[boneInfo.id] = new Matrix4f().identity();
+        } else {
+            globalTransform = parentTransform.mul(node.transform, new Matrix4f());
         }
 
         for (Model.NodeData child : node.children) {

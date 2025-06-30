@@ -14,4 +14,12 @@ public class Bone {
         this.name = aiBone.mName().dataString();
         this.offset = MathUtils.AIMatrixToMatrix(aiBone.mOffsetMatrix());
     }
+
+    @Override
+    public String toString() {
+        return "Bone(" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ')';
+    }
 }
