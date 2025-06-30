@@ -41,6 +41,7 @@ public class Mesh {
     }
 
     public void pushInt(int i) {
+//        System.out.println(i);
         data.putInt(i);
     }
 

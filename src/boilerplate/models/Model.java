@@ -225,7 +225,7 @@ public class Model {
         while (allBones.hasRemaining()) {
             try (AIBone aiBone = AIBone.create(allBones.get())) {
                 String boneName = aiBone.mName().dataString();
-                Bone boneInfo = boneMap.computeIfAbsent(boneName, _ -> new Bone(boneCounter++, aiBone));
+                Bone bone = boneMap.computeIfAbsent(boneName, _ -> new Bone(boneCounter++, aiBone));
 
                 AIVertexWeight.Buffer weights = aiBone.mWeights();
                 while (weights.hasRemaining()) {
@@ -233,8 +233,14 @@ public class Model {
                     int vertexId = aiWeight.mVertexId();
                     float weight = aiWeight.mWeight();
 
+                    if (vertexId == 0) {
+                        System.out.println(bone.name);
+                        System.out.println(bone.id);
+                        System.out.println(weight);
+                    }
+
                     List<VertexWeight> vwList = vertexWeights.computeIfAbsent(vertexId, _ -> new ArrayList<>());
-                    vwList.add(new VertexWeight(boneInfo.id, weight));
+                    vwList.add(new VertexWeight(bone.id, weight));
                 }
             }
         }
@@ -275,6 +281,7 @@ public class Model {
 
     private void pushVertexBoneIds(Mesh mesh, int vertexInx) {
         List<VertexWeight> vwList = vertexWeights.get(vertexInx);
+//        System.out.println(vwList);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
             if (vwList != null && i < vwList.size()) mesh.pushInt(vwList.get(i).boneId);
             else mesh.pushInt(-1);
