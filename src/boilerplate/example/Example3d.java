@@ -86,7 +86,15 @@ public class Example3d extends GameBase {
                 }
                 if (key == GLFW_KEY_F)
                     camera.setMode(camera.getMode() == Camera3d.MODE_FLY ? Camera3d.MODE_TARGET : Camera3d.MODE_FLY);
-                if (key == GLFW_KEY_K) model.animator.playAnimation("R6Armature|WalkAnim");
+                if (key == GLFW_KEY_1) model.animator.playAnimation("R6Armature|WalkAnim");
+                if (key == GLFW_KEY_2) model.animator.playAnimation("R6Armature|Climb");
+                if (key == GLFW_KEY_3) model.animator.playAnimation("R6Armature|Tool");
+                if (key == GLFW_KEY_4) model.animator.playAnimation("R6Armature|Sit");
+                if (key == GLFW_KEY_5) model.animator.playAnimation("R6Armature|Jump");
+                if (key == GLFW_KEY_6) model.animator.playAnimation("R6Armature|Fall");
+                if (key == GLFW_KEY_7) model.animator.playAnimation("mixamo.com");
+                if (key == GLFW_KEY_8) model.animator.playAnimation("anim_0");
+                if (key == GLFW_KEY_L) model.animator.stopPlayingAnimation(true);
             }
         });
 
@@ -150,8 +158,8 @@ public class Example3d extends GameBase {
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
-        model.loadModel("res/models/roblox/scene.gltf", true);
-//        model.modelTransform.scale(.3f).translate(0, -3, 0);
+        model.loadModel("res/models/guard/boblampclean.md5mesh", true);
+        model.modelTransform.scale(.03f).translate(0, -20, 0);
     }
 
     public void render() {

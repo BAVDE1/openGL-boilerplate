@@ -12,6 +12,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 
 public class Mesh {
     protected VertexArray va = new VertexArray();
@@ -19,8 +20,12 @@ public class Mesh {
     protected VertexElementBuffer veb = new VertexElementBuffer(VertexElementBuffer.ELEMENT_TYPE_INT);
 
     VertexLayout vertexLayout;
+    HashMap<Integer, List<Model.VertexWeight>> vertexWeights = new HashMap<>();
 
     int indicesCount = 0;
+    int baseIndice = 0;
+    int baseVertex = 0;
+
     protected ByteBuffer data = MemoryUtil.memAlloc(0);
     protected ByteBuffer indices = MemoryUtil.memAlloc(0);
     protected Material material = new Material();

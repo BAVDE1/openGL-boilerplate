@@ -21,20 +21,21 @@ uniform mat4 finalBonesMatrices[MAX_BONES];
 out vec2 v_texPos;
 
 void main() {
-    vec4 totalPosition = vec4(0.0f);
+    mat4 trans = mat4(0);
+//    vec4 totalPosition = vec4(0.0f);
     for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
         if (boneIds[i] == -1) continue;
         if (boneIds[i] >= MAX_BONES) {
-            totalPosition = vec4(pos, 1.0f);
+//            totalPosition = vec4(pos, 1.0f);
             break;
         }
 
-        vec4 localPosition = finalBonesMatrices[boneIds[i]] * vec4(pos, 1.0f);
-        totalPosition += localPosition * boneWeights[i];
+        trans += finalBonesMatrices[boneIds[i]] * boneWeights[i];
+//        totalPosition += localPosition * boneWeights[i];
 //        vec3 localNormal = mat3(finalBonesMatrices[boneIds[i]]) * normal;
     }
 
-    gl_Position = projection * view * totalPosition;
+    gl_Position = projection * view * model * trans * vec4(pos, 1);
 //    gl_Position = projection * view * vec4(pos, 1);
     v_texPos = texPos;
 }

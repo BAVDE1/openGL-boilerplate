@@ -62,13 +62,14 @@ public class Model {
     Mesh[] meshes;
     Material[] materials;
     HashMap<String, Bone> boneMap = new HashMap<>();
-    HashMap<Integer, List<VertexWeight>> vertexWeights = new HashMap<>();
     private int boneCounter = 0;
 
     private boolean renderWireFrame = false;
 
     public Matrix4f modelTransform = new Matrix4f().identity();
     public boolean modelTransformChanged = true;
+
+    public Matrix4f globalInverseTransform;
 
     public Model() {
     }
@@ -121,10 +122,9 @@ public class Model {
         // node hierarchy & model
         meshes = new Mesh[rootAiScene.mNumMeshes()];
         processNode(rootAiScene.mRootNode(), rootAiScene, rootNode);
-        animator.rootNode = rootNode;
 
         // animations
-        animator.init(boneCounter);
+        animator.init(boneCounter, rootNode);
         processAnimations(rootAiScene);
     }
 
@@ -142,13 +142,21 @@ public class Model {
         nodeDest.transform = MathUtils.AIMatrixToMatrix(aiNode.mTransformation());
 
         // meshes
+        int verticesCounter = 0;
+        int indicesCounter = 0;
         PointerBuffer allMeshes = rootAiScene.mMeshes();
         IntBuffer nodeMeshes = aiNode.mMeshes();  // indexes of scene's meshes
         if (allMeshes != null && nodeMeshes != null) {
             while (nodeMeshes.hasRemaining()) {
                 int meshInx = nodeMeshes.get();
                 try (AIMesh aiMesh = AIMesh.create(allMeshes.get(meshInx))) {
-                    meshes[meshInx] = processMesh(aiMesh);
+                    Mesh mesh = processMesh(aiMesh);
+                    mesh.baseVertex = verticesCounter;
+                    mesh.baseIndice = indicesCounter;
+                    meshes[meshInx] = mesh;
+
+                    verticesCounter += aiMesh.mNumVertices();
+                    indicesCounter += mesh.indicesCount;
                 }
             }
         }
@@ -171,7 +179,7 @@ public class Model {
         mesh.indicesCount = findIndicesCount(aiMesh);
         mesh.allocateMemory(calculateVertexDataBytes(aiMesh), mesh.indicesCount * Integer.BYTES);
 
-        processBones(aiMesh);
+        processBones(mesh, aiMesh);
         processVertices(mesh, aiMesh);
         processFaces(mesh, aiMesh);
         processMeshMaterial(mesh, aiMesh);
@@ -192,6 +200,9 @@ public class Model {
         return count;
     }
 
+    /**
+     * After process bones
+     */
     private void processVertices(Mesh mesh, AIMesh aiMesh) {
         AIVector3D.Buffer allVertices = aiMesh.mVertices();
         AIVector3D.Buffer allNormals = aiMesh.mNormals();
@@ -218,7 +229,7 @@ public class Model {
         }
     }
 
-    private void processBones(AIMesh aiMesh) {
+    private void processBones(Mesh mesh, AIMesh aiMesh) {
         PointerBuffer allBones = aiMesh.mBones();
         if (allBones == null) return;  // no bones
 
@@ -232,14 +243,9 @@ public class Model {
                     AIVertexWeight aiWeight = weights.get();
                     int vertexId = aiWeight.mVertexId();
                     float weight = aiWeight.mWeight();
+                    if (weight == 0) continue;  // no need to even add the bone
 
-                    if (vertexId == 0) {
-                        System.out.println(bone.name);
-                        System.out.println(bone.id);
-                        System.out.println(weight);
-                    }
-
-                    List<VertexWeight> vwList = vertexWeights.computeIfAbsent(vertexId, _ -> new ArrayList<>());
+                    List<VertexWeight> vwList = mesh.vertexWeights.computeIfAbsent(vertexId, _ -> new ArrayList<>());
                     vwList.add(new VertexWeight(bone.id, weight));
                 }
             }
@@ -255,9 +261,8 @@ public class Model {
 
         while (allAnimations.hasRemaining()) {
             try (AIAnimation aiAnimation = AIAnimation.create(allAnimations.get())) {
-                Logging.info("new animation, %s", aiAnimation.mName().dataString());
-
                 Animation animation = new Animation(aiAnimation, this);
+                Logging.info("new animation, %s", animation.name);
                 animator.addAnimation(animation);
             }
         }
@@ -280,7 +285,7 @@ public class Model {
     }
 
     private void pushVertexBoneIds(Mesh mesh, int vertexInx) {
-        List<VertexWeight> vwList = vertexWeights.get(vertexInx);
+        List<VertexWeight> vwList = mesh.vertexWeights.get(vertexInx);
 //        System.out.println(vwList);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
             if (vwList != null && i < vwList.size()) mesh.pushInt(vwList.get(i).boneId);
@@ -289,7 +294,7 @@ public class Model {
     }
 
     private void pushVertexBoneWeights(Mesh mesh, int vertexInx) {
-        List<VertexWeight> vwList = vertexWeights.get(vertexInx);
+        List<VertexWeight> vwList = mesh.vertexWeights.get(vertexInx);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
             if (vwList != null && i < vwList.size()) mesh.pushFloat(vwList.get(i).weight);
             else mesh.pushFloat(0);
@@ -360,6 +365,11 @@ public class Model {
         renderWireFrame = val;
         int mode = val ? GL45.GL_LINES : GL45.GL_TRIANGLES;
         for (Mesh mesh : meshes) mesh.renderMode = mode;
+    }
+
+    public Bone getBone(String boneName) {
+        if (!boneMap.containsKey(boneName)) return null;
+        return boneMap.get(boneName);
     }
 
     public static VertexLayout defaultVertexLayout() {

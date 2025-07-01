@@ -79,7 +79,7 @@ public class AnimatedBone {
         Matrix4f translation = interpolatePosition(animationTime);
         Matrix4f rotation = interpolateRotation(animationTime);
         Matrix4f scale = interpolateScale(animationTime);
-        return translation.mul(rotation.mul(scale, new Matrix4f()));
+        return translation.mul(rotation.mul(scale));
     }
 
     private int getPositionKeyInx(float animationTime) {
@@ -115,7 +115,9 @@ public class AnimatedBone {
 
         int currentKeyInx = getPositionKeyInx(animationTime);
         int nextKeyInx = currentKeyInx + 1;
-        float percent = getTimestampPercentCompletion(keyPositions.get(currentKeyInx).timestamp, keyPositions.get(nextKeyInx).timestamp, animationTime);
+        float t1 = keyPositions.get(currentKeyInx).timestamp;
+        float t2 = keyPositions.get(nextKeyInx).timestamp;
+        float percent = getTimestampPercentCompletion(t1, t2, animationTime);
         Vector3f position = keyPositions.get(currentKeyInx).position.lerp(keyPositions.get(nextKeyInx).position, percent, new Vector3f());
         return new Matrix4f().identity().translate(position);
     }

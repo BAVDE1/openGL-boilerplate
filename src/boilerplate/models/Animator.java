@@ -13,16 +13,18 @@ public class Animator {
 
     public Model.NodeData rootNode;
     public Matrix4f[] finalBoneMatrices;
+    Matrix4f globalInvTrans;
 
     public Animator(Model model) {
         this.model = model;
     }
 
-    public void init(int boneCount) {
+    public void init(int boneCount, Model.NodeData rootNode) {
+        this.rootNode = rootNode;
+        globalInvTrans = rootNode.transform.invert(new Matrix4f());
+
         finalBoneMatrices = new Matrix4f[boneCount];
-        for (int i = 0; i < boneCount; i++) {
-            finalBoneMatrices[i] = new Matrix4f().identity();
-        }
+        resetBoneMatrices(rootNode, new Matrix4f().identity());
     }
 
     public void addAnimation(Animation animation) {
@@ -42,9 +44,11 @@ public class Animator {
         currentAnimation = animationName;
     }
 
-    public void stopPlayingAnimation() {
+    public void stopPlayingAnimation(boolean resetBoneMatrices) {
         animationTime = 0;
         currentAnimation = null;
+
+        if (resetBoneMatrices) resetBoneMatrices(rootNode, new Matrix4f().identity());
     }
 
     public boolean hasAnimation(String animationName) {
@@ -60,7 +64,7 @@ public class Animator {
         if (currentAnimation == null) return;
 
         Animation animation = getCurrentAnimation();
-        animationTime += (animation.ticksPerSecond * .2f) * dt;
+        animationTime += (animation.ticksPerSecond * 1) * dt;
         animationTime = animationTime % animation.duration;
         calcBoneTransformations(rootNode, new Matrix4f().identity());
     }
@@ -81,6 +85,19 @@ public class Animator {
 
         for (Model.NodeData child : node.children) {
             calcBoneTransformations(child, globalTransform);
+        }
+    }
+
+    public void resetBoneMatrices(Model.NodeData node, Matrix4f parentTransform) {
+        Matrix4f globalTransform = parentTransform.mul(node.transform, new Matrix4f());
+
+        Bone bone = model.getBone(node.name);
+        if (bone != null) {
+            finalBoneMatrices[bone.id] = globalTransform.mul(bone.offset, new Matrix4f());
+        }
+
+        for (Model.NodeData child : node.children) {
+            resetBoneMatrices(child, globalTransform);
         }
     }
 }

@@ -155,6 +155,11 @@ public class Renderer {
         drawElements(mode, va, veb.getElementType(), vertexCount);
     }
 
+    public static void drawElementsBaseVertex(int mode, VertexArray va, VertexElementBuffer veb, int vertexCount, int baseIndice, int baseVertex) {
+        va.bind();
+        glDrawElementsBaseVertex(mode, vertexCount, veb.getElementType(), (long) Integer.BYTES * baseIndice, baseVertex);
+    }
+
     public static void drawElements(int mode, VertexArray va, int elementType, int vertexCount) {
         va.bind();
         glDrawElements(mode, vertexCount, elementType, 0);

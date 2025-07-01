@@ -7,6 +7,8 @@ import org.lwjgl.assimp.AINodeAnim;
 import java.util.HashMap;
 
 public class Animation {
+    private static int nameCounter = 0;
+
     private final Model model;
     String name;
     float duration;
@@ -22,6 +24,7 @@ public class Animation {
 
     private void processAnimation(AIAnimation aiAnimation) {
         name = aiAnimation.mName().dataString();
+        if (name.isEmpty()) name = "anim_%s".formatted(nameCounter++);
         duration = (float) aiAnimation.mDuration();
         ticksPerSecond = (float) aiAnimation.mTicksPerSecond();
 
@@ -32,6 +35,7 @@ public class Animation {
             try (AINodeAnim aiNodeAnim = AINodeAnim.create(allChannels.get())) {
                 String relatedBoneName = aiNodeAnim.mNodeName().dataString();
                 Bone bone = model.boneMap.get(relatedBoneName);
+                if (bone == null) continue;
                 AnimatedBone animatedBone = new AnimatedBone(aiNodeAnim, bone);
                 animatedBones.put(animatedBone.bone.name, animatedBone);
             }
