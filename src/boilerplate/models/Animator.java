@@ -21,9 +21,9 @@ public class Animator {
 
     public void init(int boneCount, Model.NodeData rootNode) {
         this.rootNode = rootNode;
-        globalInvTrans = rootNode.transform.invert(new Matrix4f());
+        this.globalInvTrans = rootNode.transform.invert(new Matrix4f());
 
-        finalBoneMatrices = new Matrix4f[boneCount];
+        this.finalBoneMatrices = new Matrix4f[boneCount];
         resetBoneMatrices(rootNode, new Matrix4f().identity());
     }
 

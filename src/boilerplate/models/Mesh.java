@@ -23,8 +23,6 @@ public class Mesh {
     HashMap<Integer, List<Model.VertexWeight>> vertexWeights = new HashMap<>();
 
     int indicesCount = 0;
-    int baseIndice = 0;
-    int baseVertex = 0;
 
     protected ByteBuffer data = MemoryUtil.memAlloc(0);
     protected ByteBuffer indices = MemoryUtil.memAlloc(0);

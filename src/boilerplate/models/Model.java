@@ -142,21 +142,13 @@ public class Model {
         nodeDest.transform = MathUtils.AIMatrixToMatrix(aiNode.mTransformation());
 
         // meshes
-        int verticesCounter = 0;
-        int indicesCounter = 0;
         PointerBuffer allMeshes = rootAiScene.mMeshes();
         IntBuffer nodeMeshes = aiNode.mMeshes();  // indexes of scene's meshes
         if (allMeshes != null && nodeMeshes != null) {
             while (nodeMeshes.hasRemaining()) {
                 int meshInx = nodeMeshes.get();
                 try (AIMesh aiMesh = AIMesh.create(allMeshes.get(meshInx))) {
-                    Mesh mesh = processMesh(aiMesh);
-                    mesh.baseVertex = verticesCounter;
-                    mesh.baseIndice = indicesCounter;
-                    meshes[meshInx] = mesh;
-
-                    verticesCounter += aiMesh.mNumVertices();
-                    indicesCounter += mesh.indicesCount;
+                    meshes[meshInx] = processMesh(aiMesh);
                 }
             }
         }
