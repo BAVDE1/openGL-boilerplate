@@ -3,6 +3,7 @@ package boilerplate.rendering.buffers;
 import boilerplate.utility.Logging;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,23 +75,19 @@ public class VertexLayout {
     public static final int HINT_TEX_POS = 3;
     public static final int HINT_BONE_IDS = 4;
     public static final int HINT_BONE_WEIGHTS = 5;
+    public static final int HINT_CUSTOM_0 = 100;
+    public static final int HINT_CUSTOM_1 = 101;
+    public static final int HINT_CUSTOM_2 = 102;
+    public static final int HINT_CUSTOM_3 = 103;
+    public static final int HINT_CUSTOM_4 = 104;
+    public static final int HINT_CUSTOM_5 = 105;
+    public static final int HINT_CUSTOM_6 = 106;
+    public static final int HINT_CUSTOM_7 = 107;
+    public static final int HINT_CUSTOM_8 = 108;
+    public static final int HINT_CUSTOM_9 = 109;
 
-    public static final Map<Integer, String> TYPE_STRING_MAP = Map.of(
-            TYPE_FLOAT, "float",
-            TYPE_INT, "int",
-            TYPE_UNSIGNED_INT, "unsigned_int",
-            TYPE_BYTE, "byte",
-            TYPE_UNSIGNED_BYTE, "unsigned_byte"
-    );
-
-    public static final Map<Integer, String> HINT_STRING_MAP = Map.of(
-            HINT_NULL, "no_hint",
-            HINT_POSITION, "position",
-            HINT_NORMAL, "normal",
-            HINT_TEX_POS, "tex_pos",
-            HINT_BONE_IDS, "bone_ids",
-            HINT_BONE_WEIGHTS, "bone_weights"
-    );
+    public static final Map<Integer, String> TYPE_STRING_MAP = buildTypeStringMap();
+    public static final Map<Integer, String> HINT_STRING_MAP = buildHintStringMap();
 
     public final ArrayList<Element> elements = new ArrayList<>();
     public int totalItems = 0;
@@ -106,6 +103,37 @@ public class VertexLayout {
 
     public VertexLayout(Element... elements) {
         for (Element element : elements) push(element);
+    }
+
+    private static Map<Integer, String> buildTypeStringMap() {
+        Map<Integer, String> m = new HashMap<>();
+        m.put(TYPE_FLOAT, "float");
+        m.put(TYPE_INT, "int");
+        m.put(TYPE_UNSIGNED_INT, "unsigned_int");
+        m.put(TYPE_BYTE, "byte");
+        m.put(TYPE_UNSIGNED_BYTE, "unsigned_byte");
+        return m;
+    }
+
+    private static Map<Integer, String> buildHintStringMap() {
+        Map<Integer, String> m = new HashMap<>();
+        m.put(HINT_NULL, "no hint");
+        m.put(HINT_POSITION, "position");
+        m.put(HINT_NORMAL, "normal");
+        m.put(HINT_TEX_POS, "tex_pos");
+        m.put(HINT_BONE_IDS, "bone_ids");
+        m.put(HINT_BONE_WEIGHTS, "bone_weights");
+        m.put(HINT_CUSTOM_0, "custom 0");
+        m.put(HINT_CUSTOM_1, "custom 1");
+        m.put(HINT_CUSTOM_2, "custom 2");
+        m.put(HINT_CUSTOM_3, "custom 3");
+        m.put(HINT_CUSTOM_4, "custom 4");
+        m.put(HINT_CUSTOM_5, "custom 5");
+        m.put(HINT_CUSTOM_6, "custom 6");
+        m.put(HINT_CUSTOM_7, "custom 7");
+        m.put(HINT_CUSTOM_8, "custom 8");
+        m.put(HINT_CUSTOM_9, "custom 9");
+        return m;
     }
 
     private void push(Element element) {

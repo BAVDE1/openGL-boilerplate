@@ -15,6 +15,8 @@ public class Animator {
     public Matrix4f[] finalBoneMatrices;
     Matrix4f globalInvTrans;
 
+    public float animationSpeed = 1;
+
     public Animator(Model model) {
         this.model = model;
     }
@@ -24,7 +26,7 @@ public class Animator {
         this.globalInvTrans = rootNode.transform.invert(new Matrix4f());
 
         this.finalBoneMatrices = new Matrix4f[boneCount];
-        resetBoneMatrices(rootNode, new Matrix4f().identity());
+        resetBoneMatricesToStatic(rootNode, new Matrix4f().identity());
     }
 
     public void addAnimation(Animation animation) {
@@ -48,7 +50,7 @@ public class Animator {
         animationTime = 0;
         currentAnimation = null;
 
-        if (resetBoneMatrices) resetBoneMatrices(rootNode, new Matrix4f().identity());
+        if (resetBoneMatrices) resetBoneMatricesToStatic(rootNode, new Matrix4f().identity());
     }
 
     public boolean hasAnimation(String animationName) {
@@ -64,7 +66,7 @@ public class Animator {
         if (currentAnimation == null) return;
 
         Animation animation = getCurrentAnimation();
-        animationTime += (animation.ticksPerSecond * 1) * dt;
+        animationTime += (animation.ticksPerSecond * animationSpeed) * dt;
         animationTime = animationTime % animation.duration;
         calcBoneTransformations(rootNode, rootNode.transform);
     }
@@ -88,7 +90,7 @@ public class Animator {
         }
     }
 
-    public void resetBoneMatrices(Model.NodeData node, Matrix4f parentTransform) {
+    public void resetBoneMatricesToStatic(Model.NodeData node, Matrix4f parentTransform) {
         Matrix4f globalTransform = parentTransform.mul(node.transform, new Matrix4f());
 
         Bone bone = model.getBone(node.name);
@@ -97,7 +99,13 @@ public class Animator {
         }
 
         for (Model.NodeData child : node.children) {
-            resetBoneMatrices(child, globalTransform);
+            resetBoneMatricesToStatic(child, globalTransform);
+        }
+    }
+
+    public void resetBoneMatricesToIdentity() {
+        for (int i = 0; i < finalBoneMatrices.length; i++) {
+            finalBoneMatrices[i] = new Matrix4f().identity();
         }
     }
 }

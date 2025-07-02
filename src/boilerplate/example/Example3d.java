@@ -94,6 +94,8 @@ public class Example3d extends GameBase {
                 if (key == GLFW_KEY_6) model.animator.playAnimation("R6Armature|Fall");
                 if (key == GLFW_KEY_7) model.animator.playAnimation("mixamo.com");
                 if (key == GLFW_KEY_8) model.animator.playAnimation("anim_0");
+                if (key == GLFW_KEY_PERIOD) model.animator.animationSpeed += .2f;
+                if (key == GLFW_KEY_COMMA) model.animator.animationSpeed -= .2f;
                 if (key == GLFW_KEY_L) model.animator.stopPlayingAnimation(true);
             }
         });

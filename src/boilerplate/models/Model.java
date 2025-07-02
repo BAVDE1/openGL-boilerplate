@@ -67,7 +67,10 @@ public class Model {
 
     public Matrix4f modelTransform = new Matrix4f().identity();
     public boolean modelTransformChanged = true;
+
+    private boolean hasBones = false;
     private boolean renderWireFrame = false;
+    private boolean renderBones = false;
 
     public Model() {
     }
@@ -224,6 +227,7 @@ public class Model {
         PointerBuffer allBones = aiMesh.mBones();
         if (allBones == null) return;  // no bones
 
+        hasBones = allBones.hasRemaining();
         while (allBones.hasRemaining()) {
             try (AIBone aiBone = AIBone.create(allBones.get())) {
                 String boneName = aiBone.mName().dataString();
@@ -270,6 +274,7 @@ public class Model {
                 case (VertexLayout.HINT_TEX_POS) -> mesh.pushVector2D(allTexPos.get(vertexInx));
                 case (VertexLayout.HINT_BONE_IDS) -> pushVertexBoneIds(mesh, vertexInx);
                 case (VertexLayout.HINT_BONE_WEIGHTS) -> pushVertexBoneWeights(mesh, vertexInx);
+                case (VertexLayout.HINT_CUSTOM_0) -> mesh.pushInt(hasBones ? 0 : 1);  // it is static if no bones
                 default -> throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
             }
         }
@@ -277,7 +282,6 @@ public class Model {
 
     private void pushVertexBoneIds(Mesh mesh, int vertexInx) {
         List<VertexWeight> vwList = mesh.vertexWeights.get(vertexInx);
-//        System.out.println(vwList);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
             if (vwList != null && i < vwList.size()) mesh.pushInt(vwList.get(i).boneId);
             else mesh.pushInt(-1);
@@ -358,6 +362,15 @@ public class Model {
         for (Mesh mesh : meshes) mesh.renderMode = mode;
     }
 
+    public void setRenderBones(boolean val) {
+        if (!hasBones || val == renderBones) return;
+        renderBones = true;
+    }
+
+    public boolean hasBones() {
+        return hasBones;
+    }
+
     public Bone getBone(String boneName) {
         if (!boneMap.containsKey(boneName)) return null;
         return boneMap.get(boneName);
@@ -369,7 +382,8 @@ public class Model {
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_NORMAL),
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 2, VertexLayout.HINT_TEX_POS),
                 new VertexLayout.Element(VertexLayout.TYPE_INT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_IDS),
-                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_WEIGHTS)
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_WEIGHTS),
+                new VertexLayout.Element(VertexLayout.TYPE_INT, 1, VertexLayout.HINT_CUSTOM_0)
         );
     }
 

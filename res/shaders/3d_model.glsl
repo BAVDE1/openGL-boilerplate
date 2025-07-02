@@ -6,6 +6,7 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texPos;
 layout(location = 3) in ivec4 boneIds;
 layout(location = 4) in vec4 boneWeights;
+layout(location = 5) in int isStatic;
 
 layout (std140) uniform CameraView {
     mat4 projection;
@@ -21,7 +22,12 @@ uniform mat4 finalBonesMatrices[MAX_BONES];
 out vec2 v_texPos;
 
 void main() {
-    mat4 animTransformation = mat4(0);
+    mat4 animTransformation = mat4(
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ) * isStatic;  // only use identity if its not static (ie if its not animated)
     for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
         if (boneIds[i] == -1) continue;
         if (boneIds[i] >= MAX_BONES) break;
@@ -43,7 +49,5 @@ in vec2 v_texPos;
 out vec4 colour;
 
 void main() {
-    //    colour = vec4(1, 0, 1, 1);
     colour = texture(modelTexture, v_texPos);
-    //    colour = vec4(v_texPos.x, v_texPos.y, 1, 1);
 }
