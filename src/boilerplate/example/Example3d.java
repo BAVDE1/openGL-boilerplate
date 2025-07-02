@@ -84,6 +84,7 @@ public class Example3d extends GameBase {
                     renderWireFrame = !renderWireFrame;
                     model.renderWireFrame(renderWireFrame);
                 }
+                if (key == GLFW_KEY_GRAVE_ACCENT) model.renderBones(!model.isRenderingBones());
                 if (key == GLFW_KEY_F)
                     camera.setMode(camera.getMode() == Camera3d.MODE_FLY ? Camera3d.MODE_TARGET : Camera3d.MODE_FLY);
                 if (key == GLFW_KEY_1) model.animator.playAnimation("R6Armature|WalkAnim");
@@ -161,6 +162,7 @@ public class Example3d extends GameBase {
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
         model.loadModel("res/models/roblox/scene.gltf", true);
+        model.setupBoneShader(camera);
 //        model.modelTransform.scale(.03f).translate(0, -20, 0);  // guard
 //        model.modelTransform.scale(10);  // bacon
         model.modelTransform.translate(0, -1, 0);  // roblox

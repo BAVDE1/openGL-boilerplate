@@ -1,5 +1,7 @@
 package boilerplate.models;
 
+import boilerplate.common.BoilerplateShaders;
+import boilerplate.rendering.Camera3d;
 import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexLayout;
 import boilerplate.rendering.textures.Texture2d;
@@ -19,6 +21,7 @@ import java.util.List;
 
 public class Model {
     public static final int MAX_BONE_INFLUENCE = 4;
+    private static final ShaderProgram boneShader = new ShaderProgram();
 
     public static class NodeData {
         String name;
@@ -60,10 +63,10 @@ public class Model {
     private final NodeData rootNode = new NodeData();
     public final Matrix4f rootNodeInvTrans = new Matrix4f();
 
-    Mesh[] meshes;
-    Material[] materials;
-    HashMap<String, Bone> boneMap = new HashMap<>();
+    private Mesh[] meshes;
+    private Material[] materials;
     private int boneCounter = 0;
+    HashMap<String, Bone> boneMap = new HashMap<>();
 
     public Matrix4f modelTransform = new Matrix4f().identity();
     public boolean modelTransformChanged = true;
@@ -257,7 +260,6 @@ public class Model {
         while (allAnimations.hasRemaining()) {
             try (AIAnimation aiAnimation = AIAnimation.create(allAnimations.get())) {
                 Animation animation = new Animation(aiAnimation, this);
-                Logging.info("new animation, %s", animation.name);
                 animator.addAnimation(animation);
             }
         }
@@ -337,6 +339,15 @@ public class Model {
         }
     }
 
+    public void setupBoneShader(Camera3d camera3d) {
+        boneShader.genProgram();
+        boneShader.attachShader(BoilerplateShaders.safeFormat(BoilerplateShaders.ModelBoneVertex, "% ", camera3d.uniformBlockName), GL45.GL_VERTEX_SHADER, "BoilerplateShaders class");
+        boneShader.attachShader(BoilerplateShaders.ModelBoneFragment, GL45.GL_FRAGMENT_SHADER, "BoilerplateShaders class");
+        boneShader.linkProgram();
+        camera3d.bindShaderToUniformBlock(boneShader);
+        boneShader.unbind();
+    }
+
     public void updateAnimation(double dt) {
         animator.update((float) dt);
     }
@@ -353,6 +364,12 @@ public class Model {
             modelTransformChanged = false;
         }
         for (Mesh mesh : meshes) mesh.draw();
+
+        if (renderBones) {
+            boneShader.bind();
+
+            boneShader.unbind();
+        }
     }
 
     public void renderWireFrame(boolean val) {
@@ -362,9 +379,17 @@ public class Model {
         for (Mesh mesh : meshes) mesh.renderMode = mode;
     }
 
-    public void setRenderBones(boolean val) {
+    public void renderBones(boolean val) {
         if (!hasBones || val == renderBones) return;
         renderBones = true;
+    }
+
+    public boolean isRenderingBones() {
+        return renderBones;
+    }
+
+    public boolean isRenderingWireframe() {
+        return renderWireFrame;
     }
 
     public boolean hasBones() {
