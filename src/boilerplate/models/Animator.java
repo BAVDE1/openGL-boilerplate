@@ -66,7 +66,7 @@ public class Animator {
         Animation animation = getCurrentAnimation();
         animationTime += (animation.ticksPerSecond * 1) * dt;
         animationTime = animationTime % animation.duration;
-        calcBoneTransformations(rootNode, new Matrix4f().identity());
+        calcBoneTransformations(rootNode, rootNode.transform);
     }
 
     private void calcBoneTransformations(Model.NodeData node, Matrix4f parentTransform) {
@@ -78,7 +78,7 @@ public class Animator {
             Bone bone = animatedBone.bone;
             Matrix4f boneTransform = animatedBone.calcInterpolatedMatrix(animationTime);
             globalTransform = parentTransform.mul(boneTransform, new Matrix4f());
-            finalBoneMatrices[bone.id] = globalTransform.mul(bone.offset, new Matrix4f());
+            finalBoneMatrices[bone.id] = new Matrix4f(model.rootNodeInvTrans).mul(globalTransform.mul(bone.offset, new Matrix4f()));
         } else {
             globalTransform = parentTransform.mul(node.transform, new Matrix4f());
         }

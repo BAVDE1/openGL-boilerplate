@@ -88,7 +88,7 @@ public class Example3d extends GameBase {
                     camera.setMode(camera.getMode() == Camera3d.MODE_FLY ? Camera3d.MODE_TARGET : Camera3d.MODE_FLY);
                 if (key == GLFW_KEY_1) model.animator.playAnimation("R6Armature|WalkAnim");
                 if (key == GLFW_KEY_2) model.animator.playAnimation("R6Armature|Climb");
-                if (key == GLFW_KEY_3) model.animator.playAnimation("R6Armature|Tool");
+                if (key == GLFW_KEY_3) model.animator.playAnimation("R6Armature|Idle2");
                 if (key == GLFW_KEY_4) model.animator.playAnimation("R6Armature|Sit");
                 if (key == GLFW_KEY_5) model.animator.playAnimation("R6Armature|Jump");
                 if (key == GLFW_KEY_6) model.animator.playAnimation("R6Armature|Fall");
@@ -158,8 +158,10 @@ public class Example3d extends GameBase {
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
-        model.loadModel("res/models/guard/boblampclean.md5mesh", true);
-        model.modelTransform.scale(.03f).translate(0, -20, 0);
+        model.loadModel("res/models/roblox/scene.gltf", true);
+//        model.modelTransform.scale(.03f).translate(0, -20, 0);  // guard
+//        model.modelTransform.scale(10);  // bacon
+        model.modelTransform.translate(0, -1, 0);  // roblox
     }
 
     public void render() {
@@ -198,7 +200,7 @@ public class Example3d extends GameBase {
 
         model.draw(modelShader);
 
-//        skyBox.draw();
+        skyBox.draw();
 
         fb.blitIntoIntermediaryFB(GL_COLOR_BUFFER_BIT, GL_NEAREST);
 

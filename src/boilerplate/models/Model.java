@@ -14,7 +14,6 @@ import org.lwjgl.opengl.GL45;
 import java.io.File;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -59,17 +58,16 @@ public class Model {
     public Animator animator = new Animator(this);
 
     private final NodeData rootNode = new NodeData();
+    public final Matrix4f rootNodeInvTrans = new Matrix4f();
+
     Mesh[] meshes;
     Material[] materials;
     HashMap<String, Bone> boneMap = new HashMap<>();
     private int boneCounter = 0;
 
-    private boolean renderWireFrame = false;
-
     public Matrix4f modelTransform = new Matrix4f().identity();
     public boolean modelTransformChanged = true;
-
-    public Matrix4f globalInverseTransform;
+    private boolean renderWireFrame = false;
 
     public Model() {
     }
@@ -122,6 +120,7 @@ public class Model {
         // node hierarchy & model
         meshes = new Mesh[rootAiScene.mNumMeshes()];
         processNode(rootAiScene.mRootNode(), rootAiScene, rootNode);
+        rootNode.transform.invert(rootNodeInvTrans);
 
         // animations
         animator.init(boneCounter, rootNode);

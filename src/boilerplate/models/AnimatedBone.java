@@ -76,10 +76,11 @@ public class AnimatedBone {
     }
 
     public Matrix4f calcInterpolatedMatrix(float animationTime) {
-        Matrix4f translation = interpolatePosition(animationTime);
-        Matrix4f rotation = interpolateRotation(animationTime);
-        Matrix4f scale = interpolateScale(animationTime);
-        return translation.mul(rotation.mul(scale));
+        Matrix4f out = new Matrix4f().identity();
+        interpolatePosition(animationTime, out);
+        interpolateRotation(animationTime, out);
+        interpolateScale(animationTime, out);
+        return out;
     }
 
     private int getPositionKeyInx(float animationTime) {
@@ -109,9 +110,11 @@ public class AnimatedBone {
         return current / framesDiff;
     }
 
-    private Matrix4f interpolatePosition(float animationTime) {
-//        return new Matrix4f().identity();
-        if (keyPositions.size() == 1) return new Matrix4f().identity().translate(keyPositions.getFirst().position);
+    private void interpolatePosition(float animationTime, Matrix4f out) {
+        if (keyPositions.size() == 1) {
+            out.translate(keyPositions.getFirst().position);
+            return;
+        }
 
         int currentKeyInx = getPositionKeyInx(animationTime);
         int nextKeyInx = currentKeyInx + 1;
@@ -119,29 +122,33 @@ public class AnimatedBone {
         float t2 = keyPositions.get(nextKeyInx).timestamp;
         float percent = getTimestampPercentCompletion(t1, t2, animationTime);
         Vector3f position = keyPositions.get(currentKeyInx).position.lerp(keyPositions.get(nextKeyInx).position, percent, new Vector3f());
-        return new Matrix4f().identity().translate(position);
+        out.translate(position);
     }
 
-    private Matrix4f interpolateRotation(float animationTime) {
-//        return new Matrix4f().identity();
-        if (keyRotations.size() == 1) return new Matrix4f().set(keyRotations.getFirst().orientation.normalize());  // todo: identity?
+    private void interpolateRotation(float animationTime, Matrix4f out) {
+        if (keyRotations.size() == 1) {
+            out.rotate(keyRotations.getFirst().orientation.normalize(new Quaternionf()));
+            return;
+        }
 
         int currentKeyInx = getRotationKeyInx(animationTime);
         int nextKeyInx = currentKeyInx + 1;
         float percent = getTimestampPercentCompletion(keyRotations.get(currentKeyInx).timestamp, keyRotations.get(nextKeyInx).timestamp, animationTime);
         Quaternionf rotation = keyRotations.get(currentKeyInx).orientation.slerp(keyRotations.get(nextKeyInx).orientation, percent, new Quaternionf());
-        return new Matrix4f().set(rotation.normalize());
+        out.rotate(rotation.normalize());
     }
 
-    private Matrix4f interpolateScale(float animationTime) {
-//        return new Matrix4f().identity();
-        if (keyScales.size() == 1) return new Matrix4f().identity().translate(keyScales.getFirst().scale);
+    private void interpolateScale(float animationTime, Matrix4f out) {
+        if (keyScales.size() == 1) {
+            out.scale(keyScales.getFirst().scale);
+            return;
+        }
 
         int currentKeyInx = getScaleKeyInx(animationTime);
         int nextKeyInx = currentKeyInx + 1;
         float percent = getTimestampPercentCompletion(keyScales.get(currentKeyInx).timestamp, keyScales.get(nextKeyInx).timestamp, animationTime);
         Vector3f scale = keyScales.get(currentKeyInx).scale.lerp(keyScales.get(nextKeyInx).scale, percent, new Vector3f());
-        return new Matrix4f().identity().scale(scale);
+        out.scale(scale);
     }
 
     @Override
