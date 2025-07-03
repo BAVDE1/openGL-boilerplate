@@ -2,7 +2,10 @@ package boilerplate.models;
 
 import boilerplate.common.BoilerplateShaders;
 import boilerplate.rendering.Camera3d;
+import boilerplate.rendering.Renderer;
 import boilerplate.rendering.ShaderProgram;
+import boilerplate.rendering.buffers.VertexArray;
+import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.buffers.VertexLayout;
 import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
@@ -12,12 +15,12 @@ import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 import org.lwjgl.opengl.GL45;
+import org.lwjgl.system.MemoryUtil;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Model {
     public static final int MAX_BONE_INFLUENCE = 4;
@@ -74,6 +77,8 @@ public class Model {
     private boolean hasBones = false;
     private boolean renderWireFrame = false;
     private boolean renderBones = false;
+
+    private VertexArray boneVa;
 
     public Model() {
     }
@@ -339,13 +344,29 @@ public class Model {
         }
     }
 
-    public void setupBoneShader(Camera3d camera3d) {
+    public void setupBoneRendering(Camera3d camera3d) {
+        if (boneCounter == 0) {
+            Logging.danger("No bones are present in this model '%s', aborting.", modelFile);
+            return;
+        }
         boneShader.genProgram();
         boneShader.attachShader(BoilerplateShaders.safeFormat(BoilerplateShaders.ModelBoneVertex, "% ", camera3d.uniformBlockName), GL45.GL_VERTEX_SHADER, "BoilerplateShaders class");
         boneShader.attachShader(BoilerplateShaders.ModelBoneFragment, GL45.GL_FRAGMENT_SHADER, "BoilerplateShaders class");
         boneShader.linkProgram();
         camera3d.bindShaderToUniformBlock(boneShader);
         boneShader.unbind();
+
+        boneVa = new VertexArray(true);
+        VertexArrayBuffer boneVb = new VertexArrayBuffer(true);
+
+        boneVa.bindBuffer(boneVb);
+        boneVa.pushLayout(new VertexLayout(
+                new VertexLayout.Element(VertexLayout.TYPE_INT, 1)
+        ));
+
+        ByteBuffer data = MemoryUtil.memAlloc(boneMap.size() * Integer.BYTES);
+        for (Bone bone : boneMap.values()) data.putInt(bone.id);
+        boneVb.bufferData(data);
     }
 
     public void updateAnimation(double dt) {
@@ -363,13 +384,22 @@ public class Model {
             shaderProgram.uniformMatrix4f("model", modelTransform);
             modelTransformChanged = false;
         }
+
         for (Mesh mesh : meshes) mesh.draw();
+        if (renderBones) renderBones();
+    }
 
-        if (renderBones) {
-            boneShader.bind();
-
-            boneShader.unbind();
+    private void renderBones() {
+        boneShader.uniformMatrix4f("model", modelTransform);
+        for (int i = 0; i < boneCounter; i++) {
+            boneShader.uniformMatrix4f("finalBonesMatrices[%s]".formatted(i), animator.finalBoneMatrices[i]);
         }
+
+        GL45.glPointSize(10);
+        boneShader.bind();
+        Renderer.drawArrays(GL45.GL_POINTS, boneVa, boneMap.size());
+        boneShader.unbind();
+        GL45.glPointSize(1);
     }
 
     public void renderWireFrame(boolean val) {
@@ -381,7 +411,7 @@ public class Model {
 
     public void renderBones(boolean val) {
         if (!hasBones || val == renderBones) return;
-        renderBones = true;
+        renderBones = val;
     }
 
     public boolean isRenderingBones() {
@@ -407,7 +437,7 @@ public class Model {
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_NORMAL),
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 2, VertexLayout.HINT_TEX_POS),
                 new VertexLayout.Element(VertexLayout.TYPE_INT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_IDS),
-                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_WEIGHTS),
+                new VertexLayout.Element(VertexLayout.TYPE_FLOAT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_WEIGHTS, true),
                 new VertexLayout.Element(VertexLayout.TYPE_INT, 1, VertexLayout.HINT_CUSTOM_0)
         );
     }

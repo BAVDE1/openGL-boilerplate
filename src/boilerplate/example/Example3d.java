@@ -95,8 +95,8 @@ public class Example3d extends GameBase {
                 if (key == GLFW_KEY_6) model.animator.playAnimation("R6Armature|Fall");
                 if (key == GLFW_KEY_7) model.animator.playAnimation("mixamo.com");
                 if (key == GLFW_KEY_8) model.animator.playAnimation("anim_0");
-                if (key == GLFW_KEY_PERIOD) model.animator.animationSpeed += .2f;
-                if (key == GLFW_KEY_COMMA) model.animator.animationSpeed -= .2f;
+                if (key == GLFW_KEY_PERIOD) model.animator.animationSpeed += .1f;
+                if (key == GLFW_KEY_COMMA) model.animator.animationSpeed -= .1f;
                 if (key == GLFW_KEY_L) model.animator.stopPlayingAnimation(true);
             }
         });
@@ -162,9 +162,9 @@ public class Example3d extends GameBase {
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
         model.loadModel("res/models/roblox/scene.gltf", true);
-        model.setupBoneShader(camera);
+        model.setupBoneRendering(camera);
 //        model.modelTransform.scale(.03f).translate(0, -20, 0);  // guard
-//        model.modelTransform.scale(10);  // bacon
+//        model.modelTransform.translate(0, -.3f, 0).scale(10);  // bacon
         model.modelTransform.translate(0, -1, 0);  // roblox
     }
 
