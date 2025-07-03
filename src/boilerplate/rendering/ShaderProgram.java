@@ -154,7 +154,7 @@ public class ShaderProgram {
             Logging.danger("Shader Linking Error: %s", glGetProgramInfoLog(program, 1024));
             return;
         }
-        Logging.debug("Shaders %s [linked with program %s]", attachedShaders, program);
+        Logging.debug("Shaders linked to program %s: %s", program, attachedShaders);
     }
 
     /**
@@ -283,5 +283,9 @@ public class ShaderProgram {
 
     public void useCircleShader() {
         autoInitializeShadersMulti("shaders/circle.glsl");
+    }
+
+    public boolean isSetup() {
+        return program != null;
     }
 }

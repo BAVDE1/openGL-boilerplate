@@ -72,12 +72,10 @@ public class Model {
     HashMap<String, Bone> boneMap = new HashMap<>();
 
     public Matrix4f modelTransform = new Matrix4f().identity();
-    public boolean modelTransformChanged = true;
 
     private boolean hasBones = false;
     private boolean renderWireFrame = false;
     private boolean renderBones = false;
-
     private VertexArray boneVa;
 
     public Model() {
@@ -349,12 +347,15 @@ public class Model {
             Logging.danger("No bones are present in this model '%s', aborting.", modelFile);
             return;
         }
-        boneShader.genProgram();
-        boneShader.attachShader(BoilerplateShaders.safeFormat(BoilerplateShaders.ModelBoneVertex, "% ", camera3d.uniformBlockName), GL45.GL_VERTEX_SHADER, "BoilerplateShaders class");
-        boneShader.attachShader(BoilerplateShaders.ModelBoneFragment, GL45.GL_FRAGMENT_SHADER, "BoilerplateShaders class");
-        boneShader.linkProgram();
-        camera3d.bindShaderToUniformBlock(boneShader);
-        boneShader.unbind();
+
+        if (!boneShader.isSetup()) {
+            boneShader.genProgram();
+            boneShader.attachShader(BoilerplateShaders.safeFormat(BoilerplateShaders.ModelBoneVertex, "% ", camera3d.uniformBlockName), GL45.GL_VERTEX_SHADER, "BoilerplateShaders class, ModelBoneVertex");
+            boneShader.attachShader(BoilerplateShaders.ModelBoneFragment, GL45.GL_FRAGMENT_SHADER, "BoilerplateShaders class, ModelBoneFragment");
+            boneShader.linkProgram();
+            camera3d.bindShaderToUniformBlock(boneShader);
+            boneShader.unbind();
+        }
 
         boneVa = new VertexArray(true);
         VertexArrayBuffer boneVb = new VertexArrayBuffer(true);
@@ -380,11 +381,7 @@ public class Model {
             shaderProgram.uniformMatrix4f("finalBonesMatrices[%s]".formatted(i), animator.finalBoneMatrices[i]);
         }
 
-        if (modelTransformChanged) {
-            shaderProgram.uniformMatrix4f("model", modelTransform);
-            modelTransformChanged = false;
-        }
-
+        shaderProgram.uniformMatrix4f("model", modelTransform);
         for (Mesh mesh : meshes) mesh.draw();
         if (renderBones) renderBones();
     }

@@ -51,6 +51,7 @@ public class Example3d extends GameBase {
 
     ShaderProgram modelShader = new ShaderProgram();
     Model model = new Model();
+    Model model2 = new Model();
 
     @Override
     public void start() {
@@ -83,8 +84,12 @@ public class Example3d extends GameBase {
                 if (key == GLFW_KEY_TAB) {
                     renderWireFrame = !renderWireFrame;
                     model.renderWireFrame(renderWireFrame);
+                    model2.renderWireFrame(renderWireFrame);
                 }
-                if (key == GLFW_KEY_GRAVE_ACCENT) model.renderBones(!model.isRenderingBones());
+                if (key == GLFW_KEY_GRAVE_ACCENT) {
+                    model.renderBones(!model.isRenderingBones());
+                    model2.renderBones(!model2.isRenderingBones());
+                }
                 if (key == GLFW_KEY_F)
                     camera.setMode(camera.getMode() == Camera3d.MODE_FLY ? Camera3d.MODE_TARGET : Camera3d.MODE_FLY);
                 if (key == GLFW_KEY_1) model.animator.playAnimation("R6Armature|WalkAnim");
@@ -93,11 +98,13 @@ public class Example3d extends GameBase {
                 if (key == GLFW_KEY_4) model.animator.playAnimation("R6Armature|Sit");
                 if (key == GLFW_KEY_5) model.animator.playAnimation("R6Armature|Jump");
                 if (key == GLFW_KEY_6) model.animator.playAnimation("R6Armature|Fall");
-                if (key == GLFW_KEY_7) model.animator.playAnimation("mixamo.com");
-                if (key == GLFW_KEY_8) model.animator.playAnimation("anim_0");
+                if (key == GLFW_KEY_7) model2.animator.playAnimation("anim_0");
                 if (key == GLFW_KEY_PERIOD) model.animator.animationSpeed += .1f;
                 if (key == GLFW_KEY_COMMA) model.animator.animationSpeed -= .1f;
-                if (key == GLFW_KEY_L) model.animator.stopPlayingAnimation(true);
+                if (key == GLFW_KEY_L) {
+                    model.animator.stopPlayingAnimation(true);
+                    model2.animator.stopPlayingAnimation(true);
+                }
             }
         });
 
@@ -162,21 +169,22 @@ public class Example3d extends GameBase {
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
         model.loadModel("res/models/roblox/scene.gltf", true);
+        model2.loadModel("res/models/guard/scene.md5mesh", true);
+        model.modelTransform.translate(-1.2f, -.5f, 1).rotateY(1);
+        model2.modelTransform.scale(.03f).translate(0, -20, 0);
         model.setupBoneRendering(camera);
-//        model.modelTransform.scale(.03f).translate(0, -20, 0);  // guard
-//        model.modelTransform.translate(0, -.3f, 0).scale(10);  // bacon
-        model.modelTransform.translate(0, -1, 0);  // roblox
+        model2.setupBoneRendering(camera);
     }
 
     public void render() {
         float time = (float) glfwGetTime();
 
-        Matrix4f model1 = new Matrix4f().identity();
-        Matrix4f model2 = new Matrix4f().identity();
-        model2.rotateX(time * (float) Math.toRadians(120));
-        model2.rotateY(time * (float) Math.toRadians(70));
-        model2.translate(0, 0, 1.2f);
-        model2.scale(.8f, .5f, .5f);
+        Matrix4f matModel1 = new Matrix4f().identity();
+        Matrix4f matModel2 = new Matrix4f().identity();
+        matModel2.rotateX(time * (float) Math.toRadians(120));
+        matModel2.rotateY(time * (float) Math.toRadians(70));
+        matModel2.translate(0, 0, 1.2f);
+        matModel2.scale(.8f, .5f, .5f);
 
         // --- 3D SPACE --- //
         fb.bind();
@@ -200,9 +208,10 @@ public class Example3d extends GameBase {
         shReflect.bind();
         shReflect.uniform3f("camPos", camera.getPos());
         skyBox.bindSkyBoxTexture();
-        drawObjects(model1.translate(2, 0, 0), model2.translate(2, 0, 0), shReflect);
+        drawObjects(matModel1.translate(2, 0, 0), matModel2.translate(2, 0, 0), shReflect);
 
         model.draw(modelShader);
+        model2.draw(modelShader);
 
         skyBox.draw();
 
@@ -234,6 +243,7 @@ public class Example3d extends GameBase {
         camera.processKeyInputs(window, staticDt);
         camera.updateUniformBlock();
         model.updateAnimation(staticDt);
+        model2.updateAnimation(staticDt);
         render();
     }
 
