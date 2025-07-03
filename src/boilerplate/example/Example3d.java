@@ -52,6 +52,7 @@ public class Example3d extends GameBase {
     ShaderProgram modelShader = new ShaderProgram();
     Model model = new Model();
     Model model2 = new Model();
+    Model model3 = new Model();
 
     @Override
     public void start() {
@@ -170,8 +171,10 @@ public class Example3d extends GameBase {
         camera.bindShaderToUniformBlock(modelShader);
         model.loadModel("res/models/roblox/scene.gltf", true);
         model2.loadModel("res/models/guard/scene.md5mesh", true);
+        model3.loadModel("res/models/bloxycola/cola.obj", true);
         model.modelTransform.translate(-1.2f, -.5f, 1).rotateY(1);
         model2.modelTransform.scale(.03f).translate(0, -20, 0);
+        model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
         model.setupBoneRendering(camera);
         model2.setupBoneRendering(camera);
     }
@@ -212,6 +215,7 @@ public class Example3d extends GameBase {
 
         model.draw(modelShader);
         model2.draw(modelShader);
+        model3.draw(modelShader);
 
         skyBox.draw();
 
