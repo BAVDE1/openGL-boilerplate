@@ -33,7 +33,7 @@ public class Example3d extends GameBase {
 
     boolean renderWireFrame = false;
 
-    Camera3d camera = new Camera3d(new Dimension(1, 1), Camera3d.MODE_TARGET, new Vector3f(0, 0, 3));
+    Camera3d camera = new Camera3d(new Dimension(1, 1), Camera3d.MODE_TARGET, new Vector3f(0, 0, 4), 4);
 
     ShaderProgram finalSh = new ShaderProgram();
     VertexArray finalVa = new VertexArray();
@@ -140,7 +140,7 @@ public class Example3d extends GameBase {
 
         va.fastSetup(new int[]{3, 3}, vb);
         BufferBuilder3f bb3 = new BufferBuilder3f(true, 3);
-        Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), 1);
+        Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), .8f);
         poly.mode = new ShapeMode.Unpack(Shape3d.defaultCubeNormals());
         bb3.pushPolygon(poly);
         vb.bufferData(bb3);
@@ -172,8 +172,8 @@ public class Example3d extends GameBase {
         model.loadModel("res/models/roblox/scene.gltf", true);
         model2.loadModel("res/models/guard/scene.md5mesh", true);
         model3.loadModel("res/models/bloxycola/cola.obj", true);
-        model.modelTransform.translate(-1.2f, -.5f, 1).rotateY(1);
-        model2.modelTransform.scale(.03f).translate(0, -20, 0);
+        model.modelTransform.translate(-2, -.5f, 1).rotateY(1);
+        model2.modelTransform.scale(.03f).translate(-40, -20, -50);
         model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
         model.setupBoneRendering(camera);
         model2.setupBoneRendering(camera);
@@ -192,33 +192,34 @@ public class Example3d extends GameBase {
         // --- 3D SPACE --- //
         fb.bind();
         Renderer.enableDepthTest();
-//        Renderer.enableStencilTest();
-//        Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
-//        Renderer.enableStencilWriting();
+        Renderer.enableStencilTest();
+        Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
+        Renderer.enableStencilWriting();
         Renderer.clearCDS();
 
-//        sh.bind();
-//        ballerCube.bind();
-//        drawObjects(model1, model2, sh);
-//
-//        Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
-//        Renderer.disableStencilWriting();
-//        Renderer.cullFrontFace();
-//        drawObjects(model1.scale(1.2f), model2.scale(1.2f), shOutline);
-//        Renderer.cullBackFace();
-//        Renderer.disableStencilTest();
-//
+        // outline boxes
+        sh.bind();
+        ballerCube.bind();
+        drawObjects(matModel1, matModel2, sh);
+        Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
+        Renderer.disableStencilWriting();
+        Renderer.cullFrontFace();
+        drawObjects(matModel1.scale(1.2f), matModel2.scale(1.2f), shOutline);
+        Renderer.cullBackFace();
+        Renderer.disableStencilTest();
+
+        // sky box reflector
         shReflect.bind();
         shReflect.uniform3f("camPos", camera.getPos());
         skyBox.bindSkyBoxTexture();
         drawObjects(matModel1.translate(2, 0, 0), matModel2.translate(2, 0, 0), shReflect);
 
+        // models
         model.draw(modelShader);
         model2.draw(modelShader);
         model3.draw(modelShader);
 
         skyBox.draw();
-
         fb.blitIntoIntermediaryFB(GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         // --- POST PROCESSING --- //

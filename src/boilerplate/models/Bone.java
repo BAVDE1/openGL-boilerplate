@@ -8,6 +8,7 @@ public class Bone {
     int id;
     String name;
     Matrix4f offset;
+    Bone parent;
 
     public Bone(int boneId, AIBone aiBone) {
         this.id = boneId;

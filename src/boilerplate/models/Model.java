@@ -17,6 +17,7 @@ import org.lwjgl.assimp.*;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryUtil;
 
+import javax.annotation.processing.SupportedSourceVersion;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -169,6 +170,12 @@ public class Model {
             try (AINode child = AINode.create(children.get(i))) {
                 NodeData childNode = new NodeData();
                 processNode(child, rootAiScene, childNode);
+
+                // assign bone parents
+                if (boneMap.containsKey(nodeDest.name) && boneMap.containsKey(childNode.name)) {
+                    boneMap.get(childNode.name).parent = boneMap.get(nodeDest.name);
+                }
+
                 nodeDest.children.add(childNode);
             }
         }
@@ -394,7 +401,9 @@ public class Model {
 
         GL45.glPointSize(10);
         boneShader.bind();
+        GL45.glDepthFunc(GL45.GL_ALWAYS);
         Renderer.drawArrays(GL45.GL_POINTS, boneVa, boneMap.size());
+        GL45.glDepthFunc(GL45.GL_LESS);
         boneShader.unbind();
         GL45.glPointSize(1);
     }

@@ -103,6 +103,19 @@ public class Camera3d {
         calculateDirections();
     }
 
+    public Camera3d(Dimension aspectSize, int mode, int initialRadius) {
+        this(aspectSize, mode);
+        targetRadius = initialRadius;
+        calculateDirections();
+    }
+
+    public Camera3d(Dimension aspectSize, int mode, Vector3f initialPos, int initialRadius) {
+        this(aspectSize, mode);
+        targetRadius = initialRadius;
+        pos = new Vector3f(initialPos);
+        calculateDirections();
+    }
+
     public void setupUniformBuffer(ShaderProgram... shadersToBind) {
 
         if (vub.getId() != -1) {
