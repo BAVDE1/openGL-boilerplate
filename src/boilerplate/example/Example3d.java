@@ -35,15 +35,14 @@ public class Example3d extends GameBase {
 
     Camera3d camera = new Camera3d(new Dimension(1, 1), Camera3d.MODE_TARGET, new Vector3f(0, 0, 4), 4);
 
-    ShaderProgram finalSh = new ShaderProgram();
-    VertexArray finalVa = new VertexArray();
-    VertexArrayBuffer finalVb = new VertexArrayBuffer();
-
-    ShaderProgram sh = new ShaderProgram();
+    ShaderProgram shPost = new ShaderProgram();
+    ShaderProgram shCubeMap = new ShaderProgram();
     ShaderProgram shReflect = new ShaderProgram();
     ShaderProgram shOutline = new ShaderProgram();
-    VertexArray va = new VertexArray();
-    VertexArrayBuffer vb = new VertexArrayBuffer();
+    VertexArray vaPost = new VertexArray();
+    VertexArray vaCube = new VertexArray();
+    VertexArrayBuffer vbPost = new VertexArrayBuffer();
+    VertexArrayBuffer vbCube = new VertexArrayBuffer();
     CubeMap ballerCube = new CubeMap();
     SkyBox skyBox = new SkyBox();
 
@@ -128,32 +127,32 @@ public class Example3d extends GameBase {
         ballerCube.useNearestInterpolation();
         ballerCube.useClampEdgeWrap();
         CubeMap.unbind();
-        va.genId();
-        vb.genId();
+        vaCube.genId();
+        vbCube.genId();
 
-        sh.autoInitializeShadersMulti("shaders/3d.glsl");
+        shCubeMap.autoInitializeShadersMulti("shaders/3d_cube_map.glsl");
         shReflect.autoInitializeShadersMulti("shaders/3d_reflect.glsl");
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
 
-        camera.setupUniformBuffer(sh, shReflect, shOutline);
+        camera.setupUniformBuffer(shCubeMap, shReflect, shOutline);
         skyBox.setupBuffers(camera, "res/textures/space_skybox", "png");
 
-        va.fastSetup(new int[]{3, 3}, vb);
-        BufferBuilder3f bb3 = new BufferBuilder3f(true, 3);
-        Shape3d.Poly3d poly = Shape3d.createCube(new Vector3f(), .8f);
-        poly.mode = new ShapeMode.Unpack(Shape3d.defaultCubeNormals());
-        bb3.pushPolygon(poly);
-        vb.bufferData(bb3);
+        vaCube.fastSetup(new int[]{3, 3}, vbCube);
+        BufferBuilder3f cubeData = new BufferBuilder3f(true, 3);
+        Shape3d.Poly3d cube = Shape3d.createCube(new Vector3f(), .8f);
+        cube.mode = new ShapeMode.Unpack(Shape3d.defaultCubeNormals());
+        cubeData.pushPolygon(cube);
+        vbCube.bufferData(cubeData);
 
-        finalSh.autoInitializeShadersMulti("shaders/3d_final.glsl");
-        finalVa.genId();
-        finalVb.genId();
+        shPost.autoInitializeShadersMulti("shaders/3d_pst.glsl");
+        vaPost.genId();
+        vbPost.genId();
 
-        finalVa.fastSetup(new int[]{2}, finalVb);
-        BufferBuilder2f bb2 = new BufferBuilder2f(true);
-        Shape2d.Poly2d poly2 = Shape2d.createRect(new Vector2f(-1), new Vector2f(2));
-        bb2.pushPolygon(poly2);
-        finalVb.bufferData(bb2);
+        vaPost.fastSetup(new int[]{2}, vbPost);
+        BufferBuilder2f rectData = new BufferBuilder2f(true);
+        Shape2d.Poly2d rect = Shape2d.createRect(new Vector2f(-1), new Vector2f(2));
+        rectData.pushPolygon(rect);
+        vbPost.bufferData(rectData);
 
         fb.genId();
         fb.setupIntermediaryFB();
@@ -169,14 +168,17 @@ public class Example3d extends GameBase {
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
+
         model.loadModel("res/models/roblox/scene.gltf", true);
-        model2.loadModel("res/models/guard/scene.md5mesh", true);
-        model3.loadModel("res/models/bloxycola/cola.obj", true);
         model.modelTransform.translate(-2, -.5f, 1).rotateY(1);
-        model2.modelTransform.scale(.03f).translate(-40, -20, -50);
-        model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
         model.setupBoneRendering(camera);
+
+        model2.loadModel("res/models/guard/scene.md5mesh", true);
+        model2.modelTransform.scale(.03f).translate(-40, -20, -50);
         model2.setupBoneRendering(camera);
+
+        model3.loadModel("res/models/bloxycola/cola.obj", true);
+        model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
     }
 
     public void render() {
@@ -198,9 +200,9 @@ public class Example3d extends GameBase {
         Renderer.clearCDS();
 
         // outline boxes
-        sh.bind();
+        shCubeMap.bind();
         ballerCube.bind();
-        drawObjects(matModel1, matModel2, sh);
+        drawObjects(matModel1, matModel2, shCubeMap);
         Renderer.setStencilFunc(GL_NOTEQUAL, 1, true);  // only draw if fragment in stencil is NOT equal to 1
         Renderer.disableStencilWriting();
         Renderer.cullFrontFace();
@@ -209,9 +211,9 @@ public class Example3d extends GameBase {
         Renderer.disableStencilTest();
 
         // sky box reflector
+        skyBox.bindSkyBoxTexture();
         shReflect.bind();
         shReflect.uniform3f("camPos", camera.getPos());
-        skyBox.bindSkyBoxTexture();
         drawObjects(matModel1.translate(2, 0, 0), matModel2.translate(2, 0, 0), shReflect);
 
         // models
@@ -227,19 +229,19 @@ public class Example3d extends GameBase {
         Renderer.clearC();
         Renderer.disableDepthTest();
 
-        finalSh.bind();
+        shPost.bind();
         fb.bindIntermediaryFBColorBuffer();
-        Renderer.drawArrays(GL_TRIANGLE_STRIP, finalVa, 4);
+        Renderer.drawArrays(GL_TRIANGLE_STRIP, vaPost, 4);
 
         Renderer.finish(window);
     }
 
     private void drawObjects(Matrix4f model1, Matrix4f model2, ShaderProgram sh) {
         sh.uniformMatrix4f("model", model1);
-        Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, 36);
+        Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, vaCube, 36);
 
         sh.uniformMatrix4f("model", model2);
-        Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, va, 36);
+        Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, vaCube, 36);
     }
 
     @Override
