@@ -35,12 +35,14 @@ public class Example3d extends GameBase {
 
     boolean renderWireFrame = false;
 
-    Camera3d camera = new Camera3d(new Dimension(1, 1), Camera3d.MODE_TARGET, new Vector3f(0, 0, 4), 4);
+    Camera3d camera = new Camera3d(new Dimension(1, 1), Camera3d.MODE_TARGET, new Vector3f(0, 0, 5), 5);
 
     ShaderProgram shPost = new ShaderProgram();
     ShaderProgram shCubeMap = new ShaderProgram();
     ShaderProgram shReflect = new ShaderProgram();
     ShaderProgram shOutline = new ShaderProgram();
+    ShaderProgram shLighting = new ShaderProgram();
+    ShaderProgram shLightSource = new ShaderProgram();
     VertexArray vaPost = new VertexArray();
     VertexArray vaCube = new VertexArray();
     VertexArrayBuffer vbPost = new VertexArrayBuffer();
@@ -135,8 +137,10 @@ public class Example3d extends GameBase {
         shCubeMap.autoInitializeShadersMulti("shaders/3d_cube_map.glsl");
         shReflect.autoInitializeShadersMulti("shaders/3d_reflect.glsl");
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
+        shLighting.autoInitializeShadersMulti("shaders/3d_lighting.glsl");
+        shLightSource.autoInitializeShadersMulti("shaders/3d_light_source.glsl");
 
-        camera.setupUniformBuffer(shCubeMap, shReflect, shOutline);
+        camera.setupUniformBuffer(shCubeMap, shReflect, shOutline, shLighting, shLightSource);
         skyBox.setupBuffers(camera, "res/textures/space_skybox", "png");
 
         vaCube.fastSetup(new int[]{3, 3}, vbCube);
@@ -223,7 +227,21 @@ public class Example3d extends GameBase {
         model2.draw(modelShader);
         model3.draw(modelShader);
 
-        skyBox.draw();
+        // lighting cube
+        Vector3f lightPos = new Vector3f(-1f, 2.8f, 1.5f);
+        shLighting.bind();
+        shLighting.uniformMatrix4f("model", new Matrix4f().translate(0, 2, 0).rotateY((float) glfwGetTime()).scale(1, 1, 2));
+        shLighting.uniform3f("objectColour", new Vector3f(1, .5f, .31f));
+        shLighting.uniform3f("lightColour", new Vector3f(1));
+        shLighting.uniform3f("lightPos", lightPos);
+        shLighting.uniform3f("viewPos", camera.getPos());
+        Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
+
+        shLightSource.bind();
+        shLightSource.uniformMatrix4f("model", new Matrix4f().translate(lightPos).scale(.3f));
+        Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
+
+//        skyBox.draw();
         fb.blitIntoIntermediaryFB(GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         // --- POST PROCESSING --- //
