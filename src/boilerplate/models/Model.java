@@ -261,18 +261,21 @@ public class Model {
             try (AIBone aiBone = AIBone.create(allBones.get())) {
                 String boneName = aiBone.mName().dataString();
                 Bone bone = boneMap.computeIfAbsent(boneName, _ -> new Bone(boneCounter++, aiBone));
-
-                AIVertexWeight.Buffer weights = aiBone.mWeights();
-                while (weights.hasRemaining()) {
-                    AIVertexWeight aiWeight = weights.get();
-                    int vertexId = aiWeight.mVertexId();
-                    float weight = aiWeight.mWeight();
-                    if (weight == 0) continue;  // no need to even add the bone
-
-                    List<VertexWeight> vwList = mesh.vertexWeights.computeIfAbsent(vertexId, _ -> new ArrayList<>());
-                    vwList.add(new VertexWeight(bone.id, weight));
-                }
+                processWeights(mesh, bone, aiBone);
             }
+        }
+    }
+
+    private void processWeights(Mesh mesh, Bone bone, AIBone aiBone) {
+        AIVertexWeight.Buffer weights = aiBone.mWeights();
+        while (weights.hasRemaining()) {
+            AIVertexWeight aiWeight = weights.get();
+            int vertexId = aiWeight.mVertexId();
+            float weight = aiWeight.mWeight();
+            if (weight == 0) continue;  // no need to even add the bone
+
+            List<VertexWeight> vwList = mesh.vertexWeights.computeIfAbsent(vertexId, _ -> new ArrayList<>());
+            vwList.add(new VertexWeight(bone.id, weight));
         }
     }
 
@@ -291,7 +294,7 @@ public class Model {
         }
     }
 
-    private void pushVertexBoneIds(Mesh mesh, int vertexInx) {
+    public void pushVertexBoneIds(Mesh mesh, int vertexInx) {
         List<VertexWeight> vwList = mesh.vertexWeights.get(vertexInx);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
             if (vwList != null && i < vwList.size()) mesh.pushInt(vwList.get(i).boneId);
@@ -299,7 +302,7 @@ public class Model {
         }
     }
 
-    private void pushVertexBoneWeights(Mesh mesh, int vertexInx) {
+    public void pushVertexBoneWeights(Mesh mesh, int vertexInx) {
         List<VertexWeight> vwList = mesh.vertexWeights.get(vertexInx);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
             if (vwList != null && i < vwList.size()) mesh.pushFloat(vwList.get(i).weight);
