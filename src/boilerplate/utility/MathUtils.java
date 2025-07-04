@@ -25,6 +25,10 @@ public class MathUtils {
         return milliseconds * 1E-3f;
     }
 
+    public static double secondToMillis(double seconds) {
+        return seconds / 1E-3f;
+    }
+
     public static float roundToPlace(float num, int place) {
         return (float) Math.round(num * place) / place;
     }

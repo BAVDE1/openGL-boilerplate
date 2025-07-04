@@ -8,17 +8,17 @@ public class TimeStepper {
      * Proper time stepper.
      * if game has optimised boolean toggled, thread sleeps for half of dt once stepped.
      */
-    public static void startTimeStepper(double staticDeltaTime, GameBase game) {
-        startTimeStepper(staticDeltaTime, game, BoilerplateConstants.OPTIMIZE_TIME_STEPPER);
+    public static void startStaticTimeStepper(double staticDeltaTime, GameBase game) {
+        startStaticTimeStepper(staticDeltaTime, game, BoilerplateConstants.OPTIMIZE_TIME_STEPPER);
     }
 
-    public static void startTimeStepper(double staticDeltaTime, GameBase game, Boolean tryOptimise) {
+    public static void startStaticTimeStepper(double staticDeltaTime, GameBase game, Boolean tryOptimise) {
         final double halfDt = staticDeltaTime * 0.5;  // in seconds
         double accumulator = 0;
         double lastFrame = System.nanoTime();
 
         game.createCapabilitiesAndOpen();
-        Logging.debug("Starting time stepper with a dt of %s", staticDeltaTime);
+        Logging.debug("Starting static time stepper with a dt of %s", staticDeltaTime);
 
         while (!game.shouldClose()) {
             double t = System.nanoTime();
@@ -39,6 +39,22 @@ public class TimeStepper {
                 } catch (InterruptedException e) {
                     throw new RuntimeException("Program closed while thread was asleep (between frames)");
                 }
+            }
+        }
+        game.close();
+    }
+
+    public static void startSleepingTimeStepper(double targetDeltaTime, GameBase game) {
+        game.createCapabilitiesAndOpen();
+        Logging.debug("Starting sleeping time stepper with a target dt of %s", targetDeltaTime);
+
+        while (!game.shouldClose()) {
+            try {
+                double t = System.nanoTime();
+                Thread.sleep((long) Math.floor(MathUtils.secondToMillis(targetDeltaTime)));  // give it a little break *-*
+                game.mainLoop(MathUtils.nanoToSecond(System.nanoTime() - t));
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Program closed while thread was asleep (between frames)");
             }
         }
         game.close();

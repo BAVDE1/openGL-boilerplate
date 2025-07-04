@@ -70,7 +70,7 @@ public class Example2d extends GameBase {
 
     public void start() {
         timeStarted = System.currentTimeMillis();
-        TimeStepper.startTimeStepper(BoilerplateConstants.DT, this);
+        TimeStepper.startStaticTimeStepper(BoilerplateConstants.DT, this);
     }
 
     public void createCapabilitiesAndOpen() {

@@ -4,7 +4,6 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
-import boilerplate.models.Mesh;
 import boilerplate.models.Model;
 import boilerplate.rendering.Camera3d;
 import boilerplate.rendering.Renderer;
@@ -20,7 +19,6 @@ import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.opengl.GL45;
 
 import java.awt.*;
@@ -59,7 +57,7 @@ public class Example3d extends GameBase {
 
     @Override
     public void start() {
-        TimeStepper.startTimeStepper(BoilerplateConstants.DT, this);
+        TimeStepper.startStaticTimeStepper(BoilerplateConstants.DT, this);
     }
 
     @Override
@@ -150,7 +148,7 @@ public class Example3d extends GameBase {
         cubeData.pushPolygon(cube);
         vbCube.bufferData(cubeData);
 
-        shPost.autoInitializeShadersMulti("shaders/3d_pst.glsl");
+        shPost.autoInitializeShadersMulti("shaders/3d_post_processing.glsl");
         vaPost.genId();
         vbPost.genId();
 

@@ -26,7 +26,7 @@ public class ExampleIndex extends GameBase {
 
     @Override
     public void start() {
-        TimeStepper.startTimeStepper(BoilerplateConstants.DT, this);
+        TimeStepper.startStaticTimeStepper(BoilerplateConstants.DT, this);
     }
 
     @Override
