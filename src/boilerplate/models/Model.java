@@ -17,7 +17,6 @@ import org.lwjgl.assimp.*;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryUtil;
 
-import javax.annotation.processing.SupportedSourceVersion;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -26,6 +25,22 @@ import java.util.*;
 public class Model {
     public static final int MAX_BONE_INFLUENCE = 4;
     private static final ShaderProgram boneShader = new ShaderProgram();
+
+    public interface ProcessVertexFunc {
+        default void call(Model model, Mesh mesh, int vertexInx, AIVector3D.Buffer allVertices, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos) {
+            for (VertexLayout.Element element : model.vertexLayout.elements) {
+                switch (element.hint) {
+                    case (VertexLayout.HINT_POSITION) -> mesh.pushVector3D(allVertices.get(vertexInx));
+                    case (VertexLayout.HINT_NORMAL) -> mesh.pushVector3D(allNormals.get(vertexInx));
+                    case (VertexLayout.HINT_TEX_POS) -> mesh.pushVector2D(allTexPos.get(vertexInx));
+                    case (VertexLayout.HINT_BONE_IDS) -> model.pushVertexBoneIds(mesh, vertexInx);
+                    case (VertexLayout.HINT_BONE_WEIGHTS) -> model.pushVertexBoneWeights(mesh, vertexInx);
+                    case (VertexLayout.HINT_CUSTOM_0) -> mesh.pushInt(model.hasBones ? 0 : 1);  // it is static if no bones
+                    default -> throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
+                }
+            }
+        }
+    }
 
     public static class NodeData {
         String name;
@@ -59,9 +74,10 @@ public class Model {
         }
     }
 
-    String modelFile;
-    String directory;
-    VertexLayout vertexLayout = defaultVertexLayout();
+    private String modelFile;
+    private String directory;
+    public VertexLayout vertexLayout = defaultVertexLayout();
+    public ProcessVertexFunc processVertexFunc = defaultProcessVertexFunc();
     public Animator animator = new Animator(this);
 
     private final NodeData rootNode = new NodeData();
@@ -70,7 +86,7 @@ public class Model {
     private Mesh[] meshes;
     private Material[] materials;
     private int boneCounter = 0;
-    HashMap<String, Bone> boneMap = new HashMap<>();
+    private final HashMap<String, Bone> boneMap = new HashMap<>();
 
     public Matrix4f modelTransform = new Matrix4f().identity();
 
@@ -223,7 +239,7 @@ public class Model {
 
         // process
         for (int i = 0; i < aiMesh.mNumVertices(); i++) {
-            processVertex(mesh, i, allVertices, allNormals, allTexPos);
+            processVertexFunc.call(this, mesh, i, allVertices, allNormals, allTexPos);
         }
     }
 
@@ -271,23 +287,6 @@ public class Model {
             try (AIAnimation aiAnimation = AIAnimation.create(allAnimations.get())) {
                 Animation animation = new Animation(aiAnimation, this);
                 animator.addAnimation(animation);
-            }
-        }
-    }
-
-    /**
-     * After process bones
-     */
-    private void processVertex(Mesh mesh, int vertexInx, AIVector3D.Buffer allVertices, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos) {
-        for (VertexLayout.Element element : vertexLayout.elements) {
-            switch (element.hint) {
-                case (VertexLayout.HINT_POSITION) -> mesh.pushVector3D(allVertices.get(vertexInx));
-                case (VertexLayout.HINT_NORMAL) -> mesh.pushVector3D(allNormals.get(vertexInx));
-                case (VertexLayout.HINT_TEX_POS) -> mesh.pushVector2D(allTexPos.get(vertexInx));
-                case (VertexLayout.HINT_BONE_IDS) -> pushVertexBoneIds(mesh, vertexInx);
-                case (VertexLayout.HINT_BONE_WEIGHTS) -> pushVertexBoneWeights(mesh, vertexInx);
-                case (VertexLayout.HINT_CUSTOM_0) -> mesh.pushInt(hasBones ? 0 : 1);  // it is static if no bones
-                default -> throw new RuntimeException("Element from given VertexLayout is missing a hint value.");
             }
         }
     }
@@ -437,6 +436,14 @@ public class Model {
         return boneMap.get(boneName);
     }
 
+    public String getModelFile() {
+        return modelFile;
+    }
+
+    public String getModelDirectory() {
+        return directory;
+    }
+
     public static VertexLayout defaultVertexLayout() {
         return new VertexLayout(
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, 3, VertexLayout.HINT_POSITION),
@@ -446,6 +453,15 @@ public class Model {
                 new VertexLayout.Element(VertexLayout.TYPE_FLOAT, MAX_BONE_INFLUENCE, VertexLayout.HINT_BONE_WEIGHTS, true),
                 new VertexLayout.Element(VertexLayout.TYPE_INT, 1, VertexLayout.HINT_CUSTOM_0)
         );
+    }
+
+    public static ProcessVertexFunc defaultProcessVertexFunc() {
+        return new ProcessVertexFunc() {
+            @Override
+            public void call(Model model, Mesh mesh, int vertexInx, AIVector3D.Buffer allVertices, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos) {
+                ProcessVertexFunc.super.call(model, mesh, vertexInx, allVertices, allNormals, allTexPos);
+            }
+        };
     }
 
     @Override

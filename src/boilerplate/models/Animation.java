@@ -34,7 +34,7 @@ public class Animation {
         while (allChannels.hasRemaining()) {
             try (AINodeAnim aiNodeAnim = AINodeAnim.create(allChannels.get())) {
                 String relatedBoneName = aiNodeAnim.mNodeName().dataString();
-                Bone bone = model.boneMap.get(relatedBoneName);
+                Bone bone = model.getBone(relatedBoneName);
                 if (bone == null) continue;
                 AnimatedBone animatedBone = new AnimatedBone(aiNodeAnim, bone);
                 animatedBones.put(animatedBone.bone.name, animatedBone);
