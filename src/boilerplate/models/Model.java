@@ -1,5 +1,6 @@
 package boilerplate.models;
 
+import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.BoilerplateShaders;
 import boilerplate.rendering.Camera3d;
 import boilerplate.rendering.Renderer;
@@ -25,6 +26,9 @@ import java.util.*;
 public class Model {
     public static final int MAX_BONE_INFLUENCE = 4;
     private static final ShaderProgram boneShader = new ShaderProgram();
+
+    private static final int BONE_ID_NULL = -1;
+    private static final int VERTEX_WEIGHT_NULL = 0;
 
     public interface ProcessVertexFunc {
         default void call(Model model, Mesh mesh, int vertexInx, AIVector3D.Buffer allVertices, AIVector3D.Buffer allNormals, AIVector3D.Buffer allTexPos) {
@@ -57,8 +61,8 @@ public class Model {
     }
 
     public static class VertexWeight {
-        int boneId = -1;
-        float weight = 0;
+        int boneId = BONE_ID_NULL;
+        float weight = VERTEX_WEIGHT_NULL;
 
         public VertexWeight() {
         }
@@ -261,18 +265,18 @@ public class Model {
             try (AIBone aiBone = AIBone.create(allBones.get())) {
                 String boneName = aiBone.mName().dataString();
                 Bone bone = boneMap.computeIfAbsent(boneName, _ -> new Bone(boneCounter++, aiBone));
-                processWeights(mesh, bone, aiBone);
+                processBoneWeights(mesh, bone, aiBone);
             }
         }
     }
 
-    private void processWeights(Mesh mesh, Bone bone, AIBone aiBone) {
+    private void processBoneWeights(Mesh mesh, Bone bone, AIBone aiBone) {
         AIVertexWeight.Buffer weights = aiBone.mWeights();
         while (weights.hasRemaining()) {
             AIVertexWeight aiWeight = weights.get();
             int vertexId = aiWeight.mVertexId();
             float weight = aiWeight.mWeight();
-            if (weight == 0) continue;  // no need to even add the bone
+            if (weight < BoilerplateConstants.EPSILON) continue;  // no need to even add the bone
 
             List<VertexWeight> vwList = mesh.vertexWeights.computeIfAbsent(vertexId, _ -> new ArrayList<>());
             vwList.add(new VertexWeight(bone.id, weight));
@@ -298,7 +302,7 @@ public class Model {
         List<VertexWeight> vwList = mesh.vertexWeights.get(vertexInx);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
             if (vwList != null && i < vwList.size()) mesh.pushInt(vwList.get(i).boneId);
-            else mesh.pushInt(-1);
+            else mesh.pushInt(BONE_ID_NULL);
         }
     }
 
@@ -306,7 +310,7 @@ public class Model {
         List<VertexWeight> vwList = mesh.vertexWeights.get(vertexInx);
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
             if (vwList != null && i < vwList.size()) mesh.pushFloat(vwList.get(i).weight);
-            else mesh.pushFloat(0);
+            else mesh.pushFloat(VERTEX_WEIGHT_NULL);
         }
     }
 
