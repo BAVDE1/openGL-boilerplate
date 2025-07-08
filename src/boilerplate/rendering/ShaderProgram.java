@@ -5,6 +5,7 @@ import boilerplate.utility.MathUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.awt.*;
 import java.io.*;
@@ -259,6 +260,14 @@ public class ShaderProgram {
 
     public void uniform3f(String uniform, float f1, float f2, float f3) {
         glUniform3f(getUniformLocation(uniform), f1, f2, f3);
+    }
+
+    public void uniform4f(String uniform, Vector4f v) {
+        uniform4f(uniform, v.x, v.y, v.z, v.w);
+    }
+
+    public void uniform4f(String uniform, float f1, float f2, float f3, float f4) {
+        glUniform4f(getUniformLocation(uniform), f1, f2, f3, f4);
     }
 
     public void uniformMatrix4f(String uniform, Matrix4f m) {

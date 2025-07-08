@@ -23,18 +23,23 @@ void main() {
 //--- FRAG
 #version 450 core
 
-//layout (std140) uniform CameraView {
-//    mat4 projection;
-//    mat4 view;
-//};
+struct Material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+};
 
-uniform vec3 objectColour;
-uniform vec3 lightColour;
-uniform vec3 lightPos;
+struct Light {
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+uniform Material material;
+uniform Light light;
 uniform vec3 viewPos;
-
-const float ambientStrength = .15;
-const float specularStrength = .5;
 
 in vec3 v_fragPos;
 in vec3 v_normal;
@@ -43,20 +48,19 @@ out vec4 colour;
 
 void main() {
     // ambient
-    vec3 ambient = lightColour * ambientStrength;
+    vec3 ambient = light.ambient * material.ambient;
 
     // diffuse
     vec3 norm = normalize(v_normal);
-//    vec3 lightDir = normalize(v_fragPos - (view * vec4(lightPos, 1)).xyz);  // view space
-    vec3 lightDir = normalize(v_fragPos - lightPos);
+    vec3 lightDir = normalize(v_fragPos - light.position);
     float diff = max(dot(lightDir, norm), 0);
-    vec3 diffuse = diff * lightColour;
+    vec3 diffuse = (diff * material.diffuse) * light.diffuse;
 
     // specular
     vec3 viewDir = normalize(v_fragPos - viewPos);
     vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0), 64);
-    vec3 specular = specularStrength * spec * lightColour;
+    float spec = pow(max(dot(viewDir, reflectDir), 0), material.shininess);
+    vec3 specular = (spec * material.specular) * light.specular;
 
-    colour = vec4((ambient + diffuse + specular) * objectColour, 1);
+    colour = vec4(ambient + diffuse + specular, 1);
 }

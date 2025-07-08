@@ -4,6 +4,7 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
+import boilerplate.models.Material;
 import boilerplate.models.Model;
 import boilerplate.rendering.Camera3d;
 import boilerplate.rendering.Renderer;
@@ -227,11 +228,17 @@ public class Example3d extends GameBase {
 
         // lighting cube
         Vector3f lightPos = new Vector3f(-1f, 2.8f, 1.5f);
+        Vector3f lightColour = new Vector3f(1);
+        lightColour.x = (float) Math.sin(glfwGetTime() * 2.0f);
+        lightColour.y = (float) Math.sin(glfwGetTime() * 0.7f);
+        lightColour.z = (float) Math.sin(glfwGetTime() * 1.3f);
         shLighting.bind();
         shLighting.uniformMatrix4f("model", new Matrix4f().translate(0, 2, 0).rotateY((float) glfwGetTime()).scale(1, 1, 2));
-        shLighting.uniform3f("objectColour", new Vector3f(1, .5f, .31f));
-        shLighting.uniform3f("lightColour", new Vector3f(1));
-        shLighting.uniform3f("lightPos", lightPos);
+        new Material(new Vector3f(1, .5f, .31f)).uniformValues(shLighting);
+        shLighting.uniform3f("light.position", lightPos);
+        shLighting.uniform3f("light.ambient", lightColour.mul(.2f));
+        shLighting.uniform3f("light.diffuse", lightColour.mul(1));
+        shLighting.uniform3f("light.specular", new Vector3f(.5f));
         shLighting.uniform3f("viewPos", camera.getPos());
         Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
 

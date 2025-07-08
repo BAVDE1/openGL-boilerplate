@@ -12,6 +12,7 @@ import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
 import boilerplate.utility.MathUtils;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
@@ -334,17 +335,17 @@ public class Model {
             texture = new Texture2d(directory + "/" + textPath);
         }
 
-        Vector4f ambient = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT);
-        Vector4f diffuse = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE);
-        Vector4f specular = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR);
+        Vector3f ambient = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT);
+        Vector3f diffuse = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE);
+        Vector3f specular = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR);
         return new Material(ambient, diffuse, specular, texture);
     }
 
-    private Vector4f getMaterialColour(AIMaterial aiMaterial, String type) {
+    private Vector3f getMaterialColour(AIMaterial aiMaterial, String type) {
         AIColor4D colBuff = AIColor4D.create();
-        Vector4f col = Material.DEFAULT_COLOUR;
+        Vector3f col = Material.DEFAULT_COLOUR;
         int result = Assimp.aiGetMaterialColor(aiMaterial, type, Assimp.aiTextureType_NONE, 0, colBuff);
-        if (result == 0) col = new Vector4f(colBuff.r(), colBuff.g(), colBuff.b(), colBuff.a());
+        if (result == 0) col = new Vector3f(colBuff.r(), colBuff.g(), colBuff.b());
         return col;
     }
 
