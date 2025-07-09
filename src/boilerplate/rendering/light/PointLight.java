@@ -17,9 +17,9 @@ public class PointLight extends Light {
     @Override
     public void uniformValues(ShaderProgram sh) {
         super.uniformValues(sh);
-        sh.uniform3f(uniformStructName + ".position", position);
-        sh.uniform1f(uniformStructName + ".constant", constant);
-        sh.uniform1f(uniformStructName + ".linear", linear);
-        sh.uniform1f(uniformStructName + ".quadratic", quadratic);
+        sh.uniform3f(uniformName + ".position", position);
+        sh.uniform1f(uniformName + ".constant", constant);
+        sh.uniform1f(uniformName + ".linear", linear);
+        sh.uniform1f(uniformName + ".quadratic", quadratic);
     }
 }

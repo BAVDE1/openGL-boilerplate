@@ -7,7 +7,7 @@ import org.joml.Vector3f;
 public class Material {
     public static final Vector3f DEFAULT_COLOUR = new Vector3f(0);
 
-    public String uniformStructName = "material";
+    public String uniformName = "material";
     public Vector3f ambient = DEFAULT_COLOUR;
     public Vector3f diffuse = DEFAULT_COLOUR;
     public Vector3f specular = new Vector3f(1);
@@ -50,19 +50,19 @@ public class Material {
     }
 
     public void uniformValues(ShaderProgram sh) {
-        sh.uniform3f(uniformStructName + ".ambient", ambient);
-        sh.uniform3f(uniformStructName + ".diffuse", diffuse);
-        sh.uniform3f(uniformStructName + ".specular", specular);
-        sh.uniform1f(uniformStructName + ".shininess", shininess);
+        sh.uniform3f(uniformName + ".ambient", ambient);
+        sh.uniform3f(uniformName + ".diffuse", diffuse);
+        sh.uniform3f(uniformName + ".specular", specular);
+        sh.uniform1f(uniformName + ".shininess", shininess);
     }
 
     public void uniformAndBindTextures(ShaderProgram sh) {
         int texSlot = 0;
         if (diffuseTexture != null) {
-            sh.uniformTexture(uniformStructName + ".diffuseTexture", diffuseTexture, texSlot++);
+            sh.uniformTexture(uniformName + ".diffuseTexture", diffuseTexture, texSlot++);
         }
         if (specularMap != null) {
-            sh.uniformTexture(uniformStructName + ".specularMap", specularMap, texSlot++);
+            sh.uniformTexture(uniformName + ".specularMap", specularMap, texSlot++);
         }
     }
 

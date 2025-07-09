@@ -10,11 +10,11 @@ public abstract class Light {
     public Vector3f diffuse = DEFAULT_COLOUR;
     public Vector3f specular = DEFAULT_COLOUR;
 
-    public String uniformStructName = "light";
+    public String uniformName = "light";
 
     public void uniformValues(ShaderProgram sh) {
-        sh.uniform3f(uniformStructName + ".ambient", ambient);
-        sh.uniform3f(uniformStructName + ".diffuse", diffuse);
-        sh.uniform3f(uniformStructName + ".specular", specular);
+        sh.uniform3f(uniformName + ".ambient", ambient);
+        sh.uniform3f(uniformName + ".diffuse", diffuse);
+        sh.uniform3f(uniformName + ".specular", specular);
     };
 }

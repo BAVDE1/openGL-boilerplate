@@ -13,6 +13,6 @@ public class DirectionalLight extends Light {
     @Override
     public void uniformValues(ShaderProgram sh) {
         super.uniformValues(sh);
-        sh.uniform3f(uniformStructName + ".direction", direction);
+        sh.uniform3f(uniformName + ".direction", direction);
     }
 }
