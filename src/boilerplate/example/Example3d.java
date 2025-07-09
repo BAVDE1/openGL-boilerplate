@@ -14,6 +14,7 @@ import boilerplate.rendering.buffers.FrameBuffer;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.builders.*;
+import boilerplate.rendering.light.PointLight;
 import boilerplate.rendering.textures.CubeMap;
 import boilerplate.rendering.textures.Texture2d;
 import boilerplate.rendering.textures.Texture2dMultisample;
@@ -53,6 +54,7 @@ public class Example3d extends GameBase {
     Texture2d d;
     Texture2d s;
     Material m;
+    PointLight light = new PointLight(new Vector3f(-1f, 2.8f, 1.5f));
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
@@ -193,6 +195,8 @@ public class Example3d extends GameBase {
         d = new Texture2d("res/textures/container2.png");
         s = new Texture2d("res/textures/container2_specular.png");
         m = new Material(d, s);
+        m.uniformValues(shLighting);
+        light.uniformValues(shLighting);
     }
 
     public void render() {
@@ -228,7 +232,8 @@ public class Example3d extends GameBase {
         skyBox.bindSkyBoxTexture();
         shReflect.bind();
         shReflect.uniform3f("camPos", camera.getPos());
-        drawObjects(matModel1.translate(2, 0, 0), matModel2.translate(2, 0, 0), shReflect);
+        shReflect.uniformMatrix4f("model", matModel1.translate(2, 0, 0));
+        Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, vaCube, 36);
 
         // models
         model.draw(modelShader);
@@ -236,21 +241,15 @@ public class Example3d extends GameBase {
         model3.draw(modelShader);
 
         // lighting cube
-        Vector3f lightPos = new Vector3f(-1f, 2.8f, 1.5f);
         shLighting.bind();
-        shLighting.uniformMatrix4f("model", new Matrix4f().translate(0, 2, 0));
-        m.uniformValues(shLighting);
-        m.uniformAndBindTextures(shLighting);
-        shLighting.uniform3f("light.position", lightPos);
-        shLighting.uniform3f("light.ambient", new Vector3f(.2f));
-        shLighting.uniform3f("light.diffuse", new Vector3f(1));
-        shLighting.uniform3f("light.specular", new Vector3f(1));
+        shLighting.uniformMatrix4f("model", new Matrix4f().translate(0, 2, -2 * (float) Math.abs(Math.sin(glfwGetTime()))).rotateY((float) glfwGetTime()));
         shLighting.uniform3f("viewPos", camera.getPos());
+        m.uniformAndBindTextures(shLighting);
         Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
         GL45.glActiveTexture(GL45.GL_TEXTURE0);
 
         shLightSource.bind();
-        shLightSource.uniformMatrix4f("model", new Matrix4f().translate(lightPos).scale(.3f));
+        shLightSource.uniformMatrix4f("model", new Matrix4f().translate(light.position).scale(.3f));
         Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
 
 //        skyBox.draw();
