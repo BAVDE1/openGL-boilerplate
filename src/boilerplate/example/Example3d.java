@@ -15,6 +15,7 @@ import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.builders.*;
 import boilerplate.rendering.textures.CubeMap;
+import boilerplate.rendering.textures.Texture2d;
 import boilerplate.rendering.textures.Texture2dMultisample;
 import boilerplate.utility.Logging;
 import org.joml.Matrix4f;
@@ -48,6 +49,10 @@ public class Example3d extends GameBase {
     VertexArrayBuffer vbCube = new VertexArrayBuffer();
     CubeMap ballerCube = new CubeMap();
     SkyBox skyBox = new SkyBox();
+
+    Texture2d d;
+    Texture2d s;
+    Material m;
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
@@ -144,7 +149,7 @@ public class Example3d extends GameBase {
 
         vaCube.fastSetup(new int[]{3, 3}, vbCube);
         BufferBuilder3f cubeData = new BufferBuilder3f(true, 3);
-        Shape3d.Poly3d cube = Shape3d.createCube(new Vector3f(), .8f);
+        Shape3d.Poly3d cube = Shape3d.createCube(new Vector3f(), 1);
         cube.mode = new ShapeMode.Unpack(Shape3d.defaultCubeNormals());
         cubeData.pushPolygon(cube);
         vbCube.bufferData(cubeData);
@@ -184,6 +189,10 @@ public class Example3d extends GameBase {
 
         model3.loadModel("res/models/bloxycola/cola.obj", true);
         model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
+
+        d = new Texture2d("res/textures/container2.png");
+        s = new Texture2d("res/textures/container2_specular.png");
+        m = new Material(d, s);
     }
 
     public void render() {
@@ -228,19 +237,17 @@ public class Example3d extends GameBase {
 
         // lighting cube
         Vector3f lightPos = new Vector3f(-1f, 2.8f, 1.5f);
-        Vector3f lightColour = new Vector3f(1);
-        lightColour.x = (float) Math.sin(glfwGetTime() * 2.0f);
-        lightColour.y = (float) Math.sin(glfwGetTime() * 0.7f);
-        lightColour.z = (float) Math.sin(glfwGetTime() * 1.3f);
         shLighting.bind();
-        shLighting.uniformMatrix4f("model", new Matrix4f().translate(0, 2, 0).rotateY((float) glfwGetTime()).scale(1, 1, 2));
-        new Material(new Vector3f(1, .5f, .31f)).uniformValues(shLighting);
+        shLighting.uniformMatrix4f("model", new Matrix4f().translate(0, 2, 0));
+        m.uniformValues(shLighting);
+        m.uniformAndBindTextures(shLighting);
         shLighting.uniform3f("light.position", lightPos);
-        shLighting.uniform3f("light.ambient", lightColour.mul(.2f));
-        shLighting.uniform3f("light.diffuse", lightColour.mul(1));
-        shLighting.uniform3f("light.specular", new Vector3f(.5f));
+        shLighting.uniform3f("light.ambient", new Vector3f(.2f));
+        shLighting.uniform3f("light.diffuse", new Vector3f(1));
+        shLighting.uniform3f("light.specular", new Vector3f(1));
         shLighting.uniform3f("viewPos", camera.getPos());
         Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
+        GL45.glActiveTexture(GL45.GL_TEXTURE0);
 
         shLightSource.bind();
         shLightSource.uniformMatrix4f("model", new Matrix4f().translate(lightPos).scale(.3f));

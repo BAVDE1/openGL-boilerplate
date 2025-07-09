@@ -1,6 +1,7 @@
 package boilerplate.models;
 
 import boilerplate.rendering.Renderer;
+import boilerplate.rendering.ShaderProgram;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.buffers.VertexElementBuffer;
@@ -117,8 +118,9 @@ public class Mesh {
         veb.bufferData(indices);
     }
 
-    public void draw() {
-        material.bindTexture();
+    public void draw(ShaderProgram sh) {
+        material.diffuseTexture.bind();
+//        material.uniformValues(sh);
         Renderer.drawElements(renderMode, va, veb, indicesCount);
     }
 }

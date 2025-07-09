@@ -396,7 +396,7 @@ public class Model {
         }
 
         shaderProgram.uniformMatrix4f("model", modelTransform);
-        for (Mesh mesh : meshes) mesh.draw();
+        for (Mesh mesh : meshes) mesh.draw(shaderProgram);
         if (renderBones) renderBones();
     }
 

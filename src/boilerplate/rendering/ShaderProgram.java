@@ -1,11 +1,14 @@
 package boilerplate.rendering;
 
+import boilerplate.rendering.textures.Texture;
+import boilerplate.rendering.textures.Texture2d;
 import boilerplate.utility.Logging;
 import boilerplate.utility.MathUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.opengl.GL45;
 
 import java.awt.*;
 import java.io.*;
@@ -280,6 +283,11 @@ public class ShaderProgram {
 
     public void uniformMatrix4f(String uniform, float[] matFloats) {
         glUniformMatrix4fv(getUniformLocation(uniform), false, matFloats);
+    }
+
+    public void uniformTexture(String uniform, Texture texture, int slot) {
+        uniform1i(uniform, slot);
+        texture.bind(slot);
     }
 
     public void useDemoShader() {
