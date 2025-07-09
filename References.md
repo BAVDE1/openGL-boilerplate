@@ -38,7 +38,8 @@ shaders stuff:\
 https://shader-tutorial.dev/ \
 https://learnopengl.com/Getting-started/Shaders \
 https://docs.tizen.org/application/native/guides/graphics/vertex-shader/ \
-https://www.khronos.org/opengl/wiki/Shader
+https://www.khronos.org/opengl/wiki/Shader \
+https://theorangeduck.com/page/avoiding-shader-conditionals
 
 panorama to cube map: https://jaxry.github.io/panorama-to-cubemap/
 
