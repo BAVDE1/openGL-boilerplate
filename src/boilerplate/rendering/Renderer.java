@@ -12,11 +12,11 @@ import static org.lwjgl.opengl.GL45.*;
 
 /**
  * State Machine
- * Automatically binds and draws VertexArrays & Shaders
+ * A bunch of common quick-access rendering utilities & toggles
  */
 public class Renderer {
     /**
-     * Do before anything GL related
+     * Do before anything GL related!
      */
     public static void setupGLContext(boolean setupDefaults) {
         GL.createCapabilities();
