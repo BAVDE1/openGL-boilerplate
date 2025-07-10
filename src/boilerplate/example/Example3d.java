@@ -17,6 +17,7 @@ import boilerplate.rendering.builders.*;
 import boilerplate.rendering.light.DirectionalLight;
 import boilerplate.rendering.light.Light;
 import boilerplate.rendering.light.PointLight;
+import boilerplate.rendering.light.SpotLight;
 import boilerplate.rendering.textures.CubeMap;
 import boilerplate.rendering.textures.Texture2d;
 import boilerplate.rendering.textures.Texture2dMultisample;
@@ -56,6 +57,7 @@ public class Example3d extends GameBase {
     PointLight lightBlue = new PointLight(new Vector3f(0));
     Light.LightGroup lightGroup = new Light.LightGroup();
     DirectionalLight skyLight = new DirectionalLight(new Vector3f(0, 0, 1));
+    SpotLight spotLight = new SpotLight(camera.getPos(), camera.getForward());
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
@@ -192,14 +194,15 @@ public class Example3d extends GameBase {
         model3.loadModel("res/models/bloxycola/cola.obj", true);
         model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
 
-        lightRed.setColourValues(new Vector3f(.8f, 0, 0), new Vector3f(.8f, 0, 0), new Vector3f(0));
-        lightBlue.setColourValues(new Vector3f(0, 0, .8f), new Vector3f(0, 0, .8f), new Vector3f(0));
+        lightRed.setColourValues(new Vector3f(1, 0, 0), new Vector3f(.8f, 0, 0), new Vector3f());
+        lightBlue.setColourValues(new Vector3f(0, 0, 1), new Vector3f(0, 0, .8f), new Vector3f());
         lightGroup.addLight(lightRed, lightBlue);
-        lightGroup.uniformValuesAsArray("lights", modelShader);
 
         skyLight.diffuse = new Vector3f(.5f);
         skyLight.specular = new Vector3f(.2f);
-        skyLight.uniformValues("skyLight", modelShader);
+        skyLight.uniformValues("skyLight", modelShader);  // never changes
+
+        spotLight.setColourValues(new Vector3f(0, .8f, 0), new Vector3f(0, .8f, 0), new Vector3f());
     }
 
     public void render() {
@@ -253,10 +256,10 @@ public class Example3d extends GameBase {
         // light sources
         shLightSource.bind();
         shLightSource.uniformMatrix4f("model", new Matrix4f().translate(lightRed.position).scale(.3f));
-        shLightSource.uniform3f("lightColour", new Vector3f(1, 0, 0));
+        shLightSource.uniform3f("lightColour", lightRed.diffuse);
         Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
         shLightSource.uniformMatrix4f("model", new Matrix4f().translate(lightBlue.position).scale(.3f));
-        shLightSource.uniform3f("lightColour", new Vector3f(0, 0, 1));
+        shLightSource.uniform3f("lightColour", lightBlue.diffuse);
         Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
 
         skyBox.draw();
