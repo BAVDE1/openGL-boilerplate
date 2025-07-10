@@ -14,6 +14,7 @@ import boilerplate.rendering.buffers.FrameBuffer;
 import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.builders.*;
+import boilerplate.rendering.light.DirectionalLight;
 import boilerplate.rendering.light.PointLight;
 import boilerplate.rendering.textures.CubeMap;
 import boilerplate.rendering.textures.Texture2d;
@@ -55,6 +56,7 @@ public class Example3d extends GameBase {
     Texture2d s;
     Material m;
     PointLight light = new PointLight(new Vector3f(0, 1, 2f));
+    DirectionalLight skyLight = new DirectionalLight(new Vector3f(0, 0, 1));
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
@@ -195,8 +197,14 @@ public class Example3d extends GameBase {
         m = new Material(new Texture2d("res/textures/container2.png"), new Texture2d("res/textures/container2_specular.png"));
         m.shininess = 32f;
         m.uniformValues("material", shLighting);
+        light.diffuse = new Vector3f(.8f, 0, 0);
+        light.specular = new Vector3f(.8f, 0, 0);
+        light.ambient = new Vector3f(0);
+        skyLight.diffuse = new Vector3f(.5f);
+        skyLight.specular = new Vector3f(.2f);
         light.uniformValues("light", shLighting);
         light.uniformValues("light", modelShader);
+        skyLight.uniformValues("skyLight", modelShader);
     }
 
     public void render() {
@@ -235,6 +243,11 @@ public class Example3d extends GameBase {
         shReflect.uniformMatrix4f("model", matModel1.translate(2, 0, 0));
         Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, vaCube, 36);
 
+        light.position.z = 3 * (float) Math.sin(glfwGetTime());
+        light.position.x = 3 * (float) Math.cos(glfwGetTime());
+        light.uniformValues("light", shLighting);
+        light.uniformValues("light", modelShader);
+
         // models
         modelShader.uniform3f("viewPos", camera.getPos());
         model.draw(modelShader);
@@ -253,7 +266,7 @@ public class Example3d extends GameBase {
         shLightSource.uniformMatrix4f("model", new Matrix4f().translate(light.position).scale(.3f));
         Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
 
-//        skyBox.draw();
+        skyBox.draw();
         fb.blitIntoIntermediaryFB(GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         // --- POST PROCESSING --- //

@@ -336,7 +336,7 @@ public class Model {
         material.diffuse = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE);
         material.specular = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR);
 
-        material.shininess = 32f;
+        material.shininess = 8f;
         return material;
     }
 
@@ -354,9 +354,12 @@ public class Model {
         return null;
     }
 
-//    private Float getMaterialFloat(AIMaterial aiMaterial, String type) {
-//        Assimp.aigetmater
-//    }
+    private Float getMaterialFloat(AIMaterial aiMaterial, String type) {
+        float[] f = new float[1];
+        Assimp.aiGetMaterialFloatArray(aiMaterial, type, Assimp.aiTextureType_SHININESS, 0, f, new int[1]);
+        System.out.println(Arrays.toString(f));
+        return f[0];
+    }
 
     private void processMeshMaterial(Mesh mesh, AIMesh aiMesh) {
         int matInx = aiMesh.mMaterialIndex();
@@ -366,10 +369,7 @@ public class Model {
     }
 
     public void setupBoneRendering(Camera3d camera3d) {
-        if (boneCounter == 0) {
-            Logging.danger("No bones are present in this model '%s', aborting.", modelFile);
-            return;
-        }
+        if (boneCounter == 0) return;
 
         if (!boneShader.isSetup()) {
             boneShader.genProgram();
