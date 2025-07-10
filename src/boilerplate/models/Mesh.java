@@ -119,8 +119,8 @@ public class Mesh {
     }
 
     public void draw(ShaderProgram sh) {
-        material.diffuseTexture.bind();
-//        material.uniformValues(sh);
+        material.uniformValues("material", sh);  // todo: only needs to call once
+        material.uniformAndBindTextures("material", sh);  // todo ^
         Renderer.drawElements(renderMode, va, veb, indicesCount);
     }
 }

@@ -5,13 +5,10 @@ import boilerplate.rendering.textures.Texture2d;
 import org.joml.Vector3f;
 
 public class Material {
-    public static final Vector3f DEFAULT_COLOUR = new Vector3f(0);
-
-    public String uniformName = "material";
-    public Vector3f ambient = DEFAULT_COLOUR;
-    public Vector3f diffuse = DEFAULT_COLOUR;
-    public Vector3f specular = new Vector3f(1);
-    public float shininess = 64;
+    public Vector3f ambient;
+    public Vector3f diffuse;
+    public Vector3f specular;
+    public Float shininess;
 
     public Texture2d diffuseTexture;
     public Texture2d specularMap;
@@ -49,21 +46,17 @@ public class Material {
         this.diffuseTexture = diffuseTexture;
     }
 
-    public void uniformValues(ShaderProgram sh) {
-        sh.uniform3f(uniformName + ".ambient", ambient);
-        sh.uniform3f(uniformName + ".diffuse", diffuse);
-        sh.uniform3f(uniformName + ".specular", specular);
-        sh.uniform1f(uniformName + ".shininess", shininess);
+    public void uniformValues(String uniform, ShaderProgram sh) {
+        if (ambient != null) sh.uniform3f(uniform + ".ambient", ambient);
+        if (diffuse != null) sh.uniform3f(uniform + ".diffuse", diffuse);
+        if (specular != null) sh.uniform3f(uniform + ".specular", specular);
+        if (shininess != null) sh.uniform1f(uniform + ".shininess", shininess);
     }
 
-    public void uniformAndBindTextures(ShaderProgram sh) {
+    public void uniformAndBindTextures(String uniform, ShaderProgram sh) {
         int texSlot = 0;
-        if (diffuseTexture != null) {
-            sh.uniformTexture(uniformName + ".diffuseTexture", diffuseTexture, texSlot++);
-        }
-        if (specularMap != null) {
-            sh.uniformTexture(uniformName + ".specularMap", specularMap, texSlot++);
-        }
+        if (diffuseTexture != null) sh.uniformTexture(uniform + ".diffuseTexture", diffuseTexture, texSlot++);
+        if (specularMap != null) sh.uniformTexture(uniform + ".specularMap", specularMap, texSlot++);
     }
 
     @Override

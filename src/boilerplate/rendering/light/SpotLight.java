@@ -14,10 +14,10 @@ public class SpotLight extends Light {
     }
 
     @Override
-    public void uniformValues(ShaderProgram sh) {
-        super.uniformValues(sh);
-        sh.uniform3f(uniformName + ".position", position);
-        sh.uniform3f(uniformName + ".direction", direction);
-        sh.uniform1f(uniformName + ".cutoff", (float) Math.cos(Math.toRadians(cutoff)));
+    public void uniformValues(String uniform, ShaderProgram sh) {
+        super.uniformValues(uniform, sh);
+        sh.uniform3f(uniform + ".position", position);
+        sh.uniform3f(uniform + ".direction", direction);
+        sh.uniform1f(uniform + ".cutoff", (float) Math.cos(Math.toRadians(cutoff)));
     }
 }

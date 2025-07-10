@@ -327,27 +327,36 @@ public class Model {
     }
 
     private Material processMaterial(AIMaterial aiMaterial) {
-        AIString path = AIString.calloc();
-        Assimp.aiGetMaterialTexture(aiMaterial, Assimp.aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
-        String textPath = path.dataString();
-        Texture2d texture = null;
-        if (!textPath.isEmpty()) {
-            texture = new Texture2d(directory + "/" + textPath);
-        }
+        Material material = new Material();
 
-        Vector3f ambient = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT);
-        Vector3f diffuse = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE);
-        Vector3f specular = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR);
-        return new Material(ambient, diffuse, specular, texture);
+        material.diffuseTexture = getMaterialTexture(aiMaterial, Assimp.aiTextureType_DIFFUSE);
+        material.specularMap = getMaterialTexture(aiMaterial, Assimp.aiTextureType_SPECULAR);
+
+        material.ambient = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT);
+        material.diffuse = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE);
+        material.specular = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR);
+
+        material.shininess = 32f;
+        return material;
+    }
+
+    private Texture2d getMaterialTexture(AIMaterial aiMaterial, int type) {
+        AIString texPath = AIString.calloc();
+        Assimp.aiGetMaterialTexture(aiMaterial, type, 0, texPath, (IntBuffer) null, null, null, null, null, null);
+        if (texPath.dataString().isEmpty()) return null;
+        return new Texture2d(directory + "/" + texPath.dataString());
     }
 
     private Vector3f getMaterialColour(AIMaterial aiMaterial, String type) {
         AIColor4D colBuff = AIColor4D.create();
-        Vector3f col = Material.DEFAULT_COLOUR;
         int result = Assimp.aiGetMaterialColor(aiMaterial, type, Assimp.aiTextureType_NONE, 0, colBuff);
-        if (result == 0) col = new Vector3f(colBuff.r(), colBuff.g(), colBuff.b());
-        return col;
+        if (result == 0) return new Vector3f(colBuff.r(), colBuff.g(), colBuff.b());
+        return null;
     }
+
+//    private Float getMaterialFloat(AIMaterial aiMaterial, String type) {
+//        Assimp.aigetmater
+//    }
 
     private void processMeshMaterial(Mesh mesh, AIMesh aiMesh) {
         int matInx = aiMesh.mMaterialIndex();

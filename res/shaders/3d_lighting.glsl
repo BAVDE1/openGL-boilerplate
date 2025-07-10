@@ -28,14 +28,10 @@ void main() {
 struct Material {
     sampler2D diffuseTexture;
     sampler2D specularMap;
-
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
     float shininess;
 };
 
-struct Light {
+struct PointLight {
     vec3 position;
 
     vec3 ambient;
@@ -48,7 +44,7 @@ struct Light {
 };
 
 uniform Material material;
-uniform Light light;
+uniform PointLight light;
 uniform vec3 viewPos;
 
 in vec3 v_fragPos;
@@ -75,8 +71,8 @@ void main() {
 
     // specular
     vec3 viewDir = normalize(v_fragPos - viewPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0), material.shininess);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(norm, halfwayDir), 0), material.shininess);
     vec3 specular = (spec * specularMap) * light.specular;
 
     ambient *= attentuation;

@@ -54,7 +54,7 @@ public class Example3d extends GameBase {
     Texture2d d;
     Texture2d s;
     Material m;
-    PointLight light = new PointLight(new Vector3f(-1f, 2.8f, 1.5f));
+    PointLight light = new PointLight(new Vector3f(0, 1, 2f));
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
@@ -186,24 +186,24 @@ public class Example3d extends GameBase {
         model.setupBoneRendering(camera);
 
         model2.loadModel("res/models/guard/scene.md5mesh", true);
-        model2.modelTransform.scale(.03f).translate(-40, -20, -50);
+        model2.modelTransform.scale(.03f).translate(0, -20, -40);
         model2.setupBoneRendering(camera);
 
         model3.loadModel("res/models/bloxycola/cola.obj", true);
         model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
 
-        d = new Texture2d("res/textures/container2.png");
-        s = new Texture2d("res/textures/container2_specular.png");
-        m = new Material(d, s);
-        m.uniformValues(shLighting);
-        light.uniformValues(shLighting);
+        m = new Material(new Texture2d("res/textures/container2.png"), new Texture2d("res/textures/container2_specular.png"));
+        m.shininess = 32f;
+        m.uniformValues("material", shLighting);
+        light.uniformValues("light", shLighting);
+        light.uniformValues("light", modelShader);
     }
 
     public void render() {
         float time = (float) glfwGetTime();
 
-        Matrix4f matModel1 = new Matrix4f().identity();
-        Matrix4f matModel2 = new Matrix4f().identity();
+        Matrix4f matModel1 = new Matrix4f().identity().translate(10, 0, -10);
+        Matrix4f matModel2 = new Matrix4f().identity().translate(10, 0, -10);
         matModel2.rotateX(time * (float) Math.toRadians(120));
         matModel2.rotateY(time * (float) Math.toRadians(70));
         matModel2.translate(0, 0, 1.2f);
@@ -236,15 +236,16 @@ public class Example3d extends GameBase {
         Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, vaCube, 36);
 
         // models
+        modelShader.uniform3f("viewPos", camera.getPos());
         model.draw(modelShader);
         model2.draw(modelShader);
         model3.draw(modelShader);
 
         // lighting cube
         shLighting.bind();
-        shLighting.uniformMatrix4f("model", new Matrix4f().translate(0, 2, -2 * (float) Math.abs(Math.sin(glfwGetTime()))).rotateY((float) glfwGetTime()));
+        shLighting.uniformMatrix4f("model", new Matrix4f().translate(0, 1, 4 + -2 * (float) -Math.abs(Math.sin(glfwGetTime()))).rotateY((float) glfwGetTime()));
         shLighting.uniform3f("viewPos", camera.getPos());
-        m.uniformAndBindTextures(shLighting);
+        m.uniformAndBindTextures("material", shLighting);
         Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
         GL45.glActiveTexture(GL45.GL_TEXTURE0);
 
