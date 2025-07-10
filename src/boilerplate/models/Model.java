@@ -16,6 +16,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryUtil;
 
@@ -406,6 +407,7 @@ public class Model {
 
         shaderProgram.uniformMatrix4f("model", modelTransform);
         for (Mesh mesh : meshes) mesh.draw(shaderProgram);
+        GL45.glActiveTexture(GL45.GL_TEXTURE0);
         if (renderBones) renderBones();
     }
 

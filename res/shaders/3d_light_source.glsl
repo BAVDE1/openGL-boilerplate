@@ -18,8 +18,10 @@ void main() {
 //--- FRAG
 #version 450 core
 
+uniform vec3 lightColour;
+
 out vec4 colour;
 
 void main() {
-    colour = vec4(1, 0, 0, 1);
+    colour = vec4(lightColour, 1);
 }

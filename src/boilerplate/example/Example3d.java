@@ -15,6 +15,7 @@ import boilerplate.rendering.buffers.VertexArray;
 import boilerplate.rendering.buffers.VertexArrayBuffer;
 import boilerplate.rendering.builders.*;
 import boilerplate.rendering.light.DirectionalLight;
+import boilerplate.rendering.light.Light;
 import boilerplate.rendering.light.PointLight;
 import boilerplate.rendering.textures.CubeMap;
 import boilerplate.rendering.textures.Texture2d;
@@ -43,7 +44,6 @@ public class Example3d extends GameBase {
     ShaderProgram shCubeMap = new ShaderProgram();
     ShaderProgram shReflect = new ShaderProgram();
     ShaderProgram shOutline = new ShaderProgram();
-    ShaderProgram shLighting = new ShaderProgram();
     ShaderProgram shLightSource = new ShaderProgram();
     VertexArray vaPost = new VertexArray();
     VertexArray vaCube = new VertexArray();
@@ -52,10 +52,9 @@ public class Example3d extends GameBase {
     CubeMap ballerCube = new CubeMap();
     SkyBox skyBox = new SkyBox();
 
-    Texture2d d;
-    Texture2d s;
-    Material m;
-    PointLight light = new PointLight(new Vector3f(0, 1, 2f));
+    PointLight lightRed = new PointLight(new Vector3f(0));
+    PointLight lightBlue = new PointLight(new Vector3f(0));
+    Light.LightGroup lightGroup = new Light.LightGroup();
     DirectionalLight skyLight = new DirectionalLight(new Vector3f(0, 0, 1));
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
@@ -145,10 +144,9 @@ public class Example3d extends GameBase {
         shCubeMap.autoInitializeShadersMulti("shaders/3d_cube_map.glsl");
         shReflect.autoInitializeShadersMulti("shaders/3d_reflect.glsl");
         shOutline.autoInitializeShadersMulti("shaders/3d_outline.glsl");
-        shLighting.autoInitializeShadersMulti("shaders/3d_lighting.glsl");
         shLightSource.autoInitializeShadersMulti("shaders/3d_light_source.glsl");
 
-        camera.setupUniformBuffer(shCubeMap, shReflect, shOutline, shLighting, shLightSource);
+        camera.setupUniformBuffer(shCubeMap, shReflect, shOutline, shLightSource);
         skyBox.setupBuffers(camera, "res/textures/space_skybox", "png");
 
         vaCube.fastSetup(new int[]{3, 3}, vbCube);
@@ -194,16 +192,13 @@ public class Example3d extends GameBase {
         model3.loadModel("res/models/bloxycola/cola.obj", true);
         model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
 
-        m = new Material(new Texture2d("res/textures/container2.png"), new Texture2d("res/textures/container2_specular.png"));
-        m.shininess = 32f;
-        m.uniformValues("material", shLighting);
-        light.diffuse = new Vector3f(.8f, 0, 0);
-        light.specular = new Vector3f(.8f, 0, 0);
-        light.ambient = new Vector3f(0);
+        lightRed.setColourValues(new Vector3f(.8f, 0, 0), new Vector3f(.8f, 0, 0), new Vector3f(0));
+        lightBlue.setColourValues(new Vector3f(0, 0, .8f), new Vector3f(0, 0, .8f), new Vector3f(0));
+        lightGroup.addLight(lightRed, lightBlue);
+        lightGroup.uniformValuesAsArray("lights", modelShader);
+
         skyLight.diffuse = new Vector3f(.5f);
         skyLight.specular = new Vector3f(.2f);
-        light.uniformValues("light", shLighting);
-        light.uniformValues("light", modelShader);
         skyLight.uniformValues("skyLight", modelShader);
     }
 
@@ -243,10 +238,11 @@ public class Example3d extends GameBase {
         shReflect.uniformMatrix4f("model", matModel1.translate(2, 0, 0));
         Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, vaCube, 36);
 
-        light.position.z = 3 * (float) Math.sin(glfwGetTime());
-        light.position.x = 3 * (float) Math.cos(glfwGetTime());
-        light.uniformValues("light", shLighting);
-        light.uniformValues("light", modelShader);
+        lightRed.position.z = 3 * (float) Math.sin(glfwGetTime());
+        lightRed.position.x = 3 * (float) Math.cos(glfwGetTime());
+        lightBlue.position.y = 3 * (float) Math.sin(glfwGetTime());
+        lightBlue.position.z = 3 * (float) Math.cos(glfwGetTime());
+        lightGroup.uniformValuesAsArray("lights", modelShader);
 
         // models
         modelShader.uniform3f("viewPos", camera.getPos());
@@ -254,16 +250,13 @@ public class Example3d extends GameBase {
         model2.draw(modelShader);
         model3.draw(modelShader);
 
-        // lighting cube
-        shLighting.bind();
-        shLighting.uniformMatrix4f("model", new Matrix4f().translate(0, 1, 4 + -2 * (float) -Math.abs(Math.sin(glfwGetTime()))).rotateY((float) glfwGetTime()));
-        shLighting.uniform3f("viewPos", camera.getPos());
-        m.uniformAndBindTextures("material", shLighting);
-        Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
-        GL45.glActiveTexture(GL45.GL_TEXTURE0);
-
+        // light sources
         shLightSource.bind();
-        shLightSource.uniformMatrix4f("model", new Matrix4f().translate(light.position).scale(.3f));
+        shLightSource.uniformMatrix4f("model", new Matrix4f().translate(lightRed.position).scale(.3f));
+        shLightSource.uniform3f("lightColour", new Vector3f(1, 0, 0));
+        Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
+        shLightSource.uniformMatrix4f("model", new Matrix4f().translate(lightBlue.position).scale(.3f));
+        shLightSource.uniform3f("lightColour", new Vector3f(0, 0, 1));
         Renderer.drawArrays(GL_TRIANGLES, vaCube, 36);
 
         skyBox.draw();
