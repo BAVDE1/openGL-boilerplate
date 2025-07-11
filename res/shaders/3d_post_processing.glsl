@@ -13,6 +13,9 @@ void main() {
 //--- FRAG
 #version 450 core
 
+const float GAMMA = 2.2;
+const float INV_GAMMA = 1 / GAMMA;
+
 uniform sampler2D screenTexture;
 
 in vec2 v_texPos;
@@ -34,6 +37,7 @@ out vec4 colour;
 
 void main() {
     colour = texture(screenTexture, v_texPos);
+//    colour.rgb = pow(colour.rgb, vec3(INV_GAMMA));  // gamma correction
 
 //     invert
 //    colour = vec4(1 - colour.xyz, 1);
