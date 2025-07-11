@@ -57,7 +57,7 @@ public class Example3d extends GameBase {
     PointLight lightBlue = new PointLight(new Vector3f(0));
     Light.LightGroup lightGroup = new Light.LightGroup();
     DirectionalLight skyLight = new DirectionalLight(new Vector3f(0, 0, 1));
-    SpotLight spotLight = new SpotLight(camera.getPos(), camera.getForward());
+    SpotLight spotLight = new SpotLight(camera.getPos(), camera.getForward(), 10, 12);
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
 
@@ -202,7 +202,7 @@ public class Example3d extends GameBase {
         skyLight.specular = new Vector3f(.2f);
         skyLight.uniformValues("skyLight", modelShader);  // never changes
 
-        spotLight.setColourValues(new Vector3f(0, .8f, 0), new Vector3f(0, .8f, 0), new Vector3f());
+        spotLight.setColourValues(new Vector3f(1), new Vector3f(.6f), new Vector3f());
     }
 
     public void render() {
@@ -246,6 +246,9 @@ public class Example3d extends GameBase {
         lightBlue.position.y = 3 * (float) Math.sin(glfwGetTime());
         lightBlue.position.z = 3 * (float) Math.cos(glfwGetTime());
         lightGroup.uniformValuesAsArray("lights", modelShader);
+        spotLight.position = camera.getPos();
+        spotLight.direction = camera.getForward();
+        spotLight.uniformValues("spotLight", modelShader);
 
         // models
         modelShader.uniform3f("viewPos", camera.getPos());
