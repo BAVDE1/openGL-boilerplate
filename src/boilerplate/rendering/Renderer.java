@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL;
 import boilerplate.common.Window;
 import boilerplate.rendering.text.TextRenderer;
 import boilerplate.utility.Logging;
+import org.lwjgl.opengl.GL45;
 
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL45.*;
@@ -69,6 +70,14 @@ public class Renderer {
 
     public static void setStencilFunc(int function, int reference, boolean maskAllowAll) {
         glStencilFunc(function, reference, maskAllowAll ? 0xFF : 0x00);
+    }
+
+    public static void enableFramebufferGamma() {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+    }
+
+    public static void disableFramebufferGamma() {
+        glDisable(GL_FRAMEBUFFER_SRGB);
     }
 
     public static void useDefaultFaceCulling() {

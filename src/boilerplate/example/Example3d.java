@@ -82,6 +82,7 @@ public class Example3d extends GameBase {
         Renderer.enableStencilTest();
         Renderer.setStencilOperation(GL_KEEP, GL_KEEP, GL_REPLACE);
         Renderer.useDefaultFaceCulling();
+        Renderer.enableFramebufferGamma();
         glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
 
         bindEvents();
@@ -208,7 +209,6 @@ public class Example3d extends GameBase {
 
     public void render() {
         float time = (float) glfwGetTime();
-        GL45.glEnable(GL45.GL_FRAMEBUFFER_SRGB);
 
         Matrix4f matModel1 = new Matrix4f().identity().translate(10, 0, -10);
         Matrix4f matModel2 = new Matrix4f().identity().translate(10, 0, -10);
