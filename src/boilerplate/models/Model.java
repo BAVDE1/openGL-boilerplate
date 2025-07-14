@@ -337,7 +337,7 @@ public class Model {
         material.diffuse = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE);
         material.specular = getMaterialColour(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR);
 
-        material.shininess = 8f;
+        material.shininess = 32f;
         return material;
     }
 
@@ -352,7 +352,7 @@ public class Model {
         AIColor4D colBuff = AIColor4D.create();
         int result = Assimp.aiGetMaterialColor(aiMaterial, type, Assimp.aiTextureType_NONE, 0, colBuff);
         if (result == 0) return new Vector3f(colBuff.r(), colBuff.g(), colBuff.b());
-        return null;
+        return new Vector3f();
     }
 
     private Float getMaterialFloat(AIMaterial aiMaterial, String type) {

@@ -198,8 +198,9 @@ public class Example3d extends GameBase {
         lightBlue.setColourValues(new Vector3f(0, 0, 1), new Vector3f(0, 0, .8f), new Vector3f());
         lightGroup.addLight(lightRed, lightBlue);
 
-        skyLight.diffuse = new Vector3f(.5f);
+        skyLight.diffuse = new Vector3f(.8f);
         skyLight.specular = new Vector3f(.2f);
+        skyLight.ambient = new Vector3f(.1f);
         skyLight.uniformValues("skyLight", modelShader);  // never changes
 
         spotLight.setColourValues(new Vector3f(1), new Vector3f(.6f), new Vector3f());
@@ -207,6 +208,7 @@ public class Example3d extends GameBase {
 
     public void render() {
         float time = (float) glfwGetTime();
+        GL45.glEnable(GL45.GL_FRAMEBUFFER_SRGB);
 
         Matrix4f matModel1 = new Matrix4f().identity().translate(10, 0, -10);
         Matrix4f matModel2 = new Matrix4f().identity().translate(10, 0, -10);

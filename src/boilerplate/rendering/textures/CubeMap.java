@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL45;
  */
 public class CubeMap extends Texture {
     public int pixelDataType = GL45.GL_UNSIGNED_BYTE;
-    public int storedFormat = GL45.GL_RGBA;
+    public int storedFormat = GL45.GL_SRGB_ALPHA;
 
     public CubeMap() {
         textureTarget = GL45.GL_TEXTURE_CUBE_MAP;

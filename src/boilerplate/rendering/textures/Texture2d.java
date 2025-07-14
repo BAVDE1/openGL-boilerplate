@@ -29,7 +29,7 @@ public class Texture2d extends Texture {
 
     public int textureType = TYPE_NOTHING;
     public int pixelDataType = GL_UNSIGNED_BYTE;
-    public int storedFormat = GL45.GL_RGBA;
+    public int storedFormat = GL45.GL_SRGB_ALPHA;
 
     public Dimension size = new Dimension();
 
