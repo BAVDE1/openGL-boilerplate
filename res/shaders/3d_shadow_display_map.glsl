@@ -3,10 +3,12 @@
 
 layout(location = 0) in vec2 pos;
 
+uniform mat4 transform;
+
 out vec2 v_texPos;
 
 void main() {
-    gl_Position = vec4(pos.x, pos.y, 0, 1);
+    gl_Position = transform * vec4(pos.x, pos.y, 0, 1);
     v_texPos = pos;
 }
 
@@ -20,7 +22,6 @@ in vec2 v_texPos;
 out vec4 colour;
 
 void main() {
-//    float depthValue = texture(depthMap, v_texPos).r;
-//    colour = vec4(vec3(depthValue), 1.0);
-    colour = texture(depthMap, v_texPos);
+    float depthValue = texture(depthMap, v_texPos).r;
+    colour = vec4(vec3(depthValue), 1.0);
 }

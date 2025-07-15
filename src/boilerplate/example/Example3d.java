@@ -39,8 +39,6 @@ public class Example3d extends GameBase {
 
     boolean renderWireFrame = false;
 
-    Texture2d breaking;
-
     Camera3d camera = new Camera3d(new Dimension(1, 1), Camera3d.MODE_TARGET, new Vector3f(0, 0, 5), 5);
 
     ShaderProgram shPost = new ShaderProgram();
@@ -73,6 +71,7 @@ public class Example3d extends GameBase {
     ShaderProgram displayShadowMapShader = new ShaderProgram();
     ShaderProgram shadowMapShader = new ShaderProgram();
     FrameBuffer shadowMap = new FrameBuffer(SCREEN_SIZE);
+    Matrix4f displayShadowMatrixTrans = new Matrix4f();
 
     @Override
     public void start() {
@@ -144,8 +143,6 @@ public class Example3d extends GameBase {
     }
 
     public void setupBuffers() {
-        breaking = new Texture2d("res/textures/breaking.png");
-
         ballerCube.genId();
         ballerCube.loadFaces("res/textures/baller.png");
         ballerCube.useNearestInterpolation();
@@ -190,12 +187,11 @@ public class Example3d extends GameBase {
         fb.checkCompletionOrError();
         FrameBuffer.unbind();
 
-        Matrix4f skyLightProjection = new Matrix4f().ortho(-10, 10, -10, 10, camera.near, camera.far);
-        Matrix4f skyLightView = new Matrix4f().lookAt(new Vector3f(0, 1, 1), new Vector3f(), new Vector3f(0, 1, 0));
+        Matrix4f skyLightProjection = new Matrix4f().ortho(-8, 8, -8, 8, camera.near, camera.far);
+        Matrix4f skyLightView = new Matrix4f().lookAt(new Vector3f(0, 3, 3), new Vector3f(), new Vector3f(0, 1, 0));
         shadowMapShader.autoInitializeShadersMulti("shaders/3d_shadow_map.glsl");
-        shadowMapShader.uniformMatrix4f("lightSpaceMatrix", camera.generatePerspectiveMatrix().mul(camera.generateViewMatrix()));
+        shadowMapShader.uniformMatrix4f("lightSpaceMatrix", skyLightProjection.mul(skyLightView));
         shadowMap.genId();
-        shadowMap.bind();
         Texture depthMap = shadowMap.setupDefaultDepthBuffer();
         depthMap.useNearestInterpolation();
         depthMap.useRepeatWrap();
@@ -213,12 +209,13 @@ public class Example3d extends GameBase {
         rectData.clear();
         rectData.pushPolygon(Shape2d.createRect(new Vector2f(0), new Vector2f(1)));
         vbShadowMap.bufferData(rectData);
+        displayShadowMatrixTrans.translate(.5f, .5f, 0).scale(.5f);
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
 
         modelFloor.loadModel("res/models/crate/NEWCRATE.fbx", true);
-        modelFloor.modelTransform.translate(0, -11, 1).scale(20);
+        modelFloor.modelTransform.translate(0, -6, 1).scale(10);
 
         model.loadModel("res/models/roblox/scene.gltf", true);
         model.modelTransform.translate(-2, -.5f, 1).rotateY(1);
@@ -271,6 +268,8 @@ public class Example3d extends GameBase {
         // --- SHADOW MAP --- //
         shadowMap.bind();
         Renderer.clearD();
+        Renderer.enableDepthTest();
+        Renderer.disableFaceCulling();
         modelFloor.draw(shadowMapShader);
         model.draw(shadowMapShader);
         model2.draw(shadowMapShader);
@@ -280,8 +279,8 @@ public class Example3d extends GameBase {
         // --- 3D SPACE --- //
         fb.bind();
         camera.updateUniformBlock();
-        Renderer.enableDepthTest();
         Renderer.enableStencilTest();
+        Renderer.cullBackFace();
         Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
         Renderer.enableStencilWriting();
         Renderer.clearCDS();
@@ -332,8 +331,10 @@ public class Example3d extends GameBase {
         fb.bindIntermediaryFBColorBuffer();
         Renderer.drawArrays(GL_TRIANGLE_STRIP, vaPost, 4);
 
+        // debug shadow map
         displayShadowMapShader.bind();
-        breaking.bind();
+        displayShadowMapShader.uniformMatrix4f("transform", displayShadowMatrixTrans);
+        shadowMap.depthBuffer.bind();
         Renderer.drawArrays(GL_TRIANGLE_STRIP, vaDisplayShadowMap, 4);
 
         Renderer.finish(window);

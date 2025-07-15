@@ -96,11 +96,11 @@ public class Renderer {
     }
 
     public static void cullFrontFace() {
-        glCullFace(GL_FRONT);
+        enableFaceCulling(GL_FRONT);
     }
 
     public static void cullBackFace() {
-        glCullFace(GL_BACK);
+        enableFaceCulling(GL_BACK);
     }
 
     public static void setWindingOrder(int order) {
@@ -152,6 +152,10 @@ public class Renderer {
 
     public static void clearDS() {
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
+
+    public static void clearCD() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     public static void drawArrays(int mode, VertexArray va, int vertexCount) {

@@ -239,7 +239,7 @@ public class FrameBuffer {
     }
 
     public void bind() {
-        if (boundReadFrameBuffer == bufferId && boundDrawFrameBuffer == bufferId) return;
+//        if (boundReadFrameBuffer == bufferId && boundDrawFrameBuffer == bufferId) return;
         boundReadFrameBuffer = bufferId;
         boundDrawFrameBuffer = bufferId;
         GL45.glBindFramebuffer(GL45.GL_FRAMEBUFFER, bufferId);
