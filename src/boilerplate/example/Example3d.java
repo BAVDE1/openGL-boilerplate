@@ -67,6 +67,7 @@ public class Example3d extends GameBase {
     Model model3 = new Model();
     Model modelFloor = new Model();
 
+    Matrix4f lightSpaceMatrix;
     VertexArray vaDisplayShadowMap = new VertexArray();
     ShaderProgram displayShadowMapShader = new ShaderProgram();
     ShaderProgram shadowMapShader = new ShaderProgram();
@@ -188,9 +189,10 @@ public class Example3d extends GameBase {
         FrameBuffer.unbind();
 
         Matrix4f skyLightProjection = new Matrix4f().ortho(-8, 8, -8, 8, camera.near, camera.far);
-        Matrix4f skyLightView = new Matrix4f().lookAt(new Vector3f(0, 3, 3), new Vector3f(), new Vector3f(0, 1, 0));
+        Matrix4f skyLightView = new Matrix4f().lookAt(skyLight.direction.negate(new Vector3f()).mul(3), new Vector3f(), new Vector3f(0, 1, 0));
+        lightSpaceMatrix = skyLightProjection.mul(skyLightView);
         shadowMapShader.autoInitializeShadersMulti("shaders/3d_shadow_map.glsl");
-        shadowMapShader.uniformMatrix4f("lightSpaceMatrix", skyLightProjection.mul(skyLightView));
+        shadowMapShader.uniformMatrix4f("lightSpaceMatrix", lightSpaceMatrix);
         shadowMap.genId();
         Texture depthMap = shadowMap.setupDefaultDepthBuffer();
         depthMap.useNearestInterpolation();
@@ -212,6 +214,7 @@ public class Example3d extends GameBase {
         displayShadowMatrixTrans.translate(.5f, .5f, 0).scale(.5f);
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
+        modelShader.uniformMatrix4f("lightSpaceMatrix", lightSpaceMatrix);
         camera.bindShaderToUniformBlock(modelShader);
 
         modelFloor.loadModel("res/models/crate/NEWCRATE.fbx", true);
@@ -305,6 +308,7 @@ public class Example3d extends GameBase {
 
         // models
         modelShader.uniform3f("viewPos", camera.getPos());
+        modelShader.uniformTexture("shadowMap", shadowMap.depthBuffer, 0);
         modelFloor.draw(modelShader);
         model.draw(modelShader);
         model2.draw(modelShader);

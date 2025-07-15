@@ -18,8 +18,10 @@ const int MAX_BONE_INFLUENCE = 4;
 
 uniform mat4 model;
 uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform mat4 lightSpaceMatrix;
 
 out vec3 v_fragPos;
+out vec4 v_fragPosLightSpace;
 out vec3 v_normal;
 out vec2 v_texCoords;
 
@@ -40,6 +42,7 @@ void main() {
     gl_Position = projection * view * (model * finalPos);
 
     v_fragPos = vec3(model * finalPos);
+    v_fragPosLightSpace = lightSpaceMatrix * vec4(v_fragPos, 1);
     v_normal = mat3(transpose(inverse(model * animTransformation))) * normal;
     v_texCoords = texCoords;
 }
@@ -103,8 +106,10 @@ uniform PointLight lights[LIGHT_COUNT];
 uniform DirectionalLight skyLight;
 uniform SpotLight spotLight;
 uniform vec3 viewPos;
+uniform sampler2D shadowMap;
 
 in vec3 v_fragPos;
+in vec4 v_fragPosLightSpace;
 in vec3 v_normal;
 in vec2 v_texCoords;
 
@@ -154,6 +159,14 @@ vec3 calcSpotLight(vec3 normal, vec3 diffuseTexture) {
     return vec3(spotLight.ambient * diffuseTexture);
 }
 
+float calcShadow(vec3 normal, vec3 lightDir) {
+    vec3 projCoords = v_fragPosLightSpace.xyz / v_fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+    float lightDepth = texture(shadowMap, projCoords.xy).r;
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    return projCoords.z - bias > lightDepth  ? 1.0 : 0.0;
+}
+
 vec3 calcLighting(float attenuation, vec3 viewDir, vec3 lightDir, vec3 normal, vec3 diffuseTexture, vec3 lightAmbient, vec3 lightDiffuse, vec3 lightSpecular) {
     float diff = max(dot(lightDir, normal), 0);
 
@@ -163,5 +176,5 @@ vec3 calcLighting(float attenuation, vec3 viewDir, vec3 lightDir, vec3 normal, v
     vec3 ambient = lightAmbient * diffuseTexture;
     vec3 diffuse = lightDiffuse * (diff * diffuseTexture);
     vec3 specular = lightSpecular * (spec * material.specular);
-    return vec3(ambient * attenuation + diffuse * attenuation + specular * attenuation);
+    return vec3(ambient * attenuation + (1 - calcShadow(normal, lightDir)) * (diffuse * attenuation + specular * attenuation));
 }

@@ -54,7 +54,7 @@ public class Material {
     }
 
     public void uniformAndBindTextures(String uniform, ShaderProgram sh) {
-        int texSlot = 0;
+        int texSlot = 1;
         if (diffuseTexture != null) sh.uniformTexture(uniform + ".diffuseTexture", diffuseTexture, texSlot++);
         if (specularMap != null) sh.uniformTexture(uniform + ".specularMap", specularMap, texSlot++);
     }
