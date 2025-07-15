@@ -79,7 +79,7 @@ public class FrameBuffer {
     private static int boundDrawFrameBuffer = 0;
     protected Integer bufferId;
 
-    public Dimension bufferSize = new Dimension(128, 128);
+    public Dimension size = new Dimension(128, 128);
 
     public ArrayList<Texture> colourBuffers = new ArrayList<>();
     public Texture depthBuffer;
@@ -89,25 +89,21 @@ public class FrameBuffer {
 
     public FrameBuffer intermediaryFB = null;
 
-    public FrameBuffer() {
-
-    }
-
     public FrameBuffer(boolean generateId) {
         if (generateId) genId();
     }
 
     public FrameBuffer(Dimension bufferSize) {
-        this.bufferSize = bufferSize;
+        this.size = bufferSize;
     }
 
     public FrameBuffer(boolean generateId, Dimension bufferSize) {
         this(generateId);
-        this.bufferSize = bufferSize;
+        this.size = bufferSize;
     }
 
     public void setupIntermediaryFB() {
-        intermediaryFB = new FrameBuffer(true, bufferSize);
+        intermediaryFB = new FrameBuffer(true, size);
         intermediaryFB.attachColourBuffer(intermediaryFB.setupDefaultColourBuffer());
         intermediaryFB.checkCompletionOrError();
     }
@@ -119,13 +115,13 @@ public class FrameBuffer {
     public void blitIntoFrameBuffer(FrameBuffer frameBuffer, int mask, int interpolation) {
         bindToRead();
         frameBuffer.bindToDraw();
-        GL45.glBlitFramebuffer(0, 0, bufferSize.width, bufferSize.height, 0, 0, frameBuffer.bufferSize.width, frameBuffer.bufferSize.height, mask, interpolation);
+        GL45.glBlitFramebuffer(0, 0, size.width, size.height, 0, 0, frameBuffer.size.width, frameBuffer.size.height, mask, interpolation);
     }
 
     public void blitIntoDefaultFrameBuffer(Dimension destinationSize, int mask, int interpolation) {
         bindToRead();
         unbindFromDraw();
-        GL45.glBlitFramebuffer(0, 0, bufferSize.width, bufferSize.height, 0, 0, destinationSize.width, destinationSize.height, mask, interpolation);
+        GL45.glBlitFramebuffer(0, 0, size.width, size.height, 0, 0, destinationSize.width, destinationSize.height, mask, interpolation);
     }
 
     public void attachColourBuffer(Texture colourBuff) {
@@ -165,7 +161,7 @@ public class FrameBuffer {
     }
 
     public Texture setupDefaultColourBuffer() {
-        return setupDefaultColourBuffer(bufferSize);
+        return setupDefaultColourBuffer(size);
     }
 
     public static Texture setupDefaultColourBuffer(Dimension size) {
@@ -176,7 +172,7 @@ public class FrameBuffer {
     }
 
     public Texture setupDefaultDepthBuffer() {
-        return setupDefaultDepthBuffer(bufferSize);
+        return setupDefaultDepthBuffer(size);
     }
 
     public static Texture setupDefaultDepthBuffer(Dimension size) {
@@ -184,7 +180,7 @@ public class FrameBuffer {
     }
 
     public Texture setupDefaultStencilBuffer() {
-        return setupDefaultStencilBuffer(bufferSize);
+        return setupDefaultStencilBuffer(size);
     }
 
     public static Texture setupDefaultStencilBuffer(Dimension size) {
@@ -192,7 +188,7 @@ public class FrameBuffer {
     }
 
     public Texture setupDefaultDepthStencilBuffer() {
-        return setupDefaultDepthStencilBuffer(bufferSize);
+        return setupDefaultDepthStencilBuffer(size);
     }
 
     public static Texture setupDefaultDepthStencilBuffer(Dimension size) {
@@ -212,7 +208,7 @@ public class FrameBuffer {
     }
 
     public RenderBuffer setupDefaultRenderBuffer() {
-        return setupDefaultRenderBuffer(bufferSize);
+        return setupDefaultRenderBuffer(size);
     }
 
     public static RenderBuffer setupDefaultRenderBuffer(Dimension size) {
@@ -232,6 +228,14 @@ public class FrameBuffer {
 
     public int getId() {
         return bufferId;
+    }
+
+    public void drawBufferNone() {
+        GL45.glDrawBuffer(GL45.GL_NONE);
+    }
+
+    public void readBufferNone() {
+        GL45.glReadBuffer(GL45.GL_NONE);
     }
 
     public void bind() {

@@ -222,6 +222,9 @@ public class ShaderProgram {
         HashMap<String, Integer> cache = isBlock ? uniformBlockCache : uniformCache;
         if (!cache.containsKey(uniformName)) {
             int location = isBlock ? glGetUniformBlockIndex(program, uniformName) : glGetUniformLocation(program, uniformName);
+            if (location == -1) {
+                Logging.warn("The uniform for '%s' could not be found in the attached shaders '%s'", uniformName, attachedShaders);
+            }
             cache.put(uniformName, location);
         }
         return cache.get(uniformName);

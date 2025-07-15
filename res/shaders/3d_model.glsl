@@ -50,6 +50,8 @@ void main() {
 struct Material {
     sampler2D diffuseTexture;
 
+    vec3 ambient;
+    vec3 diffuse;
     vec3 specular;
     float shininess;
 };

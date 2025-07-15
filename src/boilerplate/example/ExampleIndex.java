@@ -97,7 +97,7 @@ public class ExampleIndex extends GameBase {
     }
 
     @Override
-    public void mainLoop(double staticDt) {
+    public void mainLoop(double dt) {
         glfwPollEvents();
         render();
     }

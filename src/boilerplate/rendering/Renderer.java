@@ -146,6 +146,10 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
+    public static void clearD() {
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
+
     public static void clearDS() {
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }

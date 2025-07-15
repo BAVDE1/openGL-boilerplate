@@ -101,6 +101,9 @@ public class Model {
     private boolean renderBones = false;
     private VertexArray boneVa;
 
+    public String boneMatrixUniform = "finalBonesMatrices";
+    public String modelUniform = "model";
+
     public Model() {
     }
 
@@ -402,10 +405,10 @@ public class Model {
         shaderProgram.bind();
 
         for (int i = 0; i < boneCounter; i++) {
-            shaderProgram.uniformMatrix4f("finalBonesMatrices[%s]".formatted(i), animator.finalBoneMatrices[i]);
+            shaderProgram.uniformMatrix4f(boneMatrixUniform + "[%s]".formatted(i), animator.finalBoneMatrices[i]);
         }
 
-        shaderProgram.uniformMatrix4f("model", modelTransform);
+        shaderProgram.uniformMatrix4f(modelUniform, modelTransform);
         for (Mesh mesh : meshes) mesh.draw(shaderProgram);
         GL45.glActiveTexture(GL45.GL_TEXTURE0);
         if (renderBones) renderBones();

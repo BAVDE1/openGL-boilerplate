@@ -4,7 +4,6 @@ import boilerplate.common.BoilerplateConstants;
 import boilerplate.common.GameBase;
 import boilerplate.common.TimeStepper;
 import boilerplate.common.Window;
-import boilerplate.models.Material;
 import boilerplate.models.Model;
 import boilerplate.rendering.Camera3d;
 import boilerplate.rendering.Renderer;
@@ -19,6 +18,7 @@ import boilerplate.rendering.light.Light;
 import boilerplate.rendering.light.PointLight;
 import boilerplate.rendering.light.SpotLight;
 import boilerplate.rendering.textures.CubeMap;
+import boilerplate.rendering.textures.Texture;
 import boilerplate.rendering.textures.Texture2d;
 import boilerplate.rendering.textures.Texture2dMultisample;
 import boilerplate.utility.Logging;
@@ -39,6 +39,8 @@ public class Example3d extends GameBase {
 
     boolean renderWireFrame = false;
 
+    Texture2d breaking;
+
     Camera3d camera = new Camera3d(new Dimension(1, 1), Camera3d.MODE_TARGET, new Vector3f(0, 0, 5), 5);
 
     ShaderProgram shPost = new ShaderProgram();
@@ -56,7 +58,7 @@ public class Example3d extends GameBase {
     PointLight lightRed = new PointLight(new Vector3f(0));
     PointLight lightBlue = new PointLight(new Vector3f(0));
     Light.LightGroup lightGroup = new Light.LightGroup();
-    DirectionalLight skyLight = new DirectionalLight(new Vector3f(0, 0, 1));
+    DirectionalLight skyLight = new DirectionalLight(new Vector3f(0, -1, 1));
     SpotLight spotLight = new SpotLight(camera.getPos(), camera.getForward(), 10, 12);
 
     FrameBuffer fb = new FrameBuffer(SCREEN_SIZE);
@@ -65,6 +67,12 @@ public class Example3d extends GameBase {
     Model model = new Model();
     Model model2 = new Model();
     Model model3 = new Model();
+    Model modelFloor = new Model();
+
+    VertexArray vaDisplayShadowMap = new VertexArray();
+    ShaderProgram displayShadowMapShader = new ShaderProgram();
+    ShaderProgram shadowMapShader = new ShaderProgram();
+    FrameBuffer shadowMap = new FrameBuffer(SCREEN_SIZE);
 
     @Override
     public void start() {
@@ -136,6 +144,8 @@ public class Example3d extends GameBase {
     }
 
     public void setupBuffers() {
+        breaking = new Texture2d("res/textures/breaking.png");
+
         ballerCube.genId();
         ballerCube.loadFaces("res/textures/baller.png");
         ballerCube.useNearestInterpolation();
@@ -165,8 +175,7 @@ public class Example3d extends GameBase {
 
         vaPost.fastSetup(new int[]{2}, vbPost);
         BufferBuilder2f rectData = new BufferBuilder2f(true);
-        Shape2d.Poly2d rect = Shape2d.createRect(new Vector2f(-1), new Vector2f(2));
-        rectData.pushPolygon(rect);
+        rectData.pushPolygon(Shape2d.createRect(new Vector2f(-1), new Vector2f(2)));
         vbPost.bufferData(rectData);
 
         fb.genId();
@@ -181,8 +190,35 @@ public class Example3d extends GameBase {
         fb.checkCompletionOrError();
         FrameBuffer.unbind();
 
+        Matrix4f skyLightProjection = new Matrix4f().ortho(-10, 10, -10, 10, camera.near, camera.far);
+        Matrix4f skyLightView = new Matrix4f().lookAt(new Vector3f(0, 1, 1), new Vector3f(), new Vector3f(0, 1, 0));
+        shadowMapShader.autoInitializeShadersMulti("shaders/3d_shadow_map.glsl");
+        shadowMapShader.uniformMatrix4f("lightSpaceMatrix", camera.generatePerspectiveMatrix().mul(camera.generateViewMatrix()));
+        shadowMap.genId();
+        shadowMap.bind();
+        Texture depthMap = shadowMap.setupDefaultDepthBuffer();
+        depthMap.useNearestInterpolation();
+        depthMap.useRepeatWrap();
+        shadowMap.attachDepthBuffer(depthMap);
+        shadowMap.drawBufferNone();
+        shadowMap.readBufferNone();
+        shadowMap.checkCompletionOrError();
+        FrameBuffer.unbind();
+
+        VertexArrayBuffer vbShadowMap = new VertexArrayBuffer();
+        displayShadowMapShader.autoInitializeShadersMulti("shaders/3d_shadow_display_map.glsl");
+        vaDisplayShadowMap.genId();
+        vbShadowMap.genId();
+        vaDisplayShadowMap.fastSetup(new int[]{2}, vbShadowMap);
+        rectData.clear();
+        rectData.pushPolygon(Shape2d.createRect(new Vector2f(0), new Vector2f(1)));
+        vbShadowMap.bufferData(rectData);
+
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         camera.bindShaderToUniformBlock(modelShader);
+
+        modelFloor.loadModel("res/models/crate/NEWCRATE.fbx", true);
+        modelFloor.modelTransform.translate(0, -11, 1).scale(20);
 
         model.loadModel("res/models/roblox/scene.gltf", true);
         model.modelTransform.translate(-2, -.5f, 1).rotateY(1);
@@ -207,6 +243,21 @@ public class Example3d extends GameBase {
         spotLight.setColourValues(new Vector3f(1), new Vector3f(.6f), new Vector3f());
     }
 
+    public void update(double dt) {
+        camera.processKeyInputs(window, dt);
+        model.updateAnimation(dt);
+        model2.updateAnimation(dt);
+
+        lightRed.position.z = 3 * (float) Math.sin(glfwGetTime());
+        lightRed.position.x = 3 * (float) Math.cos(glfwGetTime());
+        lightBlue.position.y = 3 * (float) Math.sin(glfwGetTime());
+        lightBlue.position.z = 3 * (float) Math.cos(glfwGetTime());
+        lightGroup.uniformValuesAsArray("lights", modelShader);
+        spotLight.position = camera.getPos();
+        spotLight.direction = camera.getForward();
+        spotLight.uniformValues("spotLight", modelShader);
+    }
+
     public void render() {
         float time = (float) glfwGetTime();
 
@@ -217,8 +268,18 @@ public class Example3d extends GameBase {
         matModel2.translate(0, 0, 1.2f);
         matModel2.scale(.8f, .5f, .5f);
 
+        // --- SHADOW MAP --- //
+        shadowMap.bind();
+        Renderer.clearD();
+        modelFloor.draw(shadowMapShader);
+        model.draw(shadowMapShader);
+        model2.draw(shadowMapShader);
+        model3.draw(shadowMapShader);
+        FrameBuffer.unbind();
+
         // --- 3D SPACE --- //
         fb.bind();
+        camera.updateUniformBlock();
         Renderer.enableDepthTest();
         Renderer.enableStencilTest();
         Renderer.setStencilFunc(GL_ALWAYS, 1, true);  // write 1 to all fragments that pass
@@ -243,17 +304,9 @@ public class Example3d extends GameBase {
         shReflect.uniformMatrix4f("model", matModel1.translate(2, 0, 0));
         Renderer.drawArrays(renderWireFrame ? GL_LINES : GL_TRIANGLES, vaCube, 36);
 
-        lightRed.position.z = 3 * (float) Math.sin(glfwGetTime());
-        lightRed.position.x = 3 * (float) Math.cos(glfwGetTime());
-        lightBlue.position.y = 3 * (float) Math.sin(glfwGetTime());
-        lightBlue.position.z = 3 * (float) Math.cos(glfwGetTime());
-        lightGroup.uniformValuesAsArray("lights", modelShader);
-        spotLight.position = camera.getPos();
-        spotLight.direction = camera.getForward();
-        spotLight.uniformValues("spotLight", modelShader);
-
         // models
         modelShader.uniform3f("viewPos", camera.getPos());
+        modelFloor.draw(modelShader);
         model.draw(modelShader);
         model2.draw(modelShader);
         model3.draw(modelShader);
@@ -279,6 +332,10 @@ public class Example3d extends GameBase {
         fb.bindIntermediaryFBColorBuffer();
         Renderer.drawArrays(GL_TRIANGLE_STRIP, vaPost, 4);
 
+        displayShadowMapShader.bind();
+        breaking.bind();
+        Renderer.drawArrays(GL_TRIANGLE_STRIP, vaDisplayShadowMap, 4);
+
         Renderer.finish(window);
     }
 
@@ -291,12 +348,9 @@ public class Example3d extends GameBase {
     }
 
     @Override
-    public void mainLoop(double staticDt) {
+    public void mainLoop(double dt) {
         glfwPollEvents();
-        camera.processKeyInputs(window, staticDt);
-        camera.updateUniformBlock();
-        model.updateAnimation(staticDt);
-        model2.updateAnimation(staticDt);
+        update(dt);
         render();
     }
 
