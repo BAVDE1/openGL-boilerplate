@@ -78,7 +78,7 @@ public class Example3d extends GameBase {
 
     @Override
     public void start() {
-        TimeStepper.startStaticTimeStepper(BoilerplateConstants.DT, this);
+        TimeStepper.startStaticTimeStepper(BoilerplateConstants.DT, this, false);
     }
 
     @Override
@@ -109,6 +109,7 @@ public class Example3d extends GameBase {
                     renderWireFrame = !renderWireFrame;
                     model.renderWireFrame(renderWireFrame);
                     model2.renderWireFrame(renderWireFrame);
+                    model4.renderWireFrame(renderWireFrame);
                 }
                 if (key == GLFW_KEY_GRAVE_ACCENT) {
                     model.renderBones(!model.isRenderingBones());
@@ -129,6 +130,8 @@ public class Example3d extends GameBase {
                     model.animator.stopPlayingAnimation(true);
                     model2.animator.stopPlayingAnimation(true);
                 }
+                if (key == GLFW_KEY_G) modelShader.uniform1f("flashLightStrength", 1);
+                if (key == GLFW_KEY_H) modelShader.uniform1f("flashLightStrength", 0);
             }
         });
 
@@ -217,6 +220,7 @@ public class Example3d extends GameBase {
 
         modelShader.autoInitializeShadersMulti("shaders/3d_model.glsl");
         modelShader.uniformMatrix4f("lightSpaceMatrix", lightSpaceMatrix);
+        modelShader.uniform1f("flashLightStrength", 1);
         camera.bindShaderToUniformBlock(modelShader);
 
         modelFloor.loadModel("res/models/crate/NEWCRATE.fbx", true);
@@ -231,10 +235,10 @@ public class Example3d extends GameBase {
         model2.setupBoneRendering(camera);
 
         model3.loadModel("res/models/bloxycola/cola.obj", true);
-        model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
+        model3.modelTransform.translate(2, -.55f, 0).rotateY(2.1f);
 
         model4.loadModel("res/models/miku/miku_prefab.fbx", true);
-        model4.modelTransform.translate(-3, 0, 2.5f).rotateY(1.2f);
+        model4.modelTransform.translate(-3, -1, 2.5f).rotateY(1.2f);
 
         lightRed.setColourValues(new Vector3f(1, 0, 0), new Vector3f(.8f, 0, 0), new Vector3f());
         lightBlue.setColourValues(new Vector3f(0, 0, 1), new Vector3f(0, 0, .8f), new Vector3f());
@@ -261,6 +265,8 @@ public class Example3d extends GameBase {
         spotLight.position = camera.getPos();
         spotLight.direction = camera.getForward();
         spotLight.uniformValues("spotLight", modelShader);
+
+        model3.modelTransform.setRotationXYZ(0, 0, 0).rotateY((float) glfwGetTime());
     }
 
     public void render() {

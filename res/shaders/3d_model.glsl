@@ -105,6 +105,7 @@ uniform Material material;
 uniform PointLight lights[LIGHT_COUNT];
 uniform DirectionalLight skyLight;
 uniform SpotLight spotLight;
+uniform float flashLightStrength;
 uniform vec3 viewPos;
 uniform sampler2D shadowMap;
 
@@ -124,7 +125,7 @@ void main() {
     for (int i = 0; i < LIGHT_COUNT; i++) {
         finalCol += calcPointLight(lights[i], normal, diffuseTexture);
     }
-    finalCol += calcSpotLight(normal, diffuseTexture);
+    finalCol += calcSpotLight(normal, diffuseTexture) * flashLightStrength;
 
     colour = vec4(finalCol, 1);
 }
@@ -163,13 +164,12 @@ float calcShadow(vec3 normal, vec3 lightDir) {
     vec3 projCoords = v_fragPosLightSpace.xyz / v_fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
     float lightDepth = texture(shadowMap, projCoords.xy).r;
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
     for(int x = -1; x <= 1; ++x) {
         for(int y = -1; y <= 1; ++y) {
             float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += projCoords.z - bias > pcfDepth ? 1.0 : 0.0;
+            shadow += projCoords.z - .001 > pcfDepth ? .8 : 0;
         }
     }
     shadow /= 9.0;
