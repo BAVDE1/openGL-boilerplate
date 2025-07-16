@@ -13,7 +13,7 @@ layout (std140) uniform CameraView {
     mat4 view;
 };
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 200;
 const int MAX_BONE_INFLUENCE = 4;
 
 uniform mat4 model;

@@ -65,8 +65,10 @@ public class Example3d extends GameBase {
     Model model = new Model();
     Model model2 = new Model();
     Model model3 = new Model();
+    Model model4 = new Model();
     Model modelFloor = new Model();
 
+    Dimension SHADOW_MAP_SIZE = new Dimension(SCREEN_SIZE.width * 4, SCREEN_SIZE.height * 4);
     Matrix4f lightSpaceMatrix;
     VertexArray vaDisplayShadowMap = new VertexArray();
     ShaderProgram displayShadowMapShader = new ShaderProgram();
@@ -91,7 +93,7 @@ public class Example3d extends GameBase {
         Renderer.setStencilOperation(GL_KEEP, GL_KEEP, GL_REPLACE);
         Renderer.useDefaultFaceCulling();
         Renderer.enableFramebufferGamma();
-        glViewport(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
+        Renderer.setViewportSize(SCREEN_SIZE.width, SCREEN_SIZE.height);
 
         bindEvents();
         setupBuffers();
@@ -194,7 +196,7 @@ public class Example3d extends GameBase {
         shadowMapShader.autoInitializeShadersMulti("shaders/3d_shadow_map.glsl");
         shadowMapShader.uniformMatrix4f("lightSpaceMatrix", lightSpaceMatrix);
         shadowMap.genId();
-        Texture depthMap = shadowMap.setupDefaultDepthBuffer();
+        Texture depthMap = FrameBuffer.setupDefaultDepthBuffer(SHADOW_MAP_SIZE);
         depthMap.useNearestInterpolation();
         depthMap.useRepeatWrap();
         shadowMap.attachDepthBuffer(depthMap);
@@ -230,6 +232,9 @@ public class Example3d extends GameBase {
 
         model3.loadModel("res/models/bloxycola/cola.obj", true);
         model3.modelTransform.translate(2, .8f, 0).rotateY(2.1f);
+
+        model4.loadModel("res/models/miku/miku_prefab.fbx", true);
+        model4.modelTransform.translate(-3, 0, 2.5f).rotateY(1.2f);
 
         lightRed.setColourValues(new Vector3f(1, 0, 0), new Vector3f(.8f, 0, 0), new Vector3f());
         lightBlue.setColourValues(new Vector3f(0, 0, 1), new Vector3f(0, 0, .8f), new Vector3f());
@@ -270,6 +275,7 @@ public class Example3d extends GameBase {
 
         // --- SHADOW MAP --- //
         shadowMap.bind();
+        Renderer.setViewportSize(SHADOW_MAP_SIZE.width, SHADOW_MAP_SIZE.height);
         Renderer.clearD();
         Renderer.enableDepthTest();
         Renderer.cullFrontFace();
@@ -278,7 +284,9 @@ public class Example3d extends GameBase {
         model.draw(shadowMapShader);
         model2.draw(shadowMapShader);
         model3.draw(shadowMapShader);
+        model4.draw(shadowMapShader);
         FrameBuffer.unbind();
+        Renderer.setViewportSize(SCREEN_SIZE.width, SCREEN_SIZE.height);
 
         // --- 3D SPACE --- //
         fb.bind();
@@ -314,6 +322,7 @@ public class Example3d extends GameBase {
         model.draw(modelShader);
         model2.draw(modelShader);
         model3.draw(modelShader);
+        model4.draw(modelShader);
 
         // light sources
         shLightSource.bind();

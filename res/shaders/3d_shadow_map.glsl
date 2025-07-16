@@ -8,7 +8,7 @@ layout(location = 3) in ivec4 boneIds;
 layout(location = 4) in vec4 boneWeights;
 layout(location = 5) in int isStatic;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 200;
 const int MAX_BONE_INFLUENCE = 4;
 
 uniform mat4 lightSpaceMatrix;
