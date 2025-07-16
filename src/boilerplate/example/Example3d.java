@@ -68,7 +68,7 @@ public class Example3d extends GameBase {
     Model model4 = new Model();
     Model modelFloor = new Model();
 
-    Dimension SHADOW_MAP_SIZE = new Dimension(SCREEN_SIZE.width * 4, SCREEN_SIZE.height * 4);
+    Dimension SHADOW_MAP_SIZE = new Dimension(SCREEN_SIZE.width * 2, SCREEN_SIZE.height * 2);
     Matrix4f lightSpaceMatrix;
     VertexArray vaDisplayShadowMap = new VertexArray();
     ShaderProgram displayShadowMapShader = new ShaderProgram();
