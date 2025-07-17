@@ -286,7 +286,7 @@ public class Example3d extends GameBase {
         Renderer.enableDepthTest();
         Renderer.cullFrontFace();
         modelFloor.draw(shadowMapShader);
-        Renderer.disableFaceCulling();
+        Renderer.cullBackFace();
         model.draw(shadowMapShader);
         model2.draw(shadowMapShader);
         model3.draw(shadowMapShader);

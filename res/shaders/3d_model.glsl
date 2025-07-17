@@ -179,7 +179,7 @@ float calcShadow(vec3 normal, vec3 lightDir) {
     projCoords = projCoords * 0.5 + 0.5;
     for (int i = 0; i < 9; i++) {
         float pcfDepth = texture(shadowMap, projCoords.xy + SHADOW_MAP_OFFSETS[i]).r;
-        shadow += projCoords.z - SHADOW_BIAS > pcfDepth ? .8 : 0;
+        shadow += projCoords.z - SHADOW_BIAS > pcfDepth ? .6 : 0;
     }
     return shadow / 9;
 }
