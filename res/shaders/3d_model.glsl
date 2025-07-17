@@ -100,6 +100,19 @@ vec3 calcSpotLight(vec3 normal, vec3 diffuseTexture);
 vec3 calcLighting(float attenuation, vec3 viewDir, vec3 lightDir, vec3 normal, vec3 diffuseTexture, vec3 lightAmbient, vec3 lightDiffuse, vec3 lightSpecular);
 
 const int LIGHT_COUNT = 2;
+const float SHADOW_BIAS = .001;
+const float SHADOW_MAP_TEXEL_SIZE = 1.0 / (800.0 * 2);
+const vec2 SHADOW_MAP_OFFSETS[9] = vec2[](
+    vec2(-SHADOW_MAP_TEXEL_SIZE,  SHADOW_MAP_TEXEL_SIZE), // top-left
+    vec2( 0.0f,       SHADOW_MAP_TEXEL_SIZE), // top-center
+    vec2( SHADOW_MAP_TEXEL_SIZE,  SHADOW_MAP_TEXEL_SIZE), // top-right
+    vec2(-SHADOW_MAP_TEXEL_SIZE,  0.0f),   // center-left
+    vec2( 0.0f,       0.0f),   // center-center
+    vec2( SHADOW_MAP_TEXEL_SIZE,  0.0f),   // center-right
+    vec2(-SHADOW_MAP_TEXEL_SIZE, -SHADOW_MAP_TEXEL_SIZE), // bottom-left
+    vec2( 0.0f,      -SHADOW_MAP_TEXEL_SIZE), // bottom-center
+    vec2( SHADOW_MAP_TEXEL_SIZE, -SHADOW_MAP_TEXEL_SIZE)  // bottom-right
+);
 
 uniform Material material;
 uniform PointLight lights[LIGHT_COUNT];
@@ -161,19 +174,14 @@ vec3 calcSpotLight(vec3 normal, vec3 diffuseTexture) {
 }
 
 float calcShadow(vec3 normal, vec3 lightDir) {
+    float shadow = 0;
     vec3 projCoords = v_fragPosLightSpace.xyz / v_fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
-    float lightDepth = texture(shadowMap, projCoords.xy).r;
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-    for(int x = -1; x <= 1; ++x) {
-        for(int y = -1; y <= 1; ++y) {
-            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += projCoords.z - .001 > pcfDepth ? .8 : 0;
-        }
+    for (int i = 0; i < 9; i++) {
+        float pcfDepth = texture(shadowMap, projCoords.xy + SHADOW_MAP_OFFSETS[i]).r;
+        shadow += projCoords.z - SHADOW_BIAS > pcfDepth ? .8 : 0;
     }
-    shadow /= 9.0;
-    return shadow;
+    return shadow / 9;
 }
 
 vec3 calcLighting(float attenuation, vec3 viewDir, vec3 lightDir, vec3 normal, vec3 diffuseTexture, vec3 lightAmbient, vec3 lightDiffuse, vec3 lightSpecular) {

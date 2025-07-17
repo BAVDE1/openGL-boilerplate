@@ -227,11 +227,11 @@ public class Example3d extends GameBase {
         modelFloor.modelTransform.translate(0, -6, 1).scale(10);
 
         model.loadModel("res/models/roblox/scene.gltf", true);
-        model.modelTransform.translate(-2, -.5f, 1).rotateY(1);
+        model.modelTransform.translate(-2, -1f, 1).rotateY(1);
         model.setupBoneRendering(camera);
 
         model2.loadModel("res/models/guard/scene.md5mesh", true);
-        model2.modelTransform.scale(.03f).translate(0, -20, -40);
+        model2.modelTransform.scale(.03f).translate(0, -33, -40);
         model2.setupBoneRendering(camera);
 
         model3.loadModel("res/models/bloxycola/cola.obj", true);
