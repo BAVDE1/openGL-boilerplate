@@ -402,13 +402,17 @@ public class Model {
     }
 
     public void draw(ShaderProgram shaderProgram) {
+        draw(shaderProgram, modelTransform);
+    }
+
+    public void draw(ShaderProgram shaderProgram, Matrix4f modelTransformOverride) {
         shaderProgram.bind();
 
         for (int i = 0; i < boneCounter; i++) {
             shaderProgram.uniformMatrix4f(boneMatrixUniform + "[%s]".formatted(i), animator.finalBoneMatrices[i]);
         }
 
-        shaderProgram.uniformMatrix4f(modelUniform, modelTransform);
+        shaderProgram.uniformMatrix4f(modelUniform, modelTransformOverride);
         for (Mesh mesh : meshes) mesh.draw(shaderProgram);
         GL45.glActiveTexture(GL45.GL_TEXTURE0);
         if (renderBones) renderBones();

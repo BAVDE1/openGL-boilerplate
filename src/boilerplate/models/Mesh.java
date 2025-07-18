@@ -31,6 +31,8 @@ public class Mesh {
 
     public int renderMode = GL45.GL_TRIANGLES;
 
+    private boolean hasUniformedValues = false;
+
     public Mesh(VertexLayout vertexLayout) {
         this.vertexLayout = vertexLayout;
     }
@@ -119,8 +121,10 @@ public class Mesh {
     }
 
     public void draw(ShaderProgram sh) {
-        material.uniformValues("material", sh);  // todo: only needs to call once
-        material.uniformAndBindTextures("material", sh);  // todo ^
+        if (!hasUniformedValues) {
+            material.uniformValues("material", sh);
+            material.uniformAndBindTextures("material", sh);
+        }
         Renderer.drawElements(renderMode, va, veb, indicesCount);
     }
 }

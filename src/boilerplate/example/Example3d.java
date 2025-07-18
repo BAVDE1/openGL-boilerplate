@@ -67,6 +67,8 @@ public class Example3d extends GameBase {
     Model model3 = new Model();
     Model model4 = new Model();
     Model modelFloor = new Model();
+    Matrix4f modelFloorTrans1 = new Matrix4f().translate(-6, 1, 1).scale(4, 4, 10);
+    Matrix4f modelFloorTrans2 = new Matrix4f().translate(6, 1, 1).scale(4, 4, 10);
 
     Dimension SHADOW_MAP_SIZE = new Dimension(SCREEN_SIZE.width * 2, SCREEN_SIZE.height * 2);
     Matrix4f lightSpaceMatrix;
@@ -267,6 +269,7 @@ public class Example3d extends GameBase {
         spotLight.uniformValues("spotLight", modelShader);
 
         model3.modelTransform.setRotationXYZ(0, 0, 0).rotateY((float) glfwGetTime());
+        model4.modelTransform.setRotationXYZ(0, 0, 0).rotateY((float) glfwGetTime());
     }
 
     public void render() {
@@ -286,6 +289,8 @@ public class Example3d extends GameBase {
         Renderer.enableDepthTest();
         Renderer.cullFrontFace();
         modelFloor.draw(shadowMapShader);
+        modelFloor.draw(shadowMapShader, modelFloorTrans1);
+        modelFloor.draw(shadowMapShader, modelFloorTrans2);
         Renderer.cullBackFace();
         model.draw(shadowMapShader);
         model2.draw(shadowMapShader);
@@ -325,6 +330,8 @@ public class Example3d extends GameBase {
         modelShader.uniform3f("viewPos", camera.getPos());
         modelShader.uniformTexture("shadowMap", shadowMap.depthBuffer, 0);
         modelFloor.draw(modelShader);
+        modelFloor.draw(modelShader, modelFloorTrans1);
+        modelFloor.draw(modelShader, modelFloorTrans2);
         model.draw(modelShader);
         model2.draw(modelShader);
         model3.draw(modelShader);

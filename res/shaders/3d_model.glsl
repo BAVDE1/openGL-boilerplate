@@ -101,7 +101,7 @@ vec3 calcLighting(float attenuation, vec3 viewDir, vec3 lightDir, vec3 normal, v
 
 const int LIGHT_COUNT = 2;
 const float SHADOW_BIAS = .001;
-const float SHADOW_MAP_TEXEL_SIZE = 1.0 / (800.0 * 2);
+const float SHADOW_MAP_TEXEL_SIZE = 1.0 / (1000.0 * 2);
 const vec2 SHADOW_MAP_OFFSETS[9] = vec2[](
     vec2(-SHADOW_MAP_TEXEL_SIZE,  SHADOW_MAP_TEXEL_SIZE), // top-left
     vec2( 0.0f,       SHADOW_MAP_TEXEL_SIZE), // top-center
