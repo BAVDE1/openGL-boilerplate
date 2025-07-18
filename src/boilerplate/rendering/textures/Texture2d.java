@@ -47,15 +47,19 @@ public class Texture2d extends Texture {
 
     public Texture2d(String path) {
         this();
-        Image image = Image.loadImageFromPathSTB(path);
-        size = new Dimension(image.width, image.height);
-        loadedPath = path;
-        createTextureFromImage(image);
+        createTextureFromPath(path);
     }
 
     public Texture2d(BufferedImage buffImg) {
         this();
         createTextureFromImgBuff(buffImg);
+    }
+
+    public void createTextureFromPath(String path) {
+        Image image = Image.loadImageFromPathSTB(path);
+        size = new Dimension(image.width, image.height);
+        loadedPath = path;
+        createTextureFromImage(image);
     }
 
     public void createTextureFromImgBuff(BufferedImage buffImg) {
